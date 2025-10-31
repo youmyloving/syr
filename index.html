@@ -1096,7 +1096,7 @@
             payload.total = grandTotal;
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
-                        await axios.post('https://puzzlebot-webhook-handler1.onrender.com/', { 
+                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', { 
                             data: payload,  
                          });
                         window.Telegram.WebApp.close();
