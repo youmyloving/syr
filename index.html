@@ -1097,7 +1097,11 @@
             
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
-                    axios.post('https://puzzlebot-webhook-handler1.onrender.com/',  payload )
+                    axios.post('https://puzzlebot-webhook-handler1.onrender.com/',  {
+                                    data {
+                                        id : 1,
+                                    },        
+                                })
                               .then(function (response) {
                                 alert('все ок тест', response);
                               })
