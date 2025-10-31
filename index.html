@@ -468,7 +468,7 @@
             <!-- Cart items will be rendered here -->
         </div>
     </dialog>
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB';
@@ -1092,7 +1092,12 @@
                 });
             });
             payload.total = grandTotal;
-
+            axios({
+                  method: 'post',
+                  url: 'https://puzzlebot-webhook-handler1.onrender.com/',
+                  data: payload,
+                });
+            alert('все ок');
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
                     window.Telegram.WebApp.sendData(JSON.stringify(payload));
