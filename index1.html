@@ -77,6 +77,9 @@
         .error-message.show { display: block; }
         .success-message { color: var(--success-color); font-size: 14px; margin-top: 5px; text-align: center; display: none; }
         .success-message.show { display: block; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .loading-spinner { width: 50px; height: 50px; border: 5px solid var(--border-color); border-top: 5px solid var(--button-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -91,6 +94,10 @@
         </header>
         <main><div id="product-grid" class="product-grid"></div></main>
         <footer class="cart-footer"><button id="open-cart-btn" disabled>Корзина пуста</button></footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
     </div>
 
     <dialog id="product-modal">
@@ -119,7 +126,6 @@
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB', ROUND = Math.round, DISCOUNT_THRESHOLDS = [{ g: 1000, rate: 0.15 }, { g: 700, rate: 0.10 }, { g: 500, rate: 0.05 }];
         const PAYLOAD_SCHEMA_VERSION = 'v1';
-        const WEBHOOK_URL = 'https://puzzlebot-webhook-handler1.onrender.com';
         const PRODUCTS = [
             { id: 'panir-classic', name: 'Панир Классический', cat: 'Сыры', pricePerKg: 1200, ico: '🧀', description: 'Нежный свежий сыр.' },
             { id: 'panir-herbs', name: 'Панир С зеленью', cat: 'Сыры', pricePerKg: 1300, ico: '🌿', description: 'С ароматными травами.' },
@@ -430,99 +436,24 @@
             let applicableDiscount = 0;
             for (const threshold of DISCOUNT_THRESHOLDS) { if (totalWeightGrams >= threshold.g) { applicableDiscount = threshold.rate; } }
             return applicableDiscount;
-        // --- ORDER SUBMISSION (ИЗМЕНЕННЫЙ КОД С ДИАГНОСТИКОЙ) ---
-function sendOrder() {
-    if (cart.length === 0) return;
-    
-    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    
-    const payload = {
-        type: "cart", 
-        source: "miniapp", 
-        currency: CURRENCY, 
-        items: [], 
-        total: 0,
-        contact: orderDetails,
-        user: user ? {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name || '',
-            username: user.username || ''
-        } : null,
-        meta: { 
-            ts: Date.now(), 
-            schema_ver: PAYLOAD_SCHEMA_VERSION 
         }
-    };
-    
-    let grandTotal = 0;
-    cart.forEach(item => {
-        const price = calculatePrice(item.id, item.variant, item.qty); grandTotal += price.finalPrice;
-        payload.items.push({
-            id: item.id, 
-            name: item.name, 
-            cat: item.cat, 
-            variant: item.variant, 
-            qty: item.qty,
-            unit_price_base: price.basePrice / item.qty, 
-            discount_rate: price.discountRate,
-            unit_price: price.finalPrice / item.qty, 
-            line_total: price.finalPrice
-        });
-    });
-    payload.total = grandTotal;
 
-    const btn = document.getElementById('finalize-order-btn');
-    btn.disabled = true; 
-    btn.textContent = 'Отправка...';
-
-    // --- ДИАГНОСТИКА: Логируем, что отправляем ---
-    console.log("Attempting to send payload to:", WEBHOOK_URL);
-    console.log("Payload:", JSON.stringify(payload, null, 2));
-
-    fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(response => {
-        // --- ДИАГНОСТИКА: Логируем ответ сервера ---
-        console.log("Full server response received:", response);
-
-        if (!response.ok) {
-            // Пробуем получить текст ошибки от сервера, если он его прислал
-            return response.text().then(errorText => {
-                console.error("Server responded with error:", errorText);
-                throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}. Ответ: ${errorText}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Order sent successfully. Server response:', data);
-        document.getElementById('success-message').classList.add('show');
-        btn.textContent = 'Заказ отправлен';
-        
-        cart = [];
-        saveState();
-        updateCartUI();
-        
-        setTimeout(() => {
-            closeCheckoutModal();
-            btn.disabled = false;
-            btn.textContent = 'Отправить заказ';
-        }, 2000);
-    })
-    .catch(error => {
-        // --- ДИАГНОСТИКА: Логируем фатальную ошибку ---
-        console.error('Fetch failed:', error);
-        alert(`Не удалось отправить заказ. Ошибка: ${error.message}. Подробности в консоли разработчика (F12).`);
-        btn.disabled = false;
-        btn.textContent = 'Отправить заказ';
-    });
-}
+        // --- ORDER SUBMISSION (ИСПРАВЛЕННЫЙ КОД) ---
+        function sendOrder() {
+            if (cart.length === 0) return;
+            
+            const payload = {
+                type: "cart", 
+                source: "miniapp", 
+                currency: CURRENCY, 
+                items: [], 
+                total: 0,
+                contact: orderDetails,
+                meta: { 
+                    ts: Date.now(), 
+                    schema_ver: PAYLOAD_SCHEMA_VERSION 
+                }
+            };
             
             let grandTotal = 0;
             cart.forEach(item => {
@@ -541,47 +472,43 @@ function sendOrder() {
             });
             payload.total = grandTotal;
 
-            const btn = document.getElementById('finalize-order-btn');
-            btn.disabled = true; 
-            btn.textContent = 'Отправка...';
-
-            // Отправка данных через вебхук
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            // Показываем индикатор загрузки
+            document.getElementById('loading-overlay').style.display = 'flex';
+            
+            // Используем нативный метод Telegram WebApp для отправки данных
+            if (window.Telegram?.WebApp) {
+                try {
+                    Telegram.WebApp.sendData(JSON.stringify(payload));
+                    
+                    // Добавляем обработчик события закрытия
+                    Telegram.WebApp.onEvent('webAppDataSent', () => {
+                        console.log("Данные успешно отправлены через Telegram");
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        
+                        // Очищаем корзину после успешной отправки
+                        cart = [];
+                        saveState();
+                        updateCartUI();
+                        
+                        // Показываем сообщение об успехе
+                        document.getElementById('success-message').classList.add('show');
+                        
+                        // Закрываем модальное окно через 2 секунды
+                        setTimeout(() => {
+                            closeCheckoutModal();
+                            document.getElementById('success-message').classList.remove('show');
+                        }, 2000);
+                    });
+                } catch (e) {
+                    console.error("Ошибка при отправке данных:", e);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.`);
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Order sent successfully:', data);
-                document.getElementById('success-message').classList.add('show');
-                btn.textContent = 'Заказ отправлен';
-                
-                // Очищаем корзину после успешной отправки
-                cart = [];
-                saveState();
-                updateCartUI();
-                
-                // Закрываем модальное окно через 2 секунды
-                setTimeout(() => {
-                    closeCheckoutModal();
-                    btn.disabled = false;
-                    btn.textContent = 'Отправить заказ';
-                }, 2000);
-            })
-            .catch(error => {
-                console.error('Error sending order:', error);
-                alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.`);
-                btn.disabled = false;
-                btn.textContent = 'Отправить заказ';
-            });
+            } else {
+                document.getElementById('loading-overlay').style.display = 'none';
+                alert(`Данные заказа (вне Telegram):\n\n${JSON.stringify(payload, null, 2)}`);
+                console.log("Order Payload:", payload);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);
