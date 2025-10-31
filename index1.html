@@ -75,6 +75,8 @@
         .cart-summary { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border-color); font-size: 18px; font-weight: 500; text-align: right; }
         .error-message { color: var(--error-color); font-size: 14px; margin-top: 5px; display: none; }
         .error-message.show { display: block; }
+        .success-message { color: var(--success-color); font-size: 14px; margin-top: 5px; text-align: center; display: none; }
+        .success-message.show { display: block; }
     </style>
 </head>
 <body>
@@ -117,6 +119,7 @@
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB', ROUND = Math.round, DISCOUNT_THRESHOLDS = [{ g: 1000, rate: 0.15 }, { g: 700, rate: 0.10 }, { g: 500, rate: 0.05 }];
         const PAYLOAD_SCHEMA_VERSION = 'v1';
+        const WEBHOOK_URL = 'https://puzzlebot-webhook-handler1.onrender.com';
         const PRODUCTS = [
             { id: 'panir-classic', name: 'Панир Классический', cat: 'Сыры', pricePerKg: 1200, ico: '🧀', description: 'Нежный свежий сыр.' },
             { id: 'panir-herbs', name: 'Панир С зеленью', cat: 'Сыры', pricePerKg: 1300, ico: '🌿', description: 'С ароматными травами.' },
@@ -224,13 +227,6 @@
         function init() {
             try {
                 loadState(); setupEventListeners(); setupTelegramWebApp(); renderUserProfile(); populateCategoryFilter(); filterAndSearchProducts(); updateCartUI();
-                // !!! КРИТИЧЕСКОЕ ИЗМЕНЕНИЕ: УСТАНАВЛИВКА ОБРАБОТЧИКА ОТПРАВКИ ОДИН РАЗ
-                if (window.Telegram?.WebApp) {
-                    Telegram.WebApp.onEvent('webAppDataSent', () => {
-                        console.log("Telegram confirmed data sent. Closing app.");
-                        Telegram.WebApp.close();
-                    });
-                }
             } catch (e) { console.error("Init error:", e); document.getElementById('product-grid').innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Ошибка загрузки. Обновите страницу.</p>`; }
         }
         function loadState() { try { const savedCart = localStorage.getItem('syromania-cart'); if (savedCart) cart = JSON.parse(savedCart); } catch (e) { console.warn("localStorage unavailable."); cart = []; } }
@@ -375,6 +371,7 @@
                 <div class="form-group"><label for="checkout-address">Адрес доставки</label><textarea id="checkout-address" placeholder="Улица, дом, квартира">${orderDetails.address}</textarea><div class="error-message" id="address-error">Пожалуйста, введите адрес доставки.</div></div>
                 <div class="form-group"><label for="checkout-payment">Способ оплаты</label><select id="checkout-payment"><option value="" disabled selected>Выберите способ</option><option value="card" ${orderDetails.payment === 'card' ? 'selected' : ''}>Картой онлайн</option><option value="cash" ${orderDetails.payment === 'cash' ? 'selected' : ''}>Наличными при получении</option></select><div class="error-message" id="payment-error">Пожалуйста, выберите способ оплаты.</div></div>
                 <button class="btn btn-primary" id="finalize-order-btn">Отправить заказ</button>
+                <div class="success-message" id="success-message">Заказ успешно отправлен!</div>
             `;
             document.getElementById('finalize-order-btn').onclick = finalizeOrder;
         }
@@ -383,6 +380,7 @@
             const address = document.getElementById('checkout-address').value.trim();
             const payment = document.getElementById('checkout-payment').value;
             document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.getElementById('success-message').classList.remove('show');
             let hasError = false;
             if (!phone || !/^[\d\s\-\+\(\)]+$/.test(phone)) { document.getElementById('phone-error').classList.add('show'); hasError = true; }
             if (!address) { document.getElementById('address-error').classList.add('show'); hasError = true; }
@@ -434,44 +432,90 @@
             return applicableDiscount;
         }
 
-        // --- ORDER SUBMISSION (THE CRITICAL FIX) ---
+        // --- ORDER SUBMISSION (ИЗМЕНЕННЫЙ КОД) ---
         function sendOrder() {
             if (cart.length === 0) return;
+            
+            // Добавляем информацию о пользователе из Telegram
+            const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            
             const payload = {
-                type: "cart", source: "miniapp", currency: CURRENCY, items: [], total: 0,
+                type: "cart", 
+                source: "miniapp", 
+                currency: CURRENCY, 
+                items: [], 
+                total: 0,
                 contact: orderDetails,
-                meta: { ts: Date.now(), schema_ver: PAYLOAD_SCHEMA_VERSION }
+                user: user ? {
+                    id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name || '',
+                    username: user.username || ''
+                } : null,
+                meta: { 
+                    ts: Date.now(), 
+                    schema_ver: PAYLOAD_SCHEMA_VERSION 
+                }
             };
+            
             let grandTotal = 0;
             cart.forEach(item => {
                 const price = calculatePrice(item.id, item.variant, item.qty); grandTotal += price.finalPrice;
                 payload.items.push({
-                    id: item.id, name: item.name, cat: item.cat, variant: item.variant, qty: item.qty,
-                    unit_price_base: price.basePrice / item.qty, discount_rate: price.discountRate,
-                    unit_price: price.finalPrice / item.qty, line_total: price.finalPrice
+                    id: item.id, 
+                    name: item.name, 
+                    cat: item.cat, 
+                    variant: item.variant, 
+                    qty: item.qty,
+                    unit_price_base: price.basePrice / item.qty, 
+                    discount_rate: price.discountRate,
+                    unit_price: price.finalPrice / item.qty, 
+                    line_total: price.finalPrice
                 });
             });
             payload.total = grandTotal;
 
             const btn = document.getElementById('finalize-order-btn');
-            btn.disabled = true; btn.textContent = 'Отправка...';
+            btn.disabled = true; 
+            btn.textContent = 'Отправка...';
 
-            // !!! ВАЖНО: УДАЛЕННЫЙ ВЫЗОВ ОТЛАВКИ
-            console.log("Attempting to send payload:", payload);
-
-            if (window.Telegram?.WebApp) {
-                try {
-                    Telegram.WebApp.sendData(JSON.stringify(payload));
-                } catch (e) {
-                    console.error("Failed to send data:", e);
-                    alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.`);
-                    btn.disabled = false; btn.textContent = 'Отправить заказ';
+            // Отправка данных через вебхук
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            } else {
-                alert(`Данные заказа (вне Telegram):\n\n${JSON.stringify(payload, null, 2)}`);
-                console.log("Order Payload:", payload);
-                btn.disabled = false; btn.textContent = 'Отправить заказ';
-            }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Order sent successfully:', data);
+                document.getElementById('success-message').classList.add('show');
+                btn.textContent = 'Заказ отправлен';
+                
+                // Очищаем корзину после успешной отправки
+                cart = [];
+                saveState();
+                updateCartUI();
+                
+                // Закрываем модальное окно через 2 секунды
+                setTimeout(() => {
+                    closeCheckoutModal();
+                    btn.disabled = false;
+                    btn.textContent = 'Отправить заказ';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error sending order:', error);
+                alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.`);
+                btn.disabled = false;
+                btn.textContent = 'Отправить заказ';
+            });
         }
 
         document.addEventListener('DOMContentLoaded', init);
