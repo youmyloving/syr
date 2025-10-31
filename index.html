@@ -1092,12 +1092,10 @@
                 });
             });
             payload.total = grandTotal;
+            alert(payload);
 try {
-
-    
-  if (window.Telegram?.WebApp) {
     axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-      data: payload
+      data: payload,
     })
       .then(function (response) {
         console.log('Успешный ответ от сервера:', response);
