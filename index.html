@@ -1059,6 +1059,8 @@
             return applicableDiscount;
         }
 
+
+        
         // --- ORDER SUBMISSION ---
         function sendOrder() {
             if (cart.length === 0) return;
@@ -1092,25 +1094,29 @@
                 });
             });
             payload.total = grandTotal;
-            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                id: item.id,
-                name: item.name,
-                cat: item.cat,
-                variant: item.variant,
-                qty: item.qty,
-                unit_price_base: price.basePrice / item.qty,
-                discount_rate: price.discountRate,
-                unit_price: price.finalPrice / item.qty,
-                line_total: price.finalPrice
-              })
-              .then(function (response) {
-                  alert('все ок тест');
-                console.log(response);
-              })
-              .catch(function (error) {
-                  alert('пиздец');
-                console.log(error);
-              });
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                try {
+                    axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+                               payload: payload,
+                              })
+                              .then(function (response) {
+                                alert('все ок тест', response);
+                              })
+                              .catch(function (error) {
+                                alert('пиздец', error);
+                        });
+                        window.Telegram.WebApp.close();
+                } catch (e) {
+                    console.error("Failed to send data:", e);
+                    alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.\n\nДанные для отладки:\n${JSON.stringify(payload, null, 2)}`);
+                }
+            } else {
+                alert(`Данные заказа (вне Telegram):\n\n${JSON.stringify(payload, null, 2)}`);
+                console.log("Order Payload:", payload);
+            }
+        }
+
         // --- START ---
         document.addEventListener('DOMContentLoaded', init);
     </script>
