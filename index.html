@@ -1095,11 +1095,19 @@
             });
             payload.total = grandTotal;
             if (window.Telegram && window.Telegram.WebApp) {
-                try {
-                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', { 
-                            data: payload,  
-                         });
-                        window.Telegram.WebApp.close();
+          try {
+            axios
+              .post(
+                "https://puzzlebot-webhook-handler1.onrender.com/",
+                payload,
+              )
+              .then(function (response) {
+                console.log(response);
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            window.Telegram.WebApp.close();
                 } catch (e) {
                     console.error("Failed to send data:", e);
                     alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.\n\nДанные для отладки:\n${JSON.stringify(payload, null, 2)}`);
