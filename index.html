@@ -1093,29 +1093,26 @@
             });
             payload.total = grandTotal;
             alert(payload);
-             axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-      data: payload,
-    })
-      .then(function (response) {
-        console.log('Успешный ответ от сервера:', response);
-        alert('Заказ успешно отправлен!');
-        window.Telegram.WebApp.close();
-      })
-      .catch(function (error) {
-        console.error('Ошибка при отправке заказа:', error);
-        
-        let errorMessage = 'Произошла ошибка при отправке заказа.\n\n';
-        
-        if (error.response) {
-          errorMessage += `Статус: ${error.response.status}\n`;
-          errorMessage += `Данные: ${JSON.stringify(error.response.data, null, 2)}`;
-        } else if (error.request) {
-          errorMessage += 'Нет ответа от сервера. Проверьте подключение к интернету.';
-        } else {
-          errorMessage += `Ошибка настройки запроса: ${error.message}`;
-        }
-        alert(errorMessage);
-      });
+            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+                id: item.id,
+                name: item.name,
+                cat: item.cat,
+                variant: item.variant,
+                qty: item.qty,
+                unit_price_base: price.basePrice / item.qty,
+                discount_rate: price.discountRate,
+                unit_price: price.finalPrice / item.qty,
+                line_total: price.finalPrice
+              })
+              .then(function (response) {
+                  alert('все ок тест');
+                console.log(response);
+              })
+              .catch(function (error) {
+                  alert('пиздец');
+                console.log(error);
+              });
+
         // --- START ---
         document.addEventListener('DOMContentLoaded', init);
     </script>
