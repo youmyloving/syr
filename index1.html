@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Сыромания</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- axios для отправки на вебхук -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         :root {
             --bg-color: #ffffff; --text-color: #000000; --hint-color: #999999; --link-color: #2481cc;
@@ -117,7 +119,7 @@
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB', ROUND = Math.round, DISCOUNT_THRESHOLDS = [{ g: 1000, rate: 0.15 }, { g: 700, rate: 0.10 }, { g: 500, rate: 0.05 }];
         const PAYLOAD_SCHEMA_VERSION = 'v1';
-        const WEBHOOK_URL = 'https://puzzlebot-webhook-handler1.onrender.com'; // 🔗 прямой вебхук
+        const WEBHOOK_URL = 'https://puzzlebot-webhook-handler1.onrender.com'; // прямой вебхук
 
         const PRODUCTS = [
             { id: 'panir-classic', name: 'Панир Классический', cat: 'Сыры', pricePerKg: 1200, ico: '🧀', description: 'Нежный свежий сыр.' },
@@ -198,7 +200,7 @@
             'suluguni': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 }, 'suluguni-smoked': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
             'imeretian': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 }, 'imeretian-dill-garlic': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
             'halloumi': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] }, 'halloumi-paprika-oregano': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] }, 'halloumi-tomato-basil-garlic': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] }, 'halloumi-tomato-paprika': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] },
-            'kosichka': { type: 'fixed', options: ['1 шт (200 г)'] }, 'kosichka-smoked': { type: 'fixed', options: ['1 шт (200 г)'] }, 'spicy-klubok': { type: 'fixed', options: ['1 шт (150 г)'] },
+            'kosichka': { type: 'fixed', options: ['1 шт (200 г)'] }, 'kosichka-smoked': { type: 'fixed', options: ['1 шт (200 г)'] }, 'spicy-klubок': { type: 'fixed', options: ['1 шт (150 г)'] },
             'mozzarella': { type: 'fixed', options: ['1 шт (200 г)'] }, 'buratta': { type: 'fixed', options: ['1 шт (250 г)'] }, 'stracciatella': { type: 'fixed', options: ['200 г', '250 г', '300 г', '500 г'] },
             'ricotta': { type: 'fixed', options: ['200 г', '250 г', '300 г', '450 г'] }, 'ricotta-herbs': { type: 'fixed', options: ['200 г', '250 г', '300 г', '450 г'] },
             'caciotta': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 }, 'caciotta-fenugreek': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
@@ -207,7 +209,7 @@
             'milk': { type: 'fixed', options: ['0.5 л', '1 л'] }, 'milk-topped': { type: 'fixed', options: ['0.5 л', '1 л'] }, 'yogurt': { type: 'fixed', options: ['0.5 л', '1 л'] }, 'ryazhenka': { type: 'fixed', options: ['0.5 л', '1 л'] }, 'whey': { type: 'fixed', options: ['1 л'] },
             'cream': { type: 'fixed', options: ['0.2 л', '0.5 л', '1 л'] }, 'tvorog': { type: 'weight', unit: 'г', step: 500, min: 500, max: 2000 }, 'butter': { type: 'fixed', options: ['1 шт (200 г)'] }, 'ghee': { type: 'fixed', options: ['200 г', '500 г', '1000 г'] },
             'condensed-milk': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 }, 'tvorozhnaya-massa': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
-            'cookies-tvorog': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'cookies-oat': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'cookies-nut': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
+            'cookies-tворог': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'cookies-oat': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'cookies-nut': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
             'cookies-carob': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'cookies-sandy': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
             'muffin-plain': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'muffin-carob': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 }, 'muffin-raisin': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
             'muffin-mix-plain-raisin': { type: 'fixed', options: ['0.5 кг'] }, 'muffin-mix-plain-carob': { type: 'fixed', options: ['0.5 кг'] }, 'muffin-mix-raisin-carob': { type: 'fixed', options: ['0.5 кг'] },
@@ -232,7 +234,10 @@
                         Telegram.WebApp.close();
                     });
                 }
-            } catch (e) { console.error("Init error:", e); document.getElementById('product-grid').innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Ошибка загрузки. Обновите страницу.</p>`; }
+            } catch (e) {
+                console.error("Init error:", e);
+                document.getElementById('product-grid').innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Ошибка загрузки. Обновите страницу.</p>`;
+            }
         }
         function loadState() { try { const savedCart = localStorage.getItem('syromania-cart'); if (savedCart) cart = JSON.parse(savedCart); } catch (e) { console.warn("localStorage unavailable."); cart = []; } }
         function saveState() { try { localStorage.setItem('syromania-cart', JSON.stringify(cart)); } catch (e) { console.warn("Could not save state."); } }
@@ -264,8 +269,10 @@
         function renderUserProfile() {
             const profileContainer = document.getElementById('user-profile');
             let user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-            if (user) { profileContainer.innerHTML = `<div class="user-avatar"><img src="${user.photo_url}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;">${user.first_name?.charAt(0)?.toUpperCase?.() || ''}</span></div><div class="user-name">${user.first_name || ''}</div>`; }
-            else { profileContainer.style.display = 'none'; }
+            if (user) {
+                profileContainer.innerHTML =
+                    `<div class="user-avatar"><img src="${user.photo_url}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;">${user.first_name?.charAt(0)?.toUpperCase?.() || ''}</span></div><div class="user-name">${user.first_name || ''}</div>`;
+            } else { profileContainer.style.display = 'none'; }
         }
         function populateCategoryFilter() {
             const categories = [...new Set(PRODUCTS.map(p => p.cat))].sort();
@@ -396,25 +403,42 @@
         // --- CALCULATIONS ---
         function parseVariant(variantString) {
             const match = variantString.match(/(\d+(?:\.\d+)?)\s*(г|кг|л|шт)/i);
-            if (match) { const value = parseFloat(match[1]); let unit = match[2].toLowerCase(); if (unit === 'г') return { value, unit: 'g' }; if (unit === 'кг') return { value, unit: 'kg' }; if (unit === 'л') return { value, unit: 'l' }; if (unit === 'шт') return { value, unit: 'pc' }; }
+            if (match) {
+                const value = parseFloat(match[1]); let unit = match[2].toLowerCase();
+                if (unit === 'г') return { value, unit: 'g' };
+                if (unit === 'кг') return { value, unit: 'kg' };
+                if (unit === 'л') return { value, unit: 'l' };
+                if (unit === 'шт') return { value, unit: 'pc' };
+            }
             const specialMatch = variantString.match(/(\d+(?:\.\d+)?)\+\s*(кг|л)/i);
-            if (specialMatch) { const value = parseFloat(specialMatch[1]); const unit = specialMatch[2].toLowerCase(); if (unit === 'кг') return { value, unit: 'kg' }; if (unit === 'л') return { value, unit: 'l' }; }
+            if (specialMatch) {
+                const value = parseFloat(specialMatch[1]); const unit = specialMatch[2].toLowerCase();
+                if (unit === 'кг') return { value, unit: 'kg' };
+                if (unit === 'л') return { value, unit: 'l' };
+            }
             return null;
         }
         function calculatePrice(productId, variant, qty) {
             const product = PRODUCTS.find(p => p.id === productId); if (!product) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
             const rule = VARIANT_RULES[productId]; let basePrice = 0;
-            if (rule && rule.type === 'fixed' && product.pricePerUnit) { basePrice = product.pricePerUnit * qty; }
-            else {
+            if (rule && rule.type === 'fixed' && product.pricePerUnit) {
+                basePrice = product.pricePerUnit * qty;
+            } else {
                 const parsedVariant = parseVariant(variant); if (!parsedVariant) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
                 let pricePerUnit = 0;
                 if (product.pricePerKg) {
                     pricePerUnit = product.pricePerKg;
                     if (parsedVariant.unit === 'g') basePrice = (parsedVariant.value / 1000) * pricePerUnit;
                     if (parsedVariant.unit === 'kg') basePrice = parsedVariant.value * pricePerUnit;
-                    if (parsedVariant.unit === 'pc') { const weightMatch = variant.match(/\((\d+)\s*г\)/); if (weightMatch) { const weightInKg = parseInt(weightMatch[1]) / 1000; basePrice = weightInKg * pricePerUnit; } }
-                } else if (product.pricePerL) { pricePerUnit = product.pricePerL; if (parsedVariant.unit === 'л') basePrice = parsedVariant.value * pricePerUnit; }
-                else if (product.pricePerUnit) { pricePerUnit = product.pricePerUnit; basePrice = pricePerUnit; }
+                    if (parsedVariant.unit === 'pc') {
+                        const weightMatch = variant.match(/\((\d+)\s*г\)/);
+                        if (weightMatch) { const weightInKg = parseInt(weightMatch[1]) / 1000; basePrice = weightInKg * pricePerUnit; }
+                    }
+                } else if (product.pricePerL) {
+                    pricePerUnit = product.pricePerL; if (parsedVariant.unit === 'l') basePrice = parsedVariant.value * pricePerUnit;
+                } else if (product.pricePerUnit) {
+                    pricePerUnit = product.pricePerUnit; basePrice = pricePerUnit;
+                }
                 basePrice *= qty;
             }
             const discountRate = getDiscountRateForProduct(productId);
@@ -427,7 +451,10 @@
                 const parsed = parseVariant(item.variant);
                 if (parsed && parsed.unit === 'g') return sum + (parsed.value * item.qty);
                 if (parsed && parsed.unit === 'kg') return sum + (parsed.value * 1000 * item.qty);
-                if (parsed && parsed.unit === 'pc') { const weightMatch = item.variant.match(/\((\d+)\s*г\)/); if (weightMatch) return sum + (parseInt(weightMatch[1]) * item.qty); }
+                if (parsed && parsed.unit === 'pc') {
+                    const weightMatch = item.variant.match(/\((\d+)\s*г\)/);
+                    if (weightMatch) return sum + (parseInt(weightMatch[1]) * item.qty);
+                }
                 return sum;
             }, 0);
             let applicableDiscount = 0;
@@ -435,7 +462,7 @@
             return applicableDiscount;
         }
 
-        // --- ORDER SUBMISSION: прямой вебхук ---
+        // --- ORDER SUBMISSION: прямой вебхук через axios ---
         async function sendOrder() {
             if (cart.length === 0) return;
 
@@ -462,16 +489,17 @@
 
             let grandTotal = 0;
             cart.forEach(item => {
-                const price = calculatePrice(item.id, item.variant, item.qty); grandTotal += price.finalPrice;
+                const price = calculatePrice(item.id, item.variant, item.qty);
+                grandTotal += price.finalPrice;
                 payload.items.push({
                     id: item.id,
                     name: item.name,
                     cat: item.cat,
                     variant: item.variant,
                     qty: item.qty,
-                    unit_price_base: price.basePrice / item.qty,
+                    unit_price_base: price.basePrice / Math.max(1, item.qty),
                     discount_rate: price.discountRate,
-                    unit_price: price.finalPrice / item.qty,
+                    unit_price: price.finalPrice / Math.max(1, item.qty),
                     line_total: price.finalPrice
                 });
             });
@@ -480,60 +508,45 @@
             const btn = document.getElementById('finalize-order-btn');
             btn.disabled = true; btn.textContent = 'Отправка...';
 
-            console.log("Sending to webhook:", payload);
-
-            // таймаут и отправка
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            console.log('Axios -> webhook payload:', payload);
 
             try {
-                const res = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8'
-                    },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal,
-                    mode: 'cors',
-                    keepalive: true,
-                    credentials: 'omit'
+                const res = await axios.post(WEBHOOK_URL, payload, {
+                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                    timeout: 15000,
+                    withCredentials: false,
+                    validateStatus: () => true
                 });
-                clearTimeout(timeoutId);
 
-                // пробуем прочитать ответ (если JSON)
-                let result = null;
-                try { result = await res.clone().json(); } catch (_) { /* no-op */ }
-                if (!res.ok) {
-                    const text = result ? JSON.stringify(result) : (await res.text().catch(() => ''));
-                    throw new Error(`Ошибка вебхука: HTTP ${res.status} ${res.statusText} ${text || ''}`.trim());
+                if (res.status < 200 || res.status >= 300) {
+                    let details = '';
+                    try { details = typeof res.data === 'string' ? res.data : JSON.stringify(res.data); } catch(_) {}
+                    throw new Error(`Ошибка вебхука: HTTP ${res.status} ${res.statusText || ''} ${details || ''}`.trim());
                 }
 
-                // успех — очищаем корзину и UI
+                // успех — очищаем всё
                 cart = [];
                 saveState();
                 updateCartUI();
                 closeCheckoutModal();
 
                 if (window.Telegram?.WebApp) {
-                    Telegram.WebApp.showPopup({
-                        title: 'Спасибо!',
-                        message: 'Заказ отправлен. Мы свяжемся с вами для подтверждения.',
-                        buttons: [{ type: 'close', text: 'Закрыть' }]
-                    });
+                    try {
+                        Telegram.WebApp.showPopup({
+                            title: 'Спасибо!',
+                            message: 'Заказ отправлен. Мы свяжемся с вами для подтверждения.',
+                            buttons: [{ type: 'close', text: 'Закрыть' }]
+                        });
+                    } catch(_) {}
                     Telegram.WebApp.close();
                 } else {
                     alert('Заказ отправлен! Спасибо.');
                 }
             } catch (e) {
-                console.error('Webhook error:', e);
+                console.error('Webhook error (axios):', e);
                 const msg = 'Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз. Если проблема повторяется — свяжитесь с нами по телефону.';
                 if (window.Telegram?.WebApp) {
-                    // showAlert блокирует, showPopup более «мягкий»
-                    try {
-                        Telegram.WebApp.showAlert(msg);
-                    } catch(_) {
-                        alert(msg);
-                    }
+                    try { Telegram.WebApp.showAlert(msg); } catch { alert(msg); }
                 } else {
                     alert(msg);
                 }
