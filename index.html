@@ -1092,20 +1092,28 @@
                 });
             });
             payload.total = grandTotal;
-    
-            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                    data: payload,
-                  })
-                  .then(function (response) {
-                    alert('все ок тест', response);
-                  })
-                  .catch(function (error) {
-                    alert('пиздец', error);
-            });
+                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+                               payload: payload,
+                              })
+                              .then(function (response) {
+                                alert('все ок тест', response);
+                              })
+                              .catch(function (error) {
+                                alert('пиздец', error);
+                        });
+            
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
-                    window.Telegram.WebApp.sendData(JSON.stringify(payload));
-                    window.Telegram.WebApp.close();
+                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+                                data: payload,
+                              })
+                              .then(function (response) {
+                                alert('все ок тест', response);
+                              })
+                              .catch(function (error) {
+                                alert('пиздец', error);
+                        });
+                        window.Telegram.WebApp.close();
                 } catch (e) {
                     console.error("Failed to send data:", e);
                     alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.\n\nДанные для отладки:\n${JSON.stringify(payload, null, 2)}`);
