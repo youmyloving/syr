@@ -1093,8 +1093,9 @@
                 });
             });
             payload.total = grandTotal;
+            
             axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                    data: JSON.stringify(payload),
+                    data: payload,
                   })
                   .then(function (response) {
                     alert('все ок тест', response);
