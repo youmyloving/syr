@@ -1,6 +1,5 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/index.html b/index.html
-index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef93247d58 100644
+index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..68ca65bc88661f47be368712f85440f95a6ada4f 100644
 --- a/index.html
 +++ b/index.html
 @@ -1,503 +1,879 @@
@@ -992,7 +991,7 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
              { id: 'ricotta-herbs', name: 'Рикотта с укропом и зеленью', cat: 'Сыры', pricePerKg: 1200, ico: '🌿', description: 'С ароматной зеленью.' },
              { id: 'caciotta', name: 'Качотта', cat: 'Сыры', pricePerKg: 2150, ico: '🧀', description: 'Мягкий итальянский сыр.' },
              { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', cat: 'Сыры', pricePerKg: 2250, ico: '🌿', description: 'С ореховым привкусом пажитника.' },
-@@ -615,207 +991,433 @@
+@@ -615,207 +991,439 @@
              'barfi-sesame': { type: 'fixed', options: ['7 шт'] },
              'halva': { type: 'fixed', options: ['0.2 кг'] },
              'potato-cake-5': { type: 'fixed', options: ['5 шт'] },
@@ -1098,7 +1097,14 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
                  webApp.ready();
                  webApp.expand();
                  applyTheme(webApp.themeParams, webApp.colorScheme);
-                 webApp.MainButton.setText('Отправить заказ').onClick(sendOrder).hide();
+-                webApp.MainButton.setText('Отправить заказ').onClick(sendOrder).hide();
++
++                const mainButton = webApp.MainButton;
++                if (mainButton) {
++                    mainButton.setText('Отправить заказ');
++                    mainButton.onClick(sendOrder);
++                    mainButton.hide();
++                }
              } else {
                  console.warn('Telegram WebApp script is not loaded. Running in standalone mode.');
                  applyTheme({ bg_color: '#ffffff', text_color: '#000000', button_color: '#2481cc', button_text_color: '#ffffff' }, 'light');
@@ -1387,9 +1393,9 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
 +
 +                section.appendChild(categoryGrid);
 +                grid.appendChild(section);
-             });
-         }
- 
++            });
++        }
++
 +        function createProductCard(product) {
 +            const card = document.createElement('div');
 +            card.className = 'product-card';
@@ -1402,7 +1408,7 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
 +                    event.preventDefault();
 +                    openProductModal(product.id);
 +                }
-+            });
+             });
 +
 +            const ico = document.createElement('div');
 +            ico.className = 'ico';
@@ -1426,8 +1432,8 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
 +            card.appendChild(price);
 +
 +            return card;
-+        }
-+
+         }
+ 
          function getPriceText(product) {
 -            if (product.pricePerKg) return `${product.pricePerKg} ₽/кг`;
 -            if (product.pricePerL) return `${product.pricePerL} ₽/л`;
@@ -1460,7 +1466,7 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
          }
  
          function renderVariantSelector() {
-@@ -828,171 +1430,428 @@
+@@ -828,171 +1436,428 @@
                  return;
              }
  
@@ -1925,7 +1931,7 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
              const product = PRODUCTS.find(p => p.id === productId);
              if (!product) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
  
-@@ -1037,78 +1896,144 @@
+@@ -1037,78 +1902,144 @@
              const product = PRODUCTS.find(p => p.id === productId);
              if (!product || product.cat !== 'Сыры') return 0;
  
@@ -2086,6 +2092,3 @@ index 7f34ac42b318dfdf684a471f8cc73130c5f58d02..51d8a69b0e5168b362ed02a508b7ecef
      </script>
  </body>
  </html>
- 
-EOF
-)
