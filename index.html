@@ -1092,37 +1092,51 @@
                 });
             });
             payload.total = grandTotal;
-                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                               payload: payload,
-                              })
-                              .then(function (response) {
-                                alert('все ок тест', response);
-                              })
-                              .catch(function (error) {
-                                alert('пиздец', error);
-                        });
-            
-            if (window.Telegram && window.Telegram.WebApp) {
-                try {
-                        axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                                data: payload,
-                              })
-                              .then(function (response) {
-                                alert('все ок тест', response);
-                              })
-                              .catch(function (error) {
-                                alert('пиздец', error);
-                        });
-                        window.Telegram.WebApp.close();
-                } catch (e) {
-                    console.error("Failed to send data:", e);
-                    alert(`Не удалось отправить заказ. Пожалуйста, попробуйте еще раз.\n\nДанные для отладки:\n${JSON.stringify(payload, null, 2)}`);
-                }
-            } else {
-                alert(`Данные заказа (вне Telegram):\n\n${JSON.stringify(payload, null, 2)}`);
-                console.log("Order Payload:", payload);
-            }
+try {
+
+    
+  if (window.Telegram?.WebApp) {
+    axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+      data: payload
+    })
+      .then(function (response) {
+        console.log('Успешный ответ от сервера:', response);
+        alert('Заказ успешно отправлен!');
+        window.Telegram.WebApp.close();
+      })
+      .catch(function (error) {
+        console.error('Ошибка при отправке заказа:', error);
+        
+        let errorMessage = 'Произошла ошибка при отправке заказа.\n\n';
+        
+        if (error.response) {
+          errorMessage += `Статус: ${error.response.status}\n`;
+          errorMessage += `Данные: ${JSON.stringify(error.response.data, null, 2)}`;
+        } else if (error.request) {
+          errorMessage += 'Нет ответа от сервера. Проверьте подключение к интернету.';
+        } else {
+          errorMessage += `Ошибка настройки запроса: ${error.message}`;
         }
+        
+        alert(errorMessage);
+      });
+  } else {
+    console.log("Режим отладки - Telegram WebApp недоступен");
+    console.log("Order Payload:", payload);
+    
+    alert(`Данные заказа (режим отладки):\n\n${JSON.stringify(payload, null, 2)}`);
+  }
+} catch (e) {
+  console.error("Критическая ошибка при отправке данных:", e);
+  alert(`Критическая ошибка: не удалось отправить заказ.\n\n` +
+        `Подробности для отладки:\n${JSON.stringify({
+          error: e.message,
+          payload: payload
+        }, null, 2)}`
+  );
+}
+
+
 
         // --- START ---
         document.addEventListener('DOMContentLoaded', init);
