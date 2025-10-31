@@ -222,8 +222,16 @@
 
         // --- INITIALIZATION ---
         function init() {
-            try { loadState(); setupEventListeners(); setupTelegramWebApp(); renderUserProfile(); populateCategoryFilter(); filterAndSearchProducts(); updateCartUI(); }
-            catch (e) { console.error("Init error:", e); document.getElementById('product-grid').innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Ошибка загрузки. Обновите страницу.</p>`; }
+            try {
+                loadState(); setupEventListeners(); setupTelegramWebApp(); renderUserProfile(); populateCategoryFilter(); filterAndSearchProducts(); updateCartUI();
+                // !!! КРИТИЧЕСКОЕ ИЗМЕНЕНИЕ: УСТАНАВЛИВКА ОБРАБОТЧИКА ОТПРАВКИ ОДИН РАЗ
+                if (window.Telegram?.WebApp) {
+                    Telegram.WebApp.onEvent('webAppDataSent', () => {
+                        console.log("Telegram confirmed data sent. Closing app.");
+                        Telegram.WebApp.close();
+                    });
+                }
+            } catch (e) { console.error("Init error:", e); document.getElementById('product-grid').innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Ошибка загрузки. Обновите страницу.</p>`; }
         }
         function loadState() { try { const savedCart = localStorage.getItem('syromania-cart'); if (savedCart) cart = JSON.parse(savedCart); } catch (e) { console.warn("localStorage unavailable."); cart = []; } }
         function saveState() { try { localStorage.setItem('syromania-cart', JSON.stringify(cart)); } catch (e) { console.warn("Could not save state."); } }
@@ -448,10 +456,10 @@
             const btn = document.getElementById('finalize-order-btn');
             btn.disabled = true; btn.textContent = 'Отправка...';
 
+            // !!! ВАЖНО: УДАЛЕННЫЙ ВЫЗОВ ОТЛАВКИ
+            console.log("Attempting to send payload:", payload);
+
             if (window.Telegram?.WebApp) {
-                Telegram.WebApp.onEvent('webAppDataSent', () => {
-                    Telegram.WebApp.close();
-                });
                 try {
                     Telegram.WebApp.sendData(JSON.stringify(payload));
                 } catch (e) {
