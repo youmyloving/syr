@@ -1092,12 +1092,15 @@
                 });
             });
             payload.total = grandTotal;
-            axios({
-                  method: 'post',
-                  url: 'https://puzzlebot-webhook-handler1.onrender.com/',
-                  data: payload,
-                });
-            alert('все ок');
+            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+                    data: payload,
+                  })
+                  .then(function (response) {
+                    alert('все ок', response);
+                  })
+                  .catch(function (error) {
+                    alert('пиздец', error);
+            });
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
                     window.Telegram.WebApp.sendData(JSON.stringify(payload));
