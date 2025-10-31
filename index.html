@@ -1094,19 +1094,11 @@
                 });
             });
             payload.total = grandTotal;
-                  axios.post('https://puzzlebot-webhook-handler1.onrender.com/',  {
-                                    id: "1",     
-                                })
-                              .then(function (response) {
-                                alert('все ок тест', response);
-                              })
-                              .catch(function (error) {
-                                alert('пиздец', error);
-                        });
-
-            
             if (window.Telegram && window.Telegram.WebApp) {
                 try {
+                        await axios.post('https://puzzlebot-webhook-handler1.onrender.com/', { 
+                            data: payload,  
+                         });
                         window.Telegram.WebApp.close();
                 } catch (e) {
                     console.error("Failed to send data:", e);
