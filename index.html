@@ -1092,7 +1092,6 @@
                 });
             });
             payload.total = grandTotal;
-            alert(payload);
             axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
                 id: item.id,
                 name: item.name,
@@ -1112,7 +1111,6 @@
                   alert('пиздец');
                 console.log(error);
               });
-
         // --- START ---
         document.addEventListener('DOMContentLoaded', init);
     </script>
