@@ -1093,8 +1093,7 @@
             });
             payload.total = grandTotal;
             alert(payload);
-try {
-    axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
+             axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
       data: payload,
     })
       .then(function (response) {
@@ -1115,27 +1114,8 @@ try {
         } else {
           errorMessage += `Ошибка настройки запроса: ${error.message}`;
         }
-        
         alert(errorMessage);
       });
-  } else {
-    console.log("Режим отладки - Telegram WebApp недоступен");
-    console.log("Order Payload:", payload);
-    
-    alert(`Данные заказа (режим отладки):\n\n${JSON.stringify(payload, null, 2)}`);
-  }
-} catch (e) {
-  console.error("Критическая ошибка при отправке данных:", e);
-  alert(`Критическая ошибка: не удалось отправить заказ.\n\n` +
-        `Подробности для отладки:\n${JSON.stringify({
-          error: e.message,
-          payload: payload
-        }, null, 2)}`
-  );
-}
-
-
-
         // --- START ---
         document.addEventListener('DOMContentLoaded', init);
     </script>
