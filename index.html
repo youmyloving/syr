@@ -1093,10 +1093,10 @@
             });
             payload.total = grandTotal;
             axios.post('https://puzzlebot-webhook-handler1.onrender.com/', {
-                    data: payload,
+                    data: JSON.stringify(payload),
                   })
                   .then(function (response) {
-                    alert('все ок', response);
+                    alert('все ок тест', response);
                   })
                   .catch(function (error) {
                     alert('пиздец', error);
