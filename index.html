@@ -1096,18 +1096,20 @@
             payload.total = grandTotal;
             if (window.Telegram && window.Telegram.WebApp) {
           try {
-                $.post(
-                  "https://puzzlebot-webhook-handler1.onrender.com/", 
-                  {
-                    payload: payload,
-                    age: 30
-                  }, 
-                  function(data, status) { 
-                    alert("Данные: " + data + "\nСтатус: " + status);
-                  }
-                );
 
-        
+              $.ajax({
+                  url: "https://puzzlebot-webhook-handler1.onrender.com/",
+                  type: "POST",
+                  data: {
+                        payload: payload,
+                  },
+                  success: function(res) {
+                    alert(res);
+                  },
+                  error: function(err) {
+                    alert(err);
+                  }
+                });      
             window.Telegram.WebApp.close();
                 } catch (e) {
                     console.error("Failed to send data:", e);
