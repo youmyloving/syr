@@ -1120,9 +1120,9 @@
             $.ajax({
                 url: "https://puzzlebot-webhook-handler1.onrender.com/",
                 type: "POST",
-                data: {
-                    payload: payload,
-                },
+                data: payload,
+                crossDomain: true,
+                dataType: 'jsonp',
                 success: function (res) {
                     alert(res);
                     window.Telegram.WebApp.close();
