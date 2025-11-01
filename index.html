@@ -489,8 +489,7 @@
             <!-- Cart items will be rendered here -->
         </div>
     </dialog>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB';
@@ -1083,7 +1082,7 @@
 
 
 
-        // --- ORDER SUBMISSION ---
+        // --- ORDER SUBMISSION --- //
         function sendOrder() {
             if (cart.length === 0) return;
 
@@ -1117,21 +1116,17 @@
             });
             payload.total = grandTotal;
 
-            $.ajax({
-                url: "https://puzzlebot-webhook-handler1.onrender.com/",
-                type: "POST",
-                data: payload,
-                success: function (res) {
-                    alert(res);
+            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', payload)
+                .then(function (response) {
+                    alert('Ваш заказ принят');
                     window.Telegram.WebApp.close();
-                },
-                error: function (err) {
-                    alert('ошибка: ', err);
-                }
-            });
+                })
+                .catch(function (error) {
+                    alert('ошибка');
+                });
         }
 
-        // --- START ---
+        // --- START --- //
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
