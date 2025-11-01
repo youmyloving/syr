@@ -468,7 +468,7 @@
             <!-- Cart items will be rendered here -->
         </div>
     </dialog>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script>
         // --- CONFIGURATION & DATA ---
         const CURRENCY = 'RUB';
@@ -1096,17 +1096,18 @@
             payload.total = grandTotal;
             if (window.Telegram && window.Telegram.WebApp) {
           try {
-            axios
-              .post(
-                "https://puzzlebot-webhook-handler1.onrender.com/",
-                payload,
-              )
-              .then(function (response) {
-                console.log(response);
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
+                $.post(
+                  "https://puzzlebot-webhook-handler1.onrender.com/", 
+                  {
+                    payload: payload,
+                    age: 30
+                  }, 
+                  function(data, status) { 
+                    alert("Данные: " + data + "\nСтатус: " + status);
+                  }
+                );
+
+        
             window.Telegram.WebApp.close();
                 } catch (e) {
                     console.error("Failed to send data:", e);
