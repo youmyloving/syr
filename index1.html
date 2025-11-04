@@ -191,6 +191,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    // === BACKEND ENDPOINT ===
+    const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com'; // замените на свой Render при необходимости
+
     // --- CONFIGURATION & DATA ---
     const CURRENCY = 'RUB';
     const ROUND = Math.round;
@@ -374,7 +377,6 @@
         setupTelegramWebApp();
         renderUserProfile();
         populateCategoryFilter();
-        // set default for "только сыры"
         document.getElementById('only-cheese-checkbox').checked = ONLY_CHEESE_FILTER_DEFAULT;
         filterAndSearchProducts();
         updateCartUI();
@@ -410,13 +412,10 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
         webApp.expand();
-        // Применяем тёплую палитру всегда
         applyTheme();
-        // MainButton открывает оформление
         webApp.MainButton.setText('Оформить заказ').onClick(() => {
           openCartModal();
         }).hide();
-        // BackButton поведение
         webApp.BackButton.onClick(() => {
           const productModal = document.getElementById('product-modal');
           const cartModal = document.getElementById('cart-modal');
@@ -431,7 +430,6 @@
 
     function applyTheme() {
       const root = document.documentElement;
-      // фиксируем фирменную палитру (в т.ч. в тёмной теме Telegram)
       root.style.setProperty('--bg-color', '#F8EFDA');
       root.style.setProperty('--text-color', '#2E2A23');
       root.style.setProperty('--hint-color', '#8A7F6A');
@@ -644,20 +642,25 @@
         <div class="section-title">Контакты и доставка</div>
         <div class="form-group">
           <label for="checkout-phone">Телефон для связи</label>
-          <input type="tel" id="checkout-phone" inputmode="tel" placeholder="+7 999 999-99-99" value="${escapeHtml(checkoutState.phone)}" />
+          <input type="tel" id="checkout-phone" inputmode="tel" placeholder="+7 999 999-99-99" />
           <div class="notice">Можно в любом формате: 8999..., +7..., пробелы/скобки не важны — мы приведём к стандарту.</div>
         </div>
         <div class="form-group">
           <label for="checkout-address">Адрес доставки</label>
-          <textarea id="checkout-address" rows="3" placeholder="Город, улица, дом, подъезд/этаж/кв.">${escapeHtml(checkoutState.address)}</textarea>
+          <textarea id="checkout-address" rows="3" placeholder="Город, улица, дом, подъезд/этаж/кв."></textarea>
         </div>
         <div class="form-group">
           <label for="checkout-comment">Комментарий к заказу</label>
-          <textarea id="checkout-comment" rows="3" placeholder="Например: позвонить перед доставкой, без чеснока и т.п.">${escapeHtml(checkoutState.comment)}</textarea>
+          <textarea id="checkout-comment" rows="3" placeholder="Например: позвонить перед доставкой, без чеснока и т.п."></textarea>
         </div>
         <div id="checkout-errors" class="error-text" style="display:none"></div>
       `;
       body.appendChild(checkoutWrap);
+
+      // Восстановим сохранённые значения после вставки HTML
+      document.getElementById('checkout-phone').value = escapeHtmlAttrRestore(checkoutState.phone);
+      document.getElementById('checkout-address').value = escapeHtmlAttrRestore(checkoutState.address);
+      document.getElementById('checkout-comment').value = escapeHtmlAttrRestore(checkoutState.comment);
 
       const sendOrderBtn = document.createElement('button');
       sendOrderBtn.className = 'btn btn-primary'; sendOrderBtn.textContent = 'Отправить заказ'; sendOrderBtn.onclick = sendOrder;
@@ -756,10 +759,8 @@
       if (digits.length === 10) {
         return '+7' + digits;
       }
-      // если уже начинается с +
       if (('' + input).trim().startsWith('+')) {
-        // оставляем как есть, но чистим пробелы
-        return ('+' + digits.replace(/^\+/, ''));
+        return '+' + digits; // привели к +7XXXXXXXXXX и т.д.
       }
       return digits ? '+' + digits : '';
     }
@@ -787,16 +788,19 @@
       box.style.display = 'block'; box.textContent = errors.join(' ');
     }
 
-    function escapeHtml(s) {
-      return (s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-    }
+    // безопасное восстановление в value/textarea (чтобы кавычки не ломали разметку)
+    function escapeHtmlAttrRestore(s) { return (s || ''); }
 
     // --- ORDER SUBMISSION ---
     function sendOrder() {
       if (cart.length === 0) return;
       const contact = getCheckoutData();
       const errors = validateCheckout(contact);
-      if (errors.length) { showCheckoutErrors(errors); if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('error'); return; }
+      if (errors.length) {
+        showCheckoutErrors(errors);
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+        return;
+      }
       showCheckoutErrors([]);
 
       const payload = {
@@ -835,10 +839,7 @@
       // enrich with Telegram user info if available
       if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-        payload.telegram = {
-          platform: tg.platform,
-          init_data: !!tg.initData,
-        };
+        payload.telegram = { platform: tg.platform, init_data: !!tg.initData };
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
           payload.telegram.user = {
             id: tg.initDataUnsafe.user.id,
@@ -849,7 +850,7 @@
         }
       }
 
-      axios.post('https://puzzlebot-webhook-handler1.onrender.com/', payload)
+      axios.post(`${BACKEND}/order`, payload)
         .then(function () {
           if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.showAlert('Спасибо! Ваш заказ принят. Мы свяжемся по телефону для подтверждения.');
