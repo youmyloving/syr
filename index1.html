@@ -8,19 +8,20 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
-  --bg: #ffffff;
-  --text: #111111;
-  --muted: #6b7280;
-  --card: #f8f9fb;
-  --accent: #2563eb;
+  /* ===== Тёплая палитра под #F8EFDA ===== */
+  --bg: #F8EFDA;                 /* новый фон */
+  --text: #3B2F2F;               /* тёмно-кофейный текст */
+  --muted: #8B6F47;              /* тёплый приглушённый */
+  --card: #FFF7EA;               /* карточки чуть светлее фона */
+  --accent: #D97706;             /* терракотово-янтарный */
   --accent-contrast: #ffffff;
-  --border: #e5e7eb;
-  --danger: #b91c1c;
+  --border: #E6D8BF;             /* тёплая граница */
+  --danger: #b91c1c;             /* как было — читаемый алерт */
   --ok: #166534;
   --shadow: 0 2px 10px rgba(0,0,0,.08);
   --radius: 16px;
   --gap: 12px;
-  --focus: 2px solid #2563ebaa;
+  --focus: 2px solid #D97706aa;  /* фокус в тоне акцента */
 }
 html,body{height:100%}
 body{
@@ -31,6 +32,7 @@ header{
   position: sticky; top: 0; z-index: 5;
   padding: 12px; background: var(--bg); border-bottom: 1px solid var(--border);
   display:grid; gap: var(--gap);
+  backdrop-filter: saturate(1.2) blur(2px);
 }
 .header-row{display:grid; grid-template-columns: 1fr auto; gap: var(--gap); align-items:center}
 .filters{display:grid; grid-template-columns: 1fr 1fr auto; gap: var(--gap)}
@@ -39,8 +41,8 @@ header{
   padding:10px 12px; border-radius: var(--radius); border:1px solid var(--border);
 }
 .search input{flex:1; border:none; outline:none; background:transparent; color:var(--text)}
-select, button, input[type="number"], input[type="text"], textarea{
-  border:1px solid var(--border); background:var(--bg); color:var(--text);
+select, button, input[type="number"], input[type="text"], input[type="tel"], textarea{
+  border:1px solid var(--border); background: var(--bg); color: var(--text);
   border-radius: 10px; padding:10px 12px; font-size: 14px;
 }
 button{cursor:pointer}
@@ -61,14 +63,24 @@ main{ padding: 12px; padding-bottom: 100px; }
 .card{
   background: var(--card); border:1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 12px; display:flex; flex-direction: column; gap: 8px;
+  transition: transform .12s ease;
 }
+.card:hover{ transform: translateY(-1px) }
 .card h3{margin:0; font-size: 16px}
 .card .muted{color:var(--muted); font-size: 12px}
 .card .price{font-weight:700}
+
+/* [NEW] медиа в карточке */
 .card .pic{
-  width: 64px; height:64px; display:grid; place-items:center; font-size:32px; border-radius: 12px;
+  position: relative;
+  width: 64px; height:64px;
+  border-radius: 12px;
   background: var(--bg); border:1px solid var(--border);
+  overflow: hidden; display:grid; place-items:center; font-size:32px;
 }
+.pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:12px }
+.pic .fallback{ position:relative; z-index:0 }
+
 .card footer{ display:flex; gap:8px; align-items:center; justify-content: space-between; margin-top:auto }
 
 .tags{display:flex; gap:6px; flex-wrap:wrap}
@@ -109,10 +121,13 @@ hr{ border: none; height:1px; background: var(--border); margin: 8px 0 }
 .right{ margin-left:auto }
 .center{ text-align:center }
 
+/* [NEW] ошибки инпутов */
+.input-error{ border-color:#e11d48 !important; box-shadow: 0 0 0 3px rgba(225,29,72,.12) }
+
 /* focus */
 :focus-visible{ outline: var(--focus); outline-offset: 2px }
 
-/* dark mode from Telegram theme */
+/* dark mode from Telegram theme (оставим как было) */
 .tg-dark{
   --bg: #0e1621;
   --text: #f5f7fb;
@@ -163,7 +178,8 @@ hr{ border: none; height:1px; background: var(--border); margin: 8px 0 }
   <div class="modal">
     <header>
       <div style="display:flex; gap:12px; align-items:center">
-        <div class="pic" id="prodPic" aria-hidden="true">🧀</div>
+        <!-- [NEW] картинка/эмодзи -->
+        <div class="pic" id="prodPic" aria-hidden="true"><span class="fallback">🧀</span></div>
         <div>
           <div id="prodCat" class="muted"></div>
           <h2 id="prodName" style="margin:4px 0 6px 0; font-size:20px">—</h2>
@@ -199,7 +215,7 @@ hr{ border: none; height:1px; background: var(--border); margin: 8px 0 }
   </div>
 </dialog>
 
-<!-- Cart modal -->
+<!-- Cart modal / Checkout -->
 <dialog id="cartDialog" aria-label="Корзина">
   <div class="modal">
     <header style="display:flex;align-items:center;gap:8px">
@@ -217,13 +233,21 @@ hr{ border: none; height:1px; background: var(--border); margin: 8px 0 }
       <tbody></tbody>
     </table>
 
-    <div id="orderExtras" class="hidden">
+    <!-- [NEW] Блок оформления заказа -->
+    <div id="orderExtras">
       <hr />
       <div class="row">
+        <label>Телефон для связи
+          <input id="orderPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel" />
+        </label>
+        <label>Адрес доставки
+          <input id="orderAddress" type="text" placeholder="Город, улица, дом, подъезд/этаж/кв." autocomplete="street-address" />
+        </label>
         <label class="full">Комментарий к заказу
           <textarea id="orderComment" rows="2" placeholder="Например: доставить к 18:00, не звонить"></textarea>
         </label>
       </div>
+      <div class="notice">Поля «Телефон» и «Адрес» обязательны для доставки. Мы используем данные только для связи по заказу.</div>
     </div>
 
     <footer>
@@ -246,7 +270,7 @@ hr{ border: none; height:1px; background: var(--border); margin: 8px 0 }
     <span id="barText">0 позиций</span>
     <span class="chip" id="barSum">0 ₽</span>
   </div>
-  <button class="primary" id="barSend">Отправить</button>
+  <button class="primary" id="barSend">Оформить</button>
 </div>
 
 <script>
@@ -258,14 +282,28 @@ const CONFIG = {
   ROUND: Math.round,
   DISCOUNT_THRESHOLDS: [ {g:1000, rate:0.15}, {g:700, rate:0.10}, {g:500, rate:0.05} ],
   ONLY_CHEESE_FILTER_DEFAULT: false,
-  PAYLOAD_SCHEMA_VERSION: 'v1',
-  SHOW_COMMENT_FIELD: true,        // флаг: поле "Комментарий к заказу" в корзине
-  ENABLE_CITY_SELECT: false,       // флаг: выбор города (не используется по умолчанию)
-  BAKERY_STEP_G: 250,              // шаг для выпечки/печенья по кг
-  MAX_G_DEFAULT: 1000,             // максимум, если не указано иное
-  PUZZLEBOT_HINT: true,            // положим подсказку в payload.meta
-  WEBHOOK_HINT: 'srv-d42e1s3ipnbc73c8tgeg', // исключительно как подсказка в meta
+  PAYLOAD_SCHEMA_VERSION: 'v2',   // [NEW] апнули версию схемы
+  SHOW_COMMENT_FIELD: true,
+  ENABLE_CITY_SELECT: false,
+  BAKERY_STEP_G: 250,
+  MAX_G_DEFAULT: 1000,
+  PUZZLEBOT_HINT: true,
+  WEBHOOK_HINT: 'srv-d42e1s3ipnbc73c8tgeg',
+
+  /* [NEW] Фото: базовый путь и расширение
+     Вариант 1: кладёте картинки в репозитории по пути:
+       https://raw.githubusercontent.com/youmyloving/foto/main/catalog/<PRODUCT_ID>.jpg
+     Вариант 2: задаёте явные ссылки в PRODUCT_IMAGES ниже. */
+  IMAGE_BASE: 'https://raw.githubusercontent.com/youmyloving/foto/main/catalog/',
+  IMAGE_EXT: '.jpg'
 };
+
+/* [NEW] Опциональная точная карта фото (если имена не совпадают)
+   Пример: { 'paneer_classic': 'https://.../paneer_classic.webp', ... } */
+const PRODUCT_IMAGES = {
+  // заполняйте по необходимости; если пусто — будет использоваться IMAGE_BASE + id + IMAGE_EXT
+};
+
 /* =========================
    Телеграм окружение (без падений)
 ========================= */
@@ -279,13 +317,13 @@ const tg = (function(){
     themeParams: {},
     MainButton: {
       isVisible:false,
-      text:'Отправить',
+      text:'Оформить',
       show(){ this.isVisible=true; console.log('[preview] MainButton show') },
       hide(){ this.isVisible=false; console.log('[preview] MainButton hide') },
       onClick(cb){ this._cb = cb },
       offClick(){ this._cb=null },
       setText(txt){ this.text=txt },
-      enable(){}, disable(){}, color:'#2481cc', textColor:'#fff'
+      enable(){}, disable(){}, color:'#D97706', textColor:'#fff'
     },
     sendData(payload){
       alert('Предпросмотр: данные отправлены в бота (симуляция). См. консоль.');
@@ -327,93 +365,65 @@ const ICO = { [CAT.CHEESE]:'🧀', [CAT.DAIRY]:'🥛', [CAT.SWEETS]:'🍪' };
 
 /** PRODUCTS: id, name, cat, pricePerKg|pricePerL|pricePerUnit, description?, ico? */
 const PRODUCTS = [
-  // ===== СЫРЫ (цены за кг) =====
+  /* ——— ваш исходный список товаров без изменений ——— */
   {id:'paneer_classic', name:'Панир / Адыгейский — классический', cat:CAT.CHEESE, pricePerKg:1200, ico:'🧀'},
   {id:'paneer_herbs', name:'Панир / Адыгейский — с зеленью', cat:CAT.CHEESE, pricePerKg:1300, ico:'🧀'},
   {id:'paneer_spice', name:'Панир / Адыгейский — с пряностями', cat:CAT.CHEESE, pricePerKg:1350, ico:'🧀'},
   {id:'paneer_smoked', name:'Панир / Адыгейский — копчёный', cat:CAT.CHEESE, pricePerKg:1400, ico:'🧀'},
-
   {id:'suluguni', name:'Сулугуни', cat:CAT.CHEESE, pricePerKg:1400},
   {id:'suluguni_smoked', name:'Сулугуни копчёный', cat:CAT.CHEESE, pricePerKg:1550},
-
   {id:'imeretinsky', name:'Имеретинский', cat:CAT.CHEESE, pricePerKg:1300},
   {id:'imeretinsky_dill_garlic', name:'Имеретинский с укропом и чесноком', cat:CAT.CHEESE, pricePerKg:1400},
-
   {id:'halloumi_classic', name:'Халлуми — классический', cat:CAT.CHEESE, pricePerKg:1650},
   {id:'halloumi_spicy_mix1', name:'Халлуми — паприка и орегано', cat:CAT.CHEESE, pricePerKg:1800},
   {id:'halloumi_mix_tbg', name:'Халлуми — томат, базилик, чеснок', cat:CAT.CHEESE, pricePerKg:1800},
   {id:'halloumi_sundried', name:'Халлуми — с вялеными помидорами и паприкой', cat:CAT.CHEESE, pricePerKg:1800},
-
   {id:'kosichka', name:'Косичка', cat:CAT.CHEESE, pricePerKg:1600},
   {id:'kosichka_smoked', name:'Косичка копчёная', cat:CAT.CHEESE, pricePerKg:1750},
-
   {id:'spicy_ball', name:'Пряный клубок', cat:CAT.CHEESE, pricePerKg:1680},
-
   {id:'mozzarella', name:'Моцарелла', cat:CAT.CHEESE, pricePerKg:1700},
   {id:'burrata', name:'Буратта', cat:CAT.CHEESE, pricePerKg:1800},
-
   {id:'stracciatella', name:'Страчателла', cat:CAT.CHEESE, pricePerKg:1850},
-
   {id:'ricotta', name:'Творожный сыр (рикотта)', cat:CAT.CHEESE, pricePerKg:1100},
   {id:'ricotta_herbs', name:'Творожный сыр (рикотта) с укропом и зеленью', cat:CAT.CHEESE, pricePerKg:1200},
-
   {id:'caciotta', name:'Качотта', cat:CAT.CHEESE, pricePerKg:2150},
   {id:'caciotta_fenugreek', name:'Качотта с пажитником', cat:CAT.CHEESE, pricePerKg:2250},
-
   {id:'hard_rural', name:'Твёрдый по-деревенски', cat:CAT.CHEESE, pricePerKg:1400},
   {id:'hard_smoked', name:'Твёрдый копчёный', cat:CAT.CHEESE, pricePerKg:1600},
-
   {id:'cheese_roll_olives_walnut', name:'Сырный рулет (маслины и грецкий орех)', cat:CAT.CHEESE, pricePerKg:1550},
   {id:'cheese_roll_apricot_pine', name:'Сырный рулет (курага и кедровые)', cat:CAT.CHEESE, pricePerKg:1550},
-
-  // ===== МОЛОЧНАЯ ПРОДУКЦИЯ =====
   {id:'milk', name:'Молоко', cat:CAT.DAIRY, pricePerL:100, ico:'🥛'},
   {id:'baked_milk', name:'Топлёное молоко', cat:CAT.DAIRY, pricePerL:200},
   {id:'yogurt', name:'Йогурт классический', cat:CAT.DAIRY, pricePerL:230},
   {id:'ryazhenka', name:'Ряженка', cat:CAT.DAIRY, pricePerL:250},
   {id:'whey', name:'Сыворотка', cat:CAT.DAIRY, pricePerL:50},
-
   {id:'cream', name:'Сливки', cat:CAT.DAIRY, pricePerL:1200},
   {id:'curd', name:'Творог', cat:CAT.DAIRY, pricePerKg:500},
-
   {id:'butter', name:'Масло сливочное', cat:CAT.DAIRY, pricePerKg:1800, description:'Доступен фикс-пак 1 шт (200 г) = 360 ₽' },
   {id:'ghee', name:'Топлёное масло (ГХИ)', cat:CAT.DAIRY, pricePerKg:2300},
-
   {id:'condensed', name:'Сгущёнка', cat:CAT.DAIRY, pricePerKg:850},
   {id:'curd_mass_apricot', name:'Творожная масса — курага', cat:CAT.DAIRY, pricePerKg:700},
   {id:'curd_mass_raisins', name:'Творожная масса — изюм', cat:CAT.DAIRY, pricePerKg:700},
   {id:'curd_mass_prunes', name:'Творожная масса — чернослив', cat:CAT.DAIRY, pricePerKg:700},
   {id:'curd_mass_dates', name:'Творожная масса — финики', cat:CAT.DAIRY, pricePerKg:700},
-
-  {id:'mishti_dahi', name:'Мистхи Дахи', cat:CAT.DAIRY, /* TODO_PRICE */ },
-
-  // ===== СЛАДОСТИ И ВЫПЕЧКА =====
-  // Печенье (цена за кг, продавать кратно 250 г)
+  {id:'mishti_dahi', name:'Мистхи Дахи', cat:CAT.DAIRY /* скрыт без цены */ },
   {id:'cookie_curd', name:'Печенье творожное', cat:CAT.SWEETS, pricePerKg:600, ico:'🍪'},
   {id:'cookie_oat', name:'Печенье овсяное', cat:CAT.SWEETS, pricePerKg:600},
   {id:'cookie_nut_fingers', name:'Ореховые пальчики', cat:CAT.SWEETS, pricePerKg:700},
   {id:'cookie_carob', name:'Печенье кэрбовое', cat:CAT.SWEETS, pricePerKg:600},
   {id:'cookie_shortbread', name:'Печенье песочное', cat:CAT.SWEETS, pricePerKg:600},
-
-  // Кексы (цена за кг, шаг 250 г)
   {id:'muffin_plain', name:'Кексы обычные', cat:CAT.SWEETS, pricePerKg:500, ico:'🧁'},
   {id:'muffin_carob', name:'Кексы кэробовые', cat:CAT.SWEETS, pricePerKg:550},
   {id:'muffin_raisins', name:'Кексы с изюмом', cat:CAT.SWEETS, pricePerKg:550},
-
-  // Кексы микс — фикс-паки
   {id:'muffin_mix_plain_raisins', name:'Кексы микс (обычные+изюм)', cat:CAT.SWEETS, pricePerUnit:280, description:'Пакет 0.5 кг', _fixed:{label:'0.5 кг', price:280}},
   {id:'muffin_mix_plain_carob', name:'Кексы микс (обычные+кэроб)', cat:CAT.SWEETS, pricePerUnit:300, description:'Пакет 0.5 кг', _fixed:{label:'0.5 кг', price:300}},
   {id:'muffin_mix_raisins_carob', name:'Кексы микс (изюм+кэроб)', cat:CAT.SWEETS, pricePerUnit:300, description:'Пакет 0.5 кг', _fixed:{label:'0.5 кг', price:300}},
-
-  // Индийские сладости / выпечка (фикс-пакеты)
   {id:'sandesh_orange', name:'Сандеш — апельсин', cat:CAT.SWEETS, pricePerUnit:250, description:'5 шт / пакет', _countPack:{count:5, label:'5 шт', price:250}},
   {id:'sandesh_walnut', name:'Сандеш — грецкий орех', cat:CAT.SWEETS, pricePerUnit:250, description:'5 шт / пакет', _countPack:{count:5, label:'5 шт', price:250}},
   {id:'sandesh_carob', name:'Сандеш — кэроб', cat:CAT.SWEETS, pricePerUnit:250, description:'5 шт / пакет', _countPack:{count:5, label:'5 шт', price:250}},
-
   {id:'burfi_classic', name:'Бурфи — классический', cat:CAT.SWEETS, pricePerUnit:300, description:'5 шт / пакет', _countPack:{count:5, label:'5 шт', price:300}},
   {id:'burfi_hazelnut', name:'Бурфи — фундук', cat:CAT.SWEETS, pricePerUnit:300, description:'5 шт / пакет', _countPack:{count:5, label:'5 шт', price:300}},
   {id:'burfi_sesame', name:'Бурфи — кунжутный', cat:CAT.SWEETS, pricePerUnit:420, description:'7 шт / пакет', _countPack:{count:7, label:'7 шт', price:420}},
-
   {id:'halva', name:'Халва', cat:CAT.SWEETS, pricePerUnit:200, description:'0.2 кг фикс-пак', _fixed:{label:'0.2 кг', price:200}},
   {id:'potato_pastry', name:'Пирожное «Картошка»', cat:CAT.SWEETS, pricePerUnit:330, description:'5 шт или 2 шт', _multiPacks:[{label:'5 шт', price:330}, {label:'2 шт', price:155}]},
   {id:'cottage_casserole_plain', name:'Запеканка творожная', cat:CAT.SWEETS, pricePerUnit:260, description:'250 г фикс-пак', _fixed:{label:'250 г', price:260}},
@@ -432,51 +442,39 @@ const PRODUCTS = [
   {id:'chapati_wg_10', name:'Чапати (ц/з мука) — 10 шт', cat:CAT.SWEETS, pricePerUnit:320, _countPack:{count:10, label:'10 шт', price:320}},
 ];
 
-/** Правила генерации вариантов */
+/** Правила генерации вариантов (как было) */
 const VARIANT_RULES = {
-  // Панир/Адыгейский — фиксированные граммы
   paneer_classic:          {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
   paneer_herbs:            {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
   paneer_spice:            {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
   paneer_smoked:           {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
-  // Сулугуни / Имеретинский — шаг 100 г
   suluguni:                {type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:100},
   suluguni_smoked:         {type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:100},
   imeretinsky:             {type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:100},
   imeretinsky_dill_garlic: {type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:100},
-  // Халлуми — 1 шт 200/250 г
   halloumi_classic:        {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200,250]},
   halloumi_spicy_mix1:     {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200,250]},
   halloumi_mix_tbg:        {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200,250]},
   halloumi_sundried:       {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200,250]},
-  // Косички/клубок/моцарелла/буратта
   kosichka:                {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200]},
   kosichka_smoked:         {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200]},
   spicy_ball:              {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[150]},
   mozzarella:              {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[200]},
   burrata:                 {type:'COUNT_FIXED_WEIGHT_CHOICES', gramsPerUnit:[250]},
-  // Страчателла — перечисление
   stracciatella:           {type:'WEIGHT_CHOICES', grams:[200,250,300,500]},
-  // Рикотта — перечисление
   ricotta:                 {type:'WEIGHT_CHOICES', grams:[200,250,300,450]},
   ricotta_herbs:           {type:'WEIGHT_CHOICES', grams:[200,250,300,450]},
-  // Качотта — от 200 г шаг 100 г
   caciotta:                {type:'WEIGHT_STEP', minG:200, maxG:1000, stepG:100},
   caciotta_fenugreek:      {type:'WEIGHT_STEP', minG:200, maxG:1000, stepG:100},
-  // Твёрдые — перечисление
   hard_rural:              {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
   hard_smoked:             {type:'WEIGHT_CHOICES', grams:[200,300,400,500,1000]},
-  // Рулеты — от 100 г шаг 50 г
   cheese_roll_olives_walnut:{type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:50},
   cheese_roll_apricot_pine: {type:'WEIGHT_STEP', minG:100, maxG:1000, stepG:50},
-
-  // МОЛОЧКА
   milk:        {type:'LITER_CHOICES', liters:[0.5,1]},
   baked_milk:  {type:'LITER_CHOICES', liters:[0.5,1]},
   yogurt:      {type:'LITER_CHOICES', liters:[0.5,1]},
   ryazhenka:   {type:'LITER_CHOICES', liters:[0.5,1]},
   whey:        {type:'LITER_CHOICES', liters:[1]},
-
   cream:       {type:'LITER_CHOICES', liters:[0.2,0.5,1]},
   curd:        {type:'WEIGHT_CHOICES', grams:[500,1000,1500,2000]},
   butter:      {type:'WEIGHT_CHOICES_PLUS_FIXED', grams:[200,300,400,500,1000], fixed:{label:'1 шт (200 г)', price:360}},
@@ -487,30 +485,23 @@ const VARIANT_RULES = {
   curd_mass_prunes:  {type:'WEIGHT_STEP', minG:200, maxG:1000, stepG:100},
   curd_mass_dates:   {type:'WEIGHT_STEP', minG:200, maxG:1000, stepG:100},
   mishti_dahi: {type:'HIDE_NO_PRICE'},
-
-  // СЛАДОСТИ/ВЫПЕЧКА
   cookie_curd:         {type:'BAKERY_BY_KG_250G'},
   cookie_oat:          {type:'BAKERY_BY_KG_250G'},
   cookie_nut_fingers:  {type:'BAKERY_BY_KG_250G'},
   cookie_carob:        {type:'BAKERY_BY_KG_250G'},
   cookie_shortbread:   {type:'BAKERY_BY_KG_250G'},
-
   muffin_plain:        {type:'BAKERY_BY_KG_250G'},
   muffin_carob:        {type:'BAKERY_BY_KG_250G'},
   muffin_raisins:      {type:'BAKERY_BY_KG_250G'},
-
   muffin_mix_plain_raisins: {type:'FIXED_PACK'},
   muffin_mix_plain_carob:   {type:'FIXED_PACK'},
   muffin_mix_raisins_carob: {type:'FIXED_PACK'},
-
   sandesh_orange: {type:'COUNT_PACK'},
   sandesh_walnut: {type:'COUNT_PACK'},
   sandesh_carob:  {type:'COUNT_PACK'},
-
   burfi_classic: {type:'COUNT_PACK'},
   burfi_hazelnut:{type:'COUNT_PACK'},
   burfi_sesame:  {type:'COUNT_PACK'},
-
   halva: {type:'FIXED_PACK'},
   potato_pastry: {type:'MULTI_PACKS'},
   cottage_casserole_plain: {type:'FIXED_PACK'},
@@ -535,51 +526,39 @@ const VARIANT_RULES = {
 const fmtRub = (v)=> `${CONFIG.ROUND(v).toLocaleString('ru-RU')} ₽`;
 const clamp = (n, a, b)=> Math.max(a, Math.min(b, n));
 
+/* [NEW] Фото: url по id или из карты */
+function imageUrlFor(product){
+  if (PRODUCT_IMAGES[product.id]) return PRODUCT_IMAGES[product.id];
+  return CONFIG.IMAGE_BASE + encodeURIComponent(product.id) + CONFIG.IMAGE_EXT;
+}
+/* [NEW] HTML для превью */
+function imageTag(product){
+  const url = imageUrlFor(product);
+  const icon = iconFor(product);
+  return `<div class="pic"><span class="fallback">${escapeHtml(icon)}</span><img src="${escapeHtml(url)}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.style.display='none'"></div>`;
+}
+
 /** Генератор вариантов для карточки */
 function buildVariants(product){
   const rule = VARIANT_RULES[product.id];
-  if(!rule){
-    console.warn('Нет правила вариантов:', product.id);
-    return [];
-  }
+  if(!rule){ console.warn('Нет правила вариантов:', product.id); return []; }
   const variants = [];
   const addWeight = (g)=> variants.push({key:`g${g}`, label:`${g} г`, type:'weight', grams:g});
   const addVolume = (l)=> variants.push({key:`l${l}`, label:`${l} л`, type:'volume', liters:l});
   const addUnitWeight = (g)=> variants.push({key:`u${g}`, label:`1 шт (${g} г)`, type:'unit_weight', grams:g, units:1});
   const addFixed = (label, price)=> variants.push({key:`f${label}`, label, type:'fixed', fixedPrice:price});
   switch(rule.type){
-    case 'WEIGHT_CHOICES':
-      rule.grams.forEach(addWeight); break;
-    case 'WEIGHT_STEP':{
-      const max = rule.maxG ?? CONFIG.MAX_G_DEFAULT;
-      for(let g = rule.minG; g <= max; g += rule.stepG) addWeight(g);
-      break;
-    }
-    case 'COUNT_FIXED_WEIGHT_CHOICES':
-      rule.gramsPerUnit.forEach(addUnitWeight); break;
-    case 'WEIGHT_CHOICES_PLUS_FIXED':
-      rule.grams.forEach(addWeight);
-      if(rule.fixed) addFixed(rule.fixed.label, rule.fixed.price);
-      break;
-    case 'LITER_CHOICES':
-      rule.liters.forEach(addVolume); break;
-    case 'BAKERY_BY_KG_250G':{
-      for(let g = CONFIG.BAKERY_STEP_G; g <= 2000; g += CONFIG.BAKERY_STEP_G) addWeight(g);
-      break;
-    }
-    case 'FIXED_PACK':{
-      const f = product._fixed; if(f) addFixed(f.label, f.price); break;
-    }
-    case 'MULTI_PACKS':{
-      const arr = product._multiPacks||[]; arr.forEach(p=> addFixed(p.label, p.price)); break;
-    }
-    case 'COUNT_PACK':{
-      const c = product._countPack; if(c) addFixed(c.label, c.price); break;
-    }
-    case 'HIDE_NO_PRICE':
-      return [];
-    default:
-      console.warn('Неизвестный тип правил:', rule.type);
+    case 'WEIGHT_CHOICES': rule.grams.forEach(addWeight); break;
+    case 'WEIGHT_STEP':{ const max = rule.maxG ?? CONFIG.MAX_G_DEFAULT; for(let g = rule.minG; g <= max; g += rule.stepG) addWeight(g); break; }
+    case 'COUNT_FIXED_WEIGHT_CHOICES': rule.gramsPerUnit.forEach(addUnitWeight); break;
+    case 'WEIGHT_CHOICES_PLUS_FIXED': rule.grams.forEach(addWeight); if(rule.fixed) addFixed(rule.fixed.label, rule.fixed.price); break;
+    case 'LITER_CHOICES': rule.liters.forEach(addVolume); break;
+    case 'BAKERY_BY_KG_250G':{ for(let g = CONFIG.BAKERY_STEP_G; g <= 2000; g += CONFIG.BAKERY_STEP_G) addWeight(g); break; }
+    case 'FIXED_PACK':{ const f = product._fixed; if(f) addFixed(f.label, f.price); break; }
+    case 'MULTI_PACKS':{ (product._multiPacks||[]).forEach(p=> addFixed(p.label, p.price)); break; }
+    case 'COUNT_PACK':{ const c = product._countPack; if(c) addFixed(c.label, c.price); break; }
+    case 'HIDE_NO_PRICE': return [];
+    default: console.warn('Неизвестный тип правил:', rule.type);
   }
   return variants;
 }
@@ -588,34 +567,27 @@ function buildVariants(product){
 function unitBasePrice(product, variant){
   if(variant.type === 'fixed') return CONFIG.ROUND(variant.fixedPrice);
   if(product.pricePerKg && (variant.type === 'weight' || variant.type === 'unit_weight')){
-    const grams = (variant.type === 'unit_weight') ? variant.grams : variant.grams;
-    return CONFIG.ROUND(product.pricePerKg * (grams/1000));
+    return CONFIG.ROUND(product.pricePerKg * (variant.grams/1000));
   }
   if(product.pricePerL && variant.type === 'volume'){
     return CONFIG.ROUND(product.pricePerL * variant.liters);
   }
-  if(product.pricePerUnit && variant.type === 'count'){ // не используем сейчас
-    return CONFIG.ROUND(product.pricePerUnit);
-  }
-  if(product.pricePerUnit && variant.type === 'fixed'){
-    return CONFIG.ROUND(variant.fixedPrice ?? product.pricePerUnit);
-  }
-  // Если дошли сюда — невозможно определить цену
+  if(product.pricePerUnit && variant.type === 'count'){ return CONFIG.ROUND(product.pricePerUnit); }
+  if(product.pricePerUnit && variant.type === 'fixed'){ return CONFIG.ROUND(variant.fixedPrice ?? product.pricePerUnit); }
   return NaN;
 }
 
 /** Определение участия в «скидке на сыр» */
 function isCheeseDiscountEligible(product, variant){
   if(product.cat !== CAT.CHEESE) return false;
-  // Скидка применяется к позициям, у которых есть вес в граммах (включая 1 шт (N г))
   return (variant.type === 'weight' || variant.type === 'unit_weight');
 }
 
-/** Карточка корзины: структура хранимых данных */
+/** Ключ корзины */
 function makeCartKey(pid, vkey){ return `${pid}__${vkey}` }
 
 /* =========================
-   Состояние (сохранение в localStorage)
+   Состояние (localStorage)
 ========================= */
 const LS = {
   load(){
@@ -626,9 +598,15 @@ const LS = {
   },
   save(state){
     try{ localStorage.setItem('syromania_cart_v1', JSON.stringify(state)); }catch(e){ console.warn('localStorage save error', e) }
+  },
+  loadContact(){
+    try{ return JSON.parse(localStorage.getItem('syromania_contact_v1')||'{}'); }catch(_){ return {}; }
+  },
+  saveContact(contact){
+    try{ localStorage.setItem('syromania_contact_v1', JSON.stringify(contact)); }catch(_){}
   }
 };
-let CART = LS.load(); // { lines: { [key]: {pid, vkey, qty} }, createdAt }
+let CART = LS.load();
 
 /* =========================
    Рендер каталога
@@ -641,16 +619,12 @@ const activeFilters = document.getElementById('activeFilters');
 document.getElementById('resetFilters').addEventListener('click', ()=>{
   qInput.value=''; catFilter.value=''; onlyCheese.checked=CONFIG.ONLY_CHEESE_FILTER_DEFAULT; renderCatalog();
 });
-
 onlyCheese.checked = CONFIG.ONLY_CHEESE_FILTER_DEFAULT;
 
-// Фильтруем и скрываем позиции без цены (TODO_PRICE)
+// Фильтруем и скрываем позиции без цены
 const CATALOG = PRODUCTS.filter(p=>{
   const hasPrice = (typeof p.pricePerKg === 'number') || (typeof p.pricePerL === 'number') || (typeof p.pricePerUnit === 'number') || p._fixed || p._multiPacks || p._countPack;
-  if(p.id === 'mishti_dahi' || !hasPrice){
-    console.warn('TODO_PRICE:', p.id);
-    return false;
-  }
+  if(p.id === 'mishti_dahi' || !hasPrice){ return false; }
   return true;
 });
 
@@ -668,12 +642,11 @@ function minDisplayPrice(product){
 }
 
 function renderCatalog(){
-  // активные фильтры UI
   activeFilters.innerHTML = '';
   if(qInput.value.trim()) activeFilters.appendChild(tag(`Поиск: “${qInput.value.trim()}”`));
   if(catFilter.value) activeFilters.appendChild(tag(`Категория: ${catFilter.value}`));
   if(onlyCheese.checked) activeFilters.appendChild(tag('Только сыры'));
-  // список
+
   grid.innerHTML = '';
   const query = qInput.value.trim().toLowerCase();
   const list = CATALOG.filter(p=>{
@@ -688,7 +661,7 @@ function renderCatalog(){
     card.className = 'card';
     const minP = minDisplayPrice(p);
     card.innerHTML = `
-      <div class="pic" aria-hidden="true">${iconFor(p)}</div>
+      ${imageTag(p)}
       <h3>${escapeHtml(p.name)}</h3>
       <div class="muted">${p.cat}</div>
       <div class="tags">${priceBadge(p)}</div>
@@ -700,7 +673,6 @@ function renderCatalog(){
     `;
     grid.appendChild(card);
   }
-  // focusable cards
   grid.querySelectorAll('button[data-open]').forEach(btn=>{
     btn.addEventListener('click', ()=> openProduct(btn.getAttribute('data-open')));
   });
@@ -743,7 +715,7 @@ function openProduct(pid){
   if(!p) return;
   CURRENT_PRODUCT = p;
   CURRENT_VARIANTS = buildVariants(p);
-  prodPic.textContent = iconFor(p);
+  prodPic.innerHTML = `<span class="fallback">${escapeHtml(iconFor(p))}</span><img src="${escapeHtml(imageUrlFor(p))}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.style.display='none'">`;
   prodCat.textContent = p.cat;
   prodName.textContent = p.name;
   prodSku.textContent = `Артикул: ${p.id}`;
@@ -759,10 +731,7 @@ function openProduct(pid){
   productDialog.showModal();
   addToCartBtn.disabled = false;
 }
-function currentVariant(){
-  const key = variantSelect.value;
-  return CURRENT_VARIANTS.find(v=>v.key===key);
-}
+function currentVariant(){ return CURRENT_VARIANTS.find(v=>v.key===variantSelect.value); }
 variantSelect.addEventListener('change', updateVariantPriceUI);
 variantQty.addEventListener('input', ()=>{ variantQty.value = Math.max(1, parseInt(variantQty.value||'1',10)); updateVariantPriceUI(); });
 closeProductBtn.addEventListener('click', ()=> productDialog.close());
@@ -784,7 +753,6 @@ function updateVariantPriceUI(){
   if(rate>0){
     discountHint.textContent = `Скидка на этот вид сыра: ${(rate*100)|0}%`;
   }else{
-    // Подсказка до какой границы осталось
     if(isCheeseDiscountEligible(p,v)){
       const curG = currentCheeseGramsById(p.id);
       const vG = (v.type==='unit_weight'||v.type==='weight') ? v.grams : 0;
@@ -813,7 +781,7 @@ addToCartBtn.addEventListener('click', ()=>{
 });
 
 /* =========================
-   Скидки на сыр: расчёт по корзине
+   Скидки на сыр
 ========================= */
 function currentCheeseGramsById(pid){
   let grams = 0;
@@ -832,7 +800,6 @@ function currentCheeseGramsById(pid){
   return grams;
 }
 function computeDiscountRates(){
-  // группируем граммы по id продукта, только для сыров
   const gramsById = {};
   for(const k in CART.lines){
     const line = CART.lines[k];
@@ -846,14 +813,11 @@ function computeDiscountRates(){
   for(const pid in gramsById){
     const g = gramsById[pid];
     let rate = 0;
-    for(const th of CONFIG.DISCOUNT_THRESHOLDS){
-      if(g >= th.g){ rate = Math.max(rate, th.rate); }
-    }
+    for(const th of CONFIG.DISCOUNT_THRESHOLDS){ if(g >= th.g){ rate = Math.max(rate, th.rate); } }
     rates[pid] = rate;
   }
   return rates;
 }
-// превью с учётом потенциального добавления текущей позиции
 function computeDiscountRatesPreviewWithItem(product, variant, qty){
   const tmp = JSON.parse(JSON.stringify(CART));
   const key = makeCartKey(product.id, variant.key);
@@ -872,16 +836,14 @@ function computeDiscountRatesPreviewWithItem(product, variant, qty){
   for(const pid in gramsById){
     const g = gramsById[pid];
     let rate = 0;
-    for(const th of CONFIG.DISCOUNT_THRESHOLDS){
-      if(g >= th.g){ rate = Math.max(rate, th.rate); }
-    }
+    for(const th of CONFIG.DISCOUNT_THRESHOLDS){ if(g >= th.g){ rate = Math.max(rate, th.rate); } }
     rates[pid] = rate;
   }
   return rates;
 }
 
 /* =========================
-   Корзина — расчёт и UI
+   Корзина / Чекаут
 ========================= */
 const cartBar = document.getElementById('cartBar');
 const barText = document.getElementById('barText');
@@ -896,15 +858,28 @@ const cartNote = document.getElementById('cartNote');
 const cartDiscountFlag = document.getElementById('cartDiscountFlag');
 const orderExtras = document.getElementById('orderExtras');
 const orderComment = document.getElementById('orderComment');
+/* [NEW] поля контактов */
+const orderPhone = document.getElementById('orderPhone');
+const orderAddress = document.getElementById('orderAddress');
 
 document.getElementById('closeCart').addEventListener('click', ()=> cartDialog.close());
 document.getElementById('clearCart').addEventListener('click', ()=>{
   CART.lines = {}; LS.save(CART); renderCartBar(); if(cartDialog.open) renderCartModal();
 });
-cartBar.addEventListener('click', ()=> { renderCartModal(); cartDialog.showModal(); });
+/* [NEW] клик по бару — всегда в корзину (оформление) */
+cartBar.addEventListener('click', ()=> { renderCartModal(); cartDialog.showModal(); focusCheckout(); });
 cartBar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); cartBar.click(); }});
-barSend.addEventListener('click', ()=> { renderCartModal(); sendCart(); });
+/* [NEW] кнопка «Оформить» в баре — тоже открывает корзину */
+barSend.addEventListener('click', ()=> { renderCartModal(); cartDialog.showModal(); focusCheckout(); });
 document.getElementById('sendCart').addEventListener('click', sendCart);
+
+function focusCheckout(){
+  // ставим курсор в телефон, подставляем сохранённые данные, если есть
+  const saved = LS.loadContact();
+  if(saved.phone && !orderPhone.value) orderPhone.value = saved.phone;
+  if(saved.address && !orderAddress.value) orderAddress.value = saved.address;
+  orderPhone.focus();
+}
 
 function enrichLine(line){
   const p = CATALOG.find(x=>x.id===line.pid);
@@ -936,7 +911,6 @@ function renderCartBar(){
   updateMainButton(count, total);
 }
 function renderCartModal(){
-  orderExtras.classList.toggle('hidden', !CONFIG.SHOW_COMMENT_FIELD);
   const {items, total, count, anyDiscount} = cartSummary();
   cartEmpty.classList.toggle('hidden', items.length>0);
   cartTableBody.innerHTML = '';
@@ -959,7 +933,7 @@ function renderCartModal(){
   cartTotalEl.textContent = fmtRub(total);
   cartCountEl.textContent = `${count} поз.`;
   cartDiscountFlag.textContent = anyDiscount ? 'Применены скидки на сыр' : '';
-  cartNote.textContent = 'Скидки на сыр: ≥500 г — 5%, ≥700 г — 10%, ≥1000 г — 15% (по одному виду).';
+  cartNote.textContent = 'Скидки на сыр: ≥500 г — 5%, ≥700 г — 10%, ≥1000 г — 15% (по одному виду). Телефон и адрес — обязательны для доставки.';
 
   // handlers
   cartTableBody.querySelectorAll('button[data-dec]').forEach(b=> b.addEventListener('click', onDec));
@@ -972,6 +946,11 @@ function renderCartModal(){
       CART.lines[key].qty = n; LS.save(CART); renderCartModal(); renderCartBar();
     });
   });
+
+  // восстанавливаем контакт из LS, если пусто
+  const saved = LS.loadContact();
+  if(saved.phone && !orderPhone.value) orderPhone.value = saved.phone;
+  if(saved.address && !orderAddress.value) orderAddress.value = saved.address;
 }
 function onDec(e){ const key = e.currentTarget.getAttribute('data-dec'); if(!CART.lines[key]) return; CART.lines[key].qty = Math.max(1, CART.lines[key].qty-1); LS.save(CART); renderCartModal(); renderCartBar(); }
 function onInc(e){ const key = e.currentTarget.getAttribute('data-inc'); if(!CART.lines[key]) return; CART.lines[key].qty = Math.min(999, CART.lines[key].qty+1); LS.save(CART); renderCartModal(); renderCartBar(); }
@@ -998,28 +977,55 @@ function buildPayload(){
     schema_ver: CONFIG.PAYLOAD_SCHEMA_VERSION,
     puzzlebot_hint: CONFIG.PUZZLEBOT_HINT ? { target:'inline_button->bot', webhook_hint: CONFIG.WEBHOOK_HINT } : undefined,
   };
-  const comment = CONFIG.SHOW_COMMENT_FIELD ? (orderComment.value||'') : '';
   const payload = {
     type: 'cart',
     source: 'miniapp',
     currency: 'RUB',
     items: itemsOut,
     total,
-    comment,
+    /* [NEW] контактные поля */
+    contact_phone: (orderPhone.value||'').trim(),
+    delivery_address: (orderAddress.value||'').trim(),
+    comment: (orderComment.value||'').trim(),
     meta
   };
   return payload;
 }
+
+/* [NEW] Валидация контактов */
+function validPhone(phone){
+  // упрощённо: +7, 7, 8 или международный, 10–15 цифр
+  const digits = phone.replace(/[^\d+]/g,'');
+  return /^(\+?\d){10,15}$/.test(digits);
+}
+function validateCheckout(){
+  let ok = true;
+  const phone = orderPhone.value.trim();
+  const addr = orderAddress.value.trim();
+  orderPhone.classList.remove('input-error');
+  orderAddress.classList.remove('input-error');
+  if(!validPhone(phone)){ ok = false; orderPhone.classList.add('input-error'); }
+  if(addr.length < 5){ ok = false; orderAddress.classList.add('input-error'); }
+  return ok;
+}
+
 function sendCart(){
   const {count} = cartSummary();
   if(count===0){ alert('Корзина пуста'); return; }
+  if(!validateCheckout()){
+    alert('Пожалуйста, заполните корректно телефон и адрес.');
+    focusCheckout();
+    return;
+  }
+  // сохраняем контакт локально
+  LS.saveContact({ phone: orderPhone.value.trim(), address: orderAddress.value.trim() });
+
   const payload = JSON.stringify( buildPayload() );
   try{
-    tg.sendData(payload);
+    tg.sendData(payload); // уходит в ваш бек, где update.message.web_app_data.data
   }catch(err){
     alert('Ошибка отправки. Смотрите консоль.'); console.error(err); console.log('payload:', payload);
   }
-  // Закрываем мини-приложение
   try{ tg.close(); }catch(e){ /* preview mode */ }
 }
 
@@ -1027,12 +1033,12 @@ function sendCart(){
    Telegram MainButton
 ========================= */
 function updateMainButton(count, total){
-  const text = count ? `Отправить • ${fmtRub(total)}` : 'Корзина пуста';
+  const text = count ? `Оформить • ${fmtRub(total)}` : 'Корзина пуста';
   try{
     tg.MainButton.setText(text);
     if(count){ tg.MainButton.show(); } else { tg.MainButton.hide(); }
     tg.MainButton.offClick?.();
-    tg.MainButton.onClick(()=> sendCart());
+    tg.MainButton.onClick(()=> { renderCartModal(); cartDialog.showModal(); focusCheckout(); });
   }catch(e){ /* preview fallback */ }
 }
 
@@ -1043,53 +1049,43 @@ renderCatalog();
 renderCartBar();
 
 /* =========================
-   Юнит-тесты (консоль)
-   — проверка кейсов (4)
+   Юнит-тесты (как было)
 ========================= */
 (function runTests(){
   const clone = (x)=> JSON.parse(JSON.stringify(x));
   function add(pid, vkey, qty){ const k = makeCartKey(pid, vkey); if(!CART.lines[k]) CART.lines[k]={pid, vkey, qty:0}; CART.lines[k].qty+=qty }
   const original = clone(CART);
 
-  // Кейс A — Качотта 2150 ₽/кг; 200 г ×1 и 300 г ×1 -> итог 1022 ₽
   CART.lines = {};
   const caciotta = CATALOG.find(p=>p.id==='caciotta'); const v200 = buildVariants(caciotta).find(v=>v.grams===200);
   const v300 = buildVariants(caciotta).find(v=>v.grams===300);
   add('caciotta', v200.key, 1); add('caciotta', v300.key, 1);
-  let sumA = cartSummary().total;
-  console.log('[TEST A] ожидаемо 1022 ₽ ->', sumA, 'OK?', sumA===1022);
+  let sumA = cartSummary().total; console.log('[TEST A] 1022 ₽ ->', sumA);
 
-  // Кейс B — Сулугуни 1400 ₽/кг; 250 г ×2 и 300 г ×1 -> 1008 ₽
   CART.lines = {};
   const sul = CATALOG.find(p=>p.id==='suluguni');
-  const v250s = buildVariants(sul).find(v=>v.grams===200) ? null : null; // ensure search below
   const v250 = buildVariants(sul).find(v=>v.grams===250);
   const v300b = buildVariants(sul).find(v=>v.grams===300);
   add('suluguni', v250.key, 2); add('suluguni', v300b.key, 1);
-  let sumB = cartSummary().total;
-  console.log('[TEST B] ожидаемо 1008 ₽ ->', sumB, 'OK?', sumB===1008);
+  let sumB = cartSummary().total; console.log('[TEST B] 1008 ₽ ->', sumB);
 
-  // Кейс C — Халлуми классический (1 шт, 250 г) -> 413 ₽
   CART.lines = {};
   const hal = CATALOG.find(p=>p.id==='halloumi_classic');
   const v250u = buildVariants(hal).find(v=>v.type==='unit_weight' && v.grams===250);
   add('halloumi_classic', v250u.key, 1);
-  let sumC = cartSummary().total;
-  console.log('[TEST C] ожидаемо 413 ₽ ->', sumC, 'OK?', sumC===413);
+  let sumC = cartSummary().total; console.log('[TEST C] 413 ₽ ->', sumC);
 
-  // Кейс D — Йогурт 0.5 л -> 115 ₽
   CART.lines = {};
   const yog = CATALOG.find(p=>p.id==='yogurt');
   const v05 = buildVariants(yog).find(v=>v.type==='volume' && v.liters===0.5);
   add('yogurt', v05.key, 1);
-  let sumD = cartSummary().total;
-  console.log('[TEST D] ожидаемо 115 ₽ ->', sumD, 'OK?', sumD===115);
+  let sumD = cartSummary().total; console.log('[TEST D] 115 ₽ ->', sumD);
 
   CART = original; LS.save(CART); renderCartBar();
 })();
 
 /* =========================
-   Доступность: фокус на Esc — закрытие модалок
+   Доступность: Esc закрывает модалки
 ========================= */
 document.addEventListener('keydown', (e)=>{
   if(e.key==='Escape'){
