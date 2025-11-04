@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Сыромания</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -24,8 +24,7 @@
       --radius:14px;
     }
 
-    /* Базовая типографика/фон */
-    html, body{height:100%}
+    html,body{height:100%}
     body{
       margin:0; background:var(--bg-color); color:var(--text-color);
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -101,9 +100,7 @@
     #open-cart-btn:disabled{opacity:.6; cursor:not-allowed}
     #open-cart-btn:hover{filter:brightness(1.06)}
 
-    dialog{
-      border:none; border-radius:16px; padding:0; background:transparent; width:min(95vw,460px)
-    }
+    dialog{border:none; border-radius:16px; padding:0; background:transparent; width:min(95vw,460px)}
     dialog::backdrop{background:rgba(0,0,0,.45)}
     .modal{
       background:var(--section-bg-color); color:var(--text-color);
@@ -136,6 +133,7 @@
     .btn{padding:12px 18px; border-radius:10px; border:1px solid var(--border-color); cursor:pointer; font-weight:700}
     .btn-primary{background:var(--button-color); color:var(--button-text-color); border-color:transparent}
     .btn-secondary{background:var(--secondary-bg-color); color:var(--text-color)}
+    .btn-ghost{background:transparent; color:var(--text-color)}
     .btn:active{transform:translateY(1px)}
 
     .cart-item{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border-color)}
@@ -147,14 +145,19 @@
     .discount-hint{color:var(--success-color); font-size:12px}
 
     .qty-control{display:flex; align-items:center; border:1px solid var(--border-color); border-radius:10px; overflow:hidden}
-    .qty-control button{
-      width:34px; height:34px; border:none; background:var(--secondary-bg-color); cursor:pointer
-    }
+    .qty-control button{width:34px; height:34px; border:none; background:var(--secondary-bg-color); cursor:pointer}
     .qty-control span{display:inline-block; min-width:34px; text-align:center}
 
     .cart-summary{margin-top:6px; padding-top:10px; border-top:2px solid var(--border-color); text-align:right; font-weight:800}
 
     .muted{color:var(--hint-color); font-size:12px}
+
+    /* Status modal */
+    .status-wrap{display:grid; gap:10px; padding:16px; text-align:center}
+    .status-ico{font-size:40px}
+    .status-title{font-weight:800; font-size:18px}
+    .status-text{color:var(--hint-color); font-size:14px}
+    .status-actions{display:flex; gap:8px; justify-content:center; padding:10px 16px 16px}
   </style>
 </head>
 <body>
@@ -214,6 +217,21 @@
     </div>
   </dialog>
 
+  <!-- Модал статуса (успех/ошибка) -->
+  <dialog id="status-modal">
+    <div class="modal">
+      <div class="status-wrap">
+        <div id="status-ico" class="status-ico">✅</div>
+        <div id="status-title" class="status-title">Заказ отправлен</div>
+        <div id="status-text" class="status-text">Мы свяжемся с вами в ближайшее время.</div>
+      </div>
+      <div class="status-actions">
+        <button class="btn btn-primary" id="status-ok">Ок</button>
+        <button class="btn btn-ghost" id="status-close">Закрыть</button>
+      </div>
+    </div>
+  </dialog>
+
   <script>
     /* ==============================
        КОНФИГ/ДАННЫЕ
@@ -225,12 +243,13 @@
     const GITHUB_ISSUE_API='https://api.github.com/repos/youmyloving/foto/issues/1';
     const IMAGE_MAP_CACHE_KEY='syromania-image-map-v1';
 
-    // при желании можешь явно забить ссылки сюда (id товара -> url)
+    // при желании: явная привязка (перебьёт авто-поиск в GitHub issue)
     const IMAGES_EXPLICIT = {
-      // 'panir-classic': 'https://.../panir-classic.jpg',
+      // 'panir-classic': 'https://raw.githubusercontent.com/.../panir-classic.jpg',
     };
 
-    const PRODUCTS=[/* твой список как раньше (оставил без изменений) */ 
+    const PRODUCTS=[
+      /* ——— ТОВАРЫ ——— */
       { id:'panir-classic', name:'Панир Классический', cat:'Сыры', pricePerKg:1200, ico:'🧀', description:'Нежный свежий сыр.' },
       { id:'panir-herbs', name:'Панир С зеленью', cat:'Сыры', pricePerKg:1300, ico:'🌿', description:'С ароматными травами.' },
       { id:'panir-spicy', name:'Панир С пряностями', cat:'Сыры', pricePerKg:1350, ico:'🌶️', description:'С пикантными специями.' },
@@ -305,7 +324,7 @@
       { id:'chapati-wholewheat-10', name:'Чапати (ц/з мука)', cat:'Сладости и выпечка', pricePerUnit:320, ico:'🫓', description:'10 шт.' },
     ];
 
-    const VARIANT_RULES={ /* без изменений от твоей версии */ 
+    const VARIANT_RULES={
       'panir-classic':{type:'fixed',options:['200 г','300 г','400 г','500 г','1000 г']},
       'panir-herbs':{type:'fixed',options:['200 г','300 г','400 г','500 г','1000 г']},
       'panir-spicy':{type:'fixed',options:['200 г','300 г','400 г','500 г','1000 г']},
@@ -384,7 +403,7 @@
        СОСТОЯНИЕ
     ============================== */
     let cart=[]; let currentProduct=null; let filteredProducts=[];
-    let imageIndex=null; // { key: {url, alt, fn} }
+    let imageIndex=null;
 
     /* ==============================
        INIT
@@ -398,7 +417,7 @@
       renderUserProfile();
       populateCategoryFilter();
       filterAndRender();
-      ensureImagesIndex(); // асинхронно подгрузим карту фото
+      ensureImagesIndex(); // асинхронно подтянем карту фото
     }
 
     function loadState(){
@@ -420,8 +439,6 @@
       const wa=Telegram.WebApp;
       wa.ready(); wa.expand();
 
-      // Мы сохраняем тёплую палитру и НЕ затираем фон/карточки темами ТГ.
-      // Но подхватим их кнопочные цвета, если заданы.
       const tp=wa.themeParams||{};
       if(tp.button_color) document.documentElement.style.setProperty('--button-color', tp.button_color);
       if(tp.button_text_color) document.documentElement.style.setProperty('--button-text-color', tp.button_text_color);
@@ -443,6 +460,10 @@
       byId('product-variant-select').addEventListener('change', updateProductModalPrice);
       byId('product-qty-input').addEventListener('input', updateProductModalPrice);
       byId('cart-send-btn').addEventListener('click', sendOrder);
+
+      // Status modal buttons
+      byId('status-ok').addEventListener('click', () => closeStatus(true));
+      byId('status-close').addEventListener('click', () => closeStatus(false));
     }
 
     function renderUserProfile(){
@@ -687,7 +708,7 @@
     }
 
     /* ==============================
-       ОФОРМЛЕНИЕ/ОТПРАВКА
+       ОФОРМЛЕНИЕ/ОТПРАВКА + СТАТУС-МОДАЛКА
     ============================== */
     function loadCheckout(){
       try{ return JSON.parse(localStorage.getItem('syromania-checkout')||'{}'); }catch{ return {} }
@@ -695,6 +716,7 @@
     function saveCheckout(obj){
       try{ localStorage.setItem('syromania-checkout', JSON.stringify(obj)); }catch{}
     }
+
     function sendOrder(){
       if(!cart.length) return;
 
@@ -728,39 +750,69 @@
       });
       payload.total=total;
 
-      // Основной путь — через Telegram, чтобы твой бэк (webhook) получил web_app_data
+      // Основной путь — через Telegram WebApp (бот получит web_app_data в вебхуке)
       if(Telegram && Telegram.WebApp){
         try{
           Telegram.WebApp.sendData(JSON.stringify(payload));
-          Telegram.WebApp.close();
+          // Показываем успешный статус, затем закрываем миниапп
+          showStatus('success','Ваш заказ отправлен. Мы свяжемся с вами в ближайшее время!', true);
         }catch(e){
-          console.error(e); alert('Не удалось отправить через Telegram WebApp');
+          console.error(e);
+          showStatus('error','Не удалось отправить заказ через Telegram. Попробуйте ещё раз.', false);
         }
       }else{
-        // fallback для локального предпросмотра в браузере (без Telegram)
+        // Предпросмотр вне Telegram (не для прода) — попытаемся постучаться в твой Render
         fetch('https://puzzlebot-webhook-handler1.onrender.com/',{
           method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
-        }).then(()=> alert('Отправлено (предпросмотр)')).catch(()=> alert('Ошибка отправки (предпросмотр)'));
+        }).then(res=>{
+          if(res.ok) showStatus('success','Заказ отправлен (режим предпросмотра).', false);
+          else showStatus('error','Сервер ответил ошибкой в режиме предпросмотра.', false);
+        }).catch(()=>{
+          showStatus('error','Сетевая ошибка при отправке (предпросмотр).', false);
+        });
+      }
+    }
+
+    function showStatus(type, text, autoclose){
+      const dlg=byId('status-modal');
+      byId('status-ico').textContent = type==='success' ? '✅' : '⚠️';
+      byId('status-title').textContent = type==='success' ? 'Заказ отправлен' : 'Ошибка';
+      byId('status-text').textContent = text || '';
+      dlg.showModal();
+
+      // Автоматически закрыть и закрыть мини-приложение, если успех и мы в Telegram
+      if(autoclose){
+        setTimeout(()=>{ closeStatus(true); }, 1400);
+      }
+    }
+
+    function closeStatus(shouldCloseApp){
+      const dlg=byId('status-modal');
+      try{ dlg.close(); }catch{}
+      if(shouldCloseApp && Telegram && Telegram.WebApp){
+        try{ Telegram.WebApp.close(); }catch{}
       }
     }
 
     /* ==============================
        ФОТО ИЗ GITHUB ISSUE (#1)
-       - Пытаемся вытащить ![alt](url) из body/комментариев
-       - Матчим по слагу имени/ID товара
+       - Вытягиваем ![alt](url) из описания и комментариев
+       - Матчим по слагу названия/ID товара
     ============================== */
     async function ensureImagesIndex(){
       try{
         const cached=JSON.parse(localStorage.getItem(IMAGE_MAP_CACHE_KEY)||'null');
         if(cached && Date.now()-cached.ts < 6*60*60*1000){ imageIndex=cached.map; renderProducts(); return; }
 
-        // читаем тело issue
         const issue = await fetch(GITHUB_ISSUE_API).then(r=>r.json());
         const comments = await fetch(GITHUB_ISSUE_API+'/comments').then(r=>r.json());
         const md = [issue.body||'', ...comments.map(c=>c.body||'')].join('\n');
         const map = {};
         const re = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
-        let m; while((m=re.exec(md))){ const alt=(m[1]||'').trim(); const url=m[2]; map[alt||url.split('/').pop()]={url,alt,fn:url.split('/').pop()} }
+        let m; while((m=re.exec(md))){
+          const alt=(m[1]||'').trim(); const url=m[2];
+          map[alt||url.split('/').pop()]={url,alt,fn:url.split('/').pop()};
+        }
         imageIndex = map;
         localStorage.setItem(IMAGE_MAP_CACHE_KEY, JSON.stringify({ts:Date.now(), map}));
         renderProducts();
