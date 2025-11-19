@@ -110,9 +110,14 @@
     /* Свой вес — состояние disabled */
     .custom-weight.disabled{opacity:.6}
     .custom-weight.disabled input{pointer-events:none}
-    .custom-weight .toggle-line{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .custom-weight .toggle-line{
+      display:flex;
+      flex-direction:column;      /* СТАВИМ В СТОЛБИК, чтобы не накладывалось */
+      align-items:flex-start;
+      gap:4px;
+      margin-top:6px;
+    }
 
-    /* Мобильные правки: поле веса широкое и читаемое */
     @media (max-width:420px){
       .form-row{flex-direction:column}
     }
@@ -162,7 +167,7 @@
         <select id="product-flavor-select"></select>
       </div>
 
-      <!-- Свой вес — всегда виден, но выключен до галочки -->
+      <!-- Свой вес -->
       <div class="form-group custom-weight disabled" id="custom-weight-wrap">
         <label for="product-custom-weight">Свой вес (г)</label>
         <input type="number" id="product-custom-weight" min="50" step="50" placeholder="Например: 350" disabled />
@@ -195,7 +200,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-  // ===== CONFIG =====
   const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com';
   const CURRENCY = 'RUB';
   const ROUND = Math.round;
@@ -208,13 +212,8 @@
   const fmtRub = (n)=> new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
   const PLACEHOLDER_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
 
-  // Промокоды (пример). Лучше хранить на бэкенде.
-  const PROMO_CODES = {
-    // 'SYR5': { type:'percent', value:5, note:'Скидка 5%' },
-    // 'HELLOSYR': { type:'fixed', value:100, note:'-100 ₽' },
-  };
+  const PROMO_CODES = {};
 
-  // ===== GROUPS =====
   const GROUPS = [
     { id:'brined',   title:'Рассольные сыры' },
     { id:'soft',     title:'Мягкие сыры' },
@@ -226,9 +225,7 @@
   ];
   const CHEESE_GROUP_IDS = new Set(['brined','soft','hard','rolls']);
 
-  // ===== DATA (цены и фото обновлены) =====
   const PRODUCTS = [
-    // -------- СЫРЫ (Рассольные) --------
     { id:'mozzarella', name:'Моцарелла', group:'brined', pricePerKg:2000,
       description:'Мешочек из моцареллы. Идеальна к салатам. Срок хранения: 3–5 суток.',
       img:'https://raw.githubusercontent.com/youmyloving/syr/main/mozzarella.webp' },
@@ -314,7 +311,6 @@
       description:'Нестандартный вкус, не сильно солёные. Срок хранения: 7 суток.',
       img:'https://static.tildacdn.com/tild3463-6166-4665-a439-323264653939/spicy-klubok.webp' },
 
-    // -------- МОЛОЧКА --------
     { id:'milk', name:'Молоко', group:'dairy', pricePerL:150,
       description:'Молоко отборное цельное, охлаждённое. Как из детства! Срок: 3–5 суток.',
       img: PLACEHOLDER_IMG },
@@ -360,7 +356,6 @@
       }
     },
 
-    // -------- СЛАДОСТИ --------
     { id:'sandesh-orange', name:'Сандеш (апельсин)', group:'sweets', pricePerUnit:300,
       description:'Молоко, тростниковый сахар, цедра апельсина. 5 шт. Срок: 5 суток.',
       img:'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp' },
@@ -389,7 +384,6 @@
       description:'Из цельнозерн. муки и домашней сгущёнки.',
       img:'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp' },
 
-    // -------- ВЫПЕЧКА --------
     { id:'cookies-nut', name:'Ореховые пальчики', group:'bakery', pricePerKg:700,
       description:'Хрустящие орехи.',
       img:'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp' },
@@ -425,7 +419,6 @@
       img: PLACEHOLDER_IMG },
   ];
 
-  // Варианты (исправлено: моцарелла — только 200 г; все халлуми — только 250 г)
   const VARIANT_RULES = {
     'mozzarella':{ type:'fixed', options:['1 шт (200 г)'] },
     'buratta':{ type:'fixed', options:['1 шт (250 г)'] },
@@ -458,7 +451,6 @@
     'kosichka-smoked':{ type:'fixed', options:['1 шт (200 г)'] },
     'spicy-klubok':{ type:'fixed', options:['1 шт (150 г)'] },
 
-    // Молочка
     'milk':{ type:'fixed', options:['0.5 л','1 л'] },
     'milk-topped':{ type:'fixed', options:['0.5 л','1 л'] },
     'yogurt':{ type:'fixed', options:['0.5 л','1 л'] },
@@ -472,7 +464,6 @@
     'condensed-milk':{ type:'weight', unit:'г', step:100, min:200, max:2000 },
     'tvorozhnaya-massa':{ type:'weight', unit:'г', step:100, min:200, max:2000 },
 
-    // Сладости/выпечка
     'sandesh-orange':{ type:'fixed', options:['5 шт'] },
     'sandesh-walnut':{ type:'fixed', options:['5 шт'] },
     'sandesh-carob':{ type:'fixed', options:['5 шт'] },
@@ -498,14 +489,12 @@
     'chapati-wholewheat-10':{ type:'fixed', options:['10 шт'] },
   };
 
-  // ===== STATE =====
   let cart = [];
   let favorites = new Set();
   let currentProduct = null;
   let filteredProducts = [];
   let checkoutState = { phone:'', address:'', comment:'', promo:'', city:'Пенза' };
 
-  // ===== INIT =====
   document.addEventListener('DOMContentLoaded', init);
   function init(){
     loadState();
@@ -530,7 +519,6 @@
     try{ localStorage.setItem(STORAGE_CHECKOUT_KEY, JSON.stringify(checkoutState)) }catch{}
   }
 
-  // ===== TELEGRAM =====
   function setupTelegramWebApp(){
     if(window.Telegram && window.Telegram.WebApp){
       const webApp = window.Telegram.WebApp;
@@ -544,7 +532,6 @@
     }
   }
 
-  // ===== UI HOOKS =====
   function setupEventListeners(){
     el('search-input').addEventListener('input', filterAndRender);
     el('category-filter').addEventListener('change', filterAndRender);
@@ -553,13 +540,11 @@
     el('open-cart-btn').addEventListener('click', openCartModal);
     el('add-to-cart-btn').addEventListener('click', addToCart);
     el('product-variant-select').addEventListener('change', updateProductModalPrice);
-    // «Свой вес» — переключатель и поле
     el('custom-weight-enable').addEventListener('change', onToggleCustomWeight);
     el('product-custom-weight').addEventListener('input', updateProductModalPrice);
     el('product-qty-input').addEventListener('input', updateProductModalPrice);
   }
 
-  // ===== HEADER =====
   function renderUserProfile(){
     const box = el('user-profile');
     const ua = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -574,7 +559,6 @@
     } else box.style.display='none';
   }
 
-  // ===== FILTERS & MAIN RENDER =====
   function populateCategoryFilter(){
     const select = el('category-filter');
     GROUPS.forEach(g=>{ const o=document.createElement('option'); o.value=g.id; o.textContent=g.title; select.appendChild(o) });
@@ -655,7 +639,6 @@
     saveState(); refreshFavoritesBar(); filterAndRender();
   }
 
-  // ===== PRODUCT MODAL =====
   function openProductModal(productId){
     currentProduct = PRODUCTS.find(p=>p.id===productId); if(!currentProduct) return;
     const m = el('product-modal');
@@ -663,10 +646,9 @@
     el('product-modal-description').textContent = currentProduct.description || '';
     renderVariantSelector();
     renderFlavorSelector();
-    // Свой вес — подсказка
     const hint = el('custom-weight-hint');
     hint.textContent = currentProduct.pricePerKg ? 'Шаг 50 г, скидки учитываются автоматически.' : 'Доступно только для товаров по весу (кг).';
-    setCustomWeightEnabled(false, /*forceDisabled*/ !currentProduct.pricePerKg);
+    setCustomWeightEnabled(false, !currentProduct.pricePerKg);
     updateProductModalPrice();
     m.showModal();
     window.Telegram?.WebApp?.BackButton.show();
@@ -685,7 +667,6 @@
       rule.options.forEach(opt=>{
         const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o);
       });
-      // бейдж ≈ цена/вес
       const maybe = approxPieceBadgeText(currentProduct);
       if(maybe){ pieceBadge.style.display=''; pieceBadge.textContent = maybe }
     } else if(rule.type==='weight'){
@@ -706,7 +687,6 @@
         const o=document.createElement('option'); o.value=f; o.textContent=f; select.appendChild(o);
       });
       select.onchange = ()=> {
-        // подменим картинку, если есть
         const img = currentProduct.flavorImages?.[select.value];
         if(img){ currentProduct.img = img; filterAndRender(); }
       };
@@ -715,7 +695,7 @@
 
   function onToggleCustomWeight(){
     const enabled = el('custom-weight-enable').checked;
-    const hardDisabled = !currentProduct?.pricePerKg; // для литров/шт
+    const hardDisabled = !currentProduct?.pricePerKg;
     setCustomWeightEnabled(enabled, hardDisabled);
     updateProductModalPrice();
   }
@@ -728,7 +708,6 @@
     wrap.classList.toggle('disabled', !enabled);
   }
 
-  // ===== CART LOGIC =====
   function addToCart(){
     if(!currentProduct) return;
     const {variant, qty, flavor} = getSelectedVariantAndQty();
@@ -783,7 +762,6 @@
       body.appendChild(div);
     });
 
-    // Сумма + промокод
     const wrap = document.createElement('div'); wrap.className='cart-summary';
     const promoBlock = `
       <div style="text-align:left;margin:10px 0 0">
@@ -794,7 +772,6 @@
     wrap.innerHTML = `Итого: ${fmtRub(total)}${promoBlock}`;
     body.appendChild(wrap);
 
-    // Контакты/доставка (+ город)
     const checkout = document.createElement('div');
     checkout.innerHTML = `
       <div class="section-title">Контакты и доставка</div>
@@ -824,7 +801,6 @@
     `;
     body.appendChild(checkout);
 
-    // восстановим
     el('checkout-city').value = checkoutState.city || 'Пенза';
     el('checkout-phone').value = checkoutState.phone || '';
     el('checkout-address').value = checkoutState.address || '';
@@ -836,12 +812,10 @@
     el('checkout-comment').addEventListener('input',()=>{ checkoutState.comment = el('checkout-comment').value; saveState() });
     el('checkout-promo').addEventListener('input',()=>{ checkoutState.promo = el('checkout-promo').value.trim(); saveState() });
 
-    // кнопка отправки
     const sendBtn = document.createElement('button'); sendBtn.className='btn btn-primary'; sendBtn.textContent='Отправить заказ';
     sendBtn.onclick = sendOrder;
     body.appendChild(sendBtn);
 
-    // Примечание про взвешивание (для сыров)
     if(hasCheeseInCart()){
       const note = document.createElement('div'); note.className='weighing-note';
       note.textContent = 'Конечная сумма заказа уточняется после взвешивания в день доставки (для сыров).';
@@ -854,7 +828,6 @@
     saveState(); updateCartUI(); renderCartModal();
   }
 
-  // ===== PRICING =====
   function hasPrice(p){ return p.pricePerKg || p.pricePerL || p.pricePerUnit }
   function getPriceText(p){
     if(p.pricePerKg) return `${fmtRub(p.pricePerKg)} / кг`;
@@ -870,13 +843,11 @@
     if(!opt) return '';
     const grams = extractGrams(opt); if(!grams) return '';
     const approx = Math.round(p.pricePerKg * grams / 1000);
-    // Для халлуми добавим пояснение по весу
     const weightNote = p.id.startsWith('halloumi') ? ' (вес 200–250 г)' : '';
     return `≈ ${fmtRub(approx)} за 1 шт${weightNote}`;
   }
 
   function getSelectedVariantAndQty(){
-    const rule = VARIANT_RULES[currentProduct.id];
     const qty = Math.max(1, parseInt(el('product-qty-input').value)||1);
     let variant = el('product-variant-select').value;
     const customEnabled = el('custom-weight-enable').checked && !!currentProduct.pricePerKg;
@@ -889,12 +860,10 @@
   }
 
   function baseVariant(v){
-    // уберём при подсчёте часть "; вкус: ...", чтобы правильно парсить граммы
     return (v||'').split(';')[0].trim();
   }
 
   function extractGrams(variant){
-    // матчит: 200 г / 1 шт (200 г) / ±200 г / ~200 г / 1 шт (250 г)
     const m = (variant||'').match(/(?:\(|^)\s*[~±]?\s*(\d+(?:\.\d+)?)\s*(г|кг)\s*\)?/i);
     if(!m) return 0;
     const val = parseFloat(m[1]);
@@ -907,7 +876,6 @@
 
   function calculatePrice(productId, variant, qty){
     const p = PRODUCTS.find(x=>x.id===productId); if(!p) return {basePrice:0, finalPrice:0, discountRate:0};
-    const rule = VARIANT_RULES[productId];
     let base=0;
 
     if(p.pricePerKg){
@@ -940,7 +908,6 @@
     const { variant, qty } = getSelectedVariantAndQty();
     const { finalPrice } = calculatePrice(currentProduct.id, variant, qty);
     el('product-modal-price').textContent = fmtRub(finalPrice);
-    // динамический бейдж "≈ за 1 шт"
     const pieceBadge = el('piece-badge');
     pieceBadge.style.display='none';
     if(currentProduct.pricePerKg && /шт/i.test(variant)){
@@ -960,7 +927,6 @@
     });
   }
 
-  // ===== CHECKOUT =====
   function normalizePhone(input){
     if(!input) return '';
     const digits = (''+input).replace(/\D+/g,'');
@@ -1023,12 +989,10 @@
       });
     });
 
-    // применим промо
     const promoRes = applyPromo(grand, contact.promo);
     payload.total = promoRes.total;
     if(promoRes.applied){ payload.promo_applied = promoRes.applied }
 
-    // enrich with Telegram user info
     if(window.Telegram?.WebApp){
       const tg = window.Telegram.WebApp; payload.telegram = { platform:tg.platform, init_data:!!tg.initData };
       const u = tg.initDataUnsafe?.user; if(u){ payload.telegram.user = { id:u.id, username:u.username, first_name:u.first_name, last_name:u.last_name } }
@@ -1044,13 +1008,10 @@
     });
   }
 
-  // ===== HELPERS =====
   function el(id){ return document.getElementById(id) }
   function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])) }
 
-  // ===== FAVORITES BAR INIT =====
   refreshFavoritesBar();
-
   </script>
 </body>
 </html>
