@@ -2,44 +2,49 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Сыромания — заказ</title>
+  <title>Сыромания — Премиум молочная продукция</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="theme-color" content="#F7F0E3" />
+  <meta name="theme-color" content="#F5F0E8" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --brand-from: #8B5A2B;
-      --brand-to: #D4A574;
-      --brand-gradient: linear-gradient(135deg, #8B5A2B 0%, #D4A574 100%);
-      --brand-light: #F5E6D3;
+      --brand-primary: #C9A87C;
+      --brand-secondary: #8B7355;
+      --brand-dark: #5C4A3A;
+      --brand-gradient: linear-gradient(135deg, #D4B896 0%, #C9A87C 50%, #B8956E 100%);
+      --brand-soft: #F5F0E8;
       
-      --bg-color: #FAF7F2;
+      --bg-color: #FAF8F5;
       --card-bg: #FFFFFF;
-      --secondary-bg: #FFF8F0;
-      --header-bg: rgba(255, 252, 248, 0.95);
-      --text-color: #2C2416;
+      --elevated-bg: #FFFFFF;
+      --header-bg: rgba(253, 251, 247, 0.92);
+      --text-primary: #2C2416;
       --text-secondary: #6B5D4D;
-      --hint-color: #8B7D6B;
-      --border-color: #E8DDD0;
-      --danger: #DC3545;
-      --success: #28A745;
-      --warning: #F0AD4E;
+      --text-tertiary: #9B8B7A;
+      --border-color: #E8E0D5;
+      --danger: #E74C3C;
+      --success: #27AE60;
+      --warning: #F39C12;
 
       --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
-      --shadow-sm: 0 2px 8px rgba(139, 90, 43, 0.08);
-      --shadow-md: 0 4px 16px rgba(139, 90, 43, 0.12);
-      --shadow-lg: 0 8px 32px rgba(139, 90, 43, 0.18);
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --shadow-sm: 0 2px 8px rgba(92, 74, 58, 0.06);
+      --shadow-md: 0 8px 24px rgba(92, 74, 58, 0.10);
+      --shadow-lg: 0 16px 48px rgba(92, 74, 58, 0.15);
+      --shadow-hover: 0 20px 60px rgba(92, 74, 58, 0.20);
 
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-display: 'Playfair Display', Georgia, serif;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     * {
@@ -55,7 +60,7 @@
       margin: 0;
       font-family: var(--font-main);
       background: var(--bg-color);
-      color: var(--text-color);
+      color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
       overflow-x: hidden;
@@ -75,34 +80,36 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      padding: 12px 16px;
+      padding: 16px;
       background: var(--header-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-color);
-      transition: box-shadow 0.3s ease;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(232, 224, 213, 0.6);
+      transition: all 0.3s var(--ease-out);
     }
 
     header.scrolled {
       box-shadow: var(--shadow-md);
+      padding-top: 12px;
+      padding-bottom: 12px;
     }
 
     .header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     #user-profile {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: var(--brand-gradient);
       display: flex;
@@ -110,9 +117,10 @@
       justify-content: center;
       overflow: hidden;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       color: white;
       box-shadow: var(--shadow-sm);
+      border: 2px solid rgba(255,255,255,0.6);
     }
 
     .user-avatar img {
@@ -124,13 +132,15 @@
     .user-name {
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-color);
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
     }
 
     .brand-title {
+      font-family: var(--font-display);
       font-weight: 700;
-      font-size: 20px;
-      background: var(--brand-gradient);
+      font-size: 24px;
+      background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -140,38 +150,40 @@
     /* Search */
     .search-container {
       position: relative;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .search-icon {
       position: absolute;
-      left: 14px;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--hint-color);
+      color: var(--text-tertiary);
       font-size: 16px;
+      pointer-events: none;
     }
 
     #search-input {
       width: 100%;
-      padding: 12px 16px 12px 40px;
+      padding: 14px 16px 14px 44px;
       border-radius: var(--radius-xl);
       border: 1px solid var(--border-color);
       font-size: 15px;
       background: var(--card-bg);
-      color: var(--text-color);
+      color: var(--text-primary);
       outline: none;
       transition: all 0.2s ease;
       font-family: inherit;
+      box-shadow: var(--shadow-sm);
     }
 
     #search-input:focus {
-      border-color: var(--brand-to);
-      box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.12);
     }
 
     #search-input::placeholder {
-      color: var(--hint-color);
+      color: var(--text-tertiary);
     }
 
     /* Filters */
@@ -190,27 +202,30 @@
 
     .filter-chip {
       flex-shrink: 0;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: var(--radius-xl);
       border: 1px solid var(--border-color);
       background: var(--card-bg);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s var(--ease-out);
       white-space: nowrap;
       color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
     }
 
     .filter-chip:hover {
-      background: var(--secondary-bg);
+      background: var(--brand-soft);
+      transform: translateY(-1px);
     }
 
     .filter-chip.active {
       background: var(--brand-gradient);
       color: white;
       border-color: transparent;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md);
+      font-weight: 600;
     }
 
     /* Favorites Bar */
@@ -219,48 +234,49 @@
       margin-top: 12px;
       padding-top: 12px;
       border-top: 1px dashed var(--border-color);
-    }
-
-    #favorites-bar.visible {
-      display: flex;
       gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
     }
 
+    #favorites-bar.visible {
+      display: flex;
+    }
+
     .fav-chip {
       flex-shrink: 0;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: var(--radius-xl);
       border: none;
-      background: var(--secondary-bg);
-      font-size: 12px;
+      background: var(--brand-soft);
+      font-size: 13px;
       font-weight: 500;
-      color: var(--brand-from);
+      color: var(--brand-secondary);
       cursor: pointer;
       transition: all 0.2s ease;
       border: 1px solid transparent;
     }
 
     .fav-chip:hover {
-      background: var(--brand-light);
-      border-color: var(--brand-to);
+      background: #EDE6D8;
+      border-color: var(--brand-primary);
+      transform: translateY(-1px);
     }
 
     /* Main Content */
     main {
       flex: 1;
       padding: 16px;
-      padding-bottom: calc(100px + var(--safe-bottom));
+      padding-bottom: calc(120px + var(--safe-bottom));
     }
 
     .section {
-      margin-bottom: 24px;
-      animation: fadeIn 0.4s ease;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.5s var(--ease-out);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -268,43 +284,49 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       padding: 0 4px;
     }
 
     .section-title {
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: 22px;
       font-weight: 700;
-      color: var(--text-color);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      letter-spacing: -0.3px;
     }
 
     .section-title::before {
       content: '';
       width: 4px;
-      height: 20px;
+      height: 24px;
       background: var(--brand-gradient);
       border-radius: 2px;
     }
 
     .section-count {
-      font-size: 13px;
-      color: var(--hint-color);
-      font-weight: 500;
+      font-size: 14px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      background: var(--brand-soft);
+      padding: 4px 12px;
+      border-radius: 20px;
     }
 
     /* Product Grid */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 16px;
     }
 
     @media (min-width: 480px) {
       .product-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
       }
     }
 
@@ -316,15 +338,15 @@
       display: flex;
       flex-direction: column;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.4s var(--ease-out);
       position: relative;
       border: 1px solid transparent;
     }
 
     .product-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--border-color);
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(201, 168, 124, 0.2);
     }
 
     .product-card:active {
@@ -334,8 +356,8 @@
     .product-image-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 75%; /* 4:3 Aspect Ratio */
-      background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
+      padding-top: 85%;
+      background: linear-gradient(135deg, #F5F0E8 0%, #EDE6D8 100%);
       overflow: hidden;
     }
 
@@ -346,43 +368,46 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      transition: transform 0.6s var(--ease-out);
     }
 
     .product-card:hover .product-thumb {
-      transform: scale(1.05);
+      transform: scale(1.08);
     }
 
     .product-badge {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 10px;
+      right: 10px;
       background: rgba(255, 255, 255, 0.95);
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      border-radius: 20px;
       font-size: 11px;
-      font-weight: 600;
-      color: var(--brand-from);
-      backdrop-filter: blur(4px);
+      font-weight: 700;
+      color: var(--brand-secondary);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.04);
     }
 
     .product-info {
-      padding: 12px;
+      padding: 16px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .product-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
-      color: var(--text-color);
-      line-height: 1.3;
+      color: var(--text-primary);
+      line-height: 1.35;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      min-height: 40px;
     }
 
     .product-price-row {
@@ -390,92 +415,65 @@
       align-items: center;
       justify-content: space-between;
       margin-top: auto;
-      padding-top: 8px;
+      padding-top: 10px;
     }
 
     .product-price {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--brand-from);
+      color: var(--brand-secondary);
+      letter-spacing: -0.3px;
     }
 
     .product-unit {
       font-size: 12px;
-      color: var(--hint-color);
+      color: var(--text-tertiary);
       font-weight: 500;
+      margin-top: 2px;
     }
 
     .fav-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: var(--secondary-bg);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      transition: all 0.2s ease;
-      color: var(--hint-color);
-    }
-
-    .fav-btn:hover {
-      background: #ffebee;
-      transform: scale(1.1);
-    }
-
-    .fav-btn.active {
-      background: #ffebee;
-      color: #e53935;
-    }
-
-    .quick-add-btn {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--brand-gradient);
       border: none;
-      color: white;
-      font-size: 20px;
+      background: var(--brand-soft);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: var(--shadow-md);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.3s ease;
+      font-size: 20px;
+      transition: all 0.3s var(--ease-spring);
+      color: var(--text-tertiary);
     }
 
-    .product-card:hover .quick-add-btn {
-      opacity: 1;
-      transform: translateY(0);
+    .fav-btn:hover {
+      background: #FCE8E6;
+      transform: scale(1.15);
     }
 
-    .quick-add-btn:active {
-      transform: scale(0.9);
+    .fav-btn.active {
+      background: #FCE8E6;
+      color: #E74C3C;
     }
 
     /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--hint-color);
+      padding: 80px 20px;
+      color: var(--text-tertiary);
     }
 
     .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.5;
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.4;
     }
 
     .empty-text {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 500;
+      color: var(--text-secondary);
     }
 
     /* Cart Footer */
@@ -485,19 +483,19 @@
       right: 0;
       bottom: 0;
       z-index: 90;
-      padding: 12px 16px calc(12px + var(--safe-bottom));
-      background: linear-gradient(to top, rgba(250, 247, 242, 1) 0%, rgba(250, 247, 242, 0.9) 100%);
-      backdrop-filter: blur(10px);
+      padding: 16px 20px calc(16px + var(--safe-bottom));
+      background: linear-gradient(to top, rgba(250, 248, 245, 1) 0%, rgba(250, 248, 245, 0.9) 100%);
+      backdrop-filter: blur(20px);
     }
 
     .cart-button {
       width: 100%;
-      max-width: 600px;
+      max-width: 560px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 20px;
+      padding: 16px 24px;
       border-radius: var(--radius-xl);
       border: none;
       background: var(--brand-gradient);
@@ -506,50 +504,56 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg), 0 4px 20px rgba(201, 168, 124, 0.3);
+      transition: all 0.3s var(--ease-out);
       position: relative;
       overflow: hidden;
     }
 
     .cart-button:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
     }
 
     .cart-button:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(139, 90, 43, 0.25);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover), 0 8px 30px rgba(201, 168, 124, 0.4);
     }
 
     .cart-button:not(:disabled):active {
-      transform: translateY(0);
+      transform: translateY(-1px);
     }
 
     .cart-info {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .cart-count {
       background: rgba(255, 255, 255, 0.25);
-      padding: 4px 10px;
-      border-radius: var(--radius-xl);
-      font-size: 14px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 15px;
       font-weight: 700;
+      backdrop-filter: blur(4px);
     }
 
     .cart-total {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 700;
     }
 
     .cart-arrow {
-      font-size: 20px;
-      opacity: 0.8;
+      font-size: 24px;
+      opacity: 0.9;
+      transition: transform 0.3s ease;
+    }
+
+    .cart-button:not(:disabled):hover .cart-arrow {
+      transform: translateX(4px);
     }
 
     /* Modals */
@@ -559,23 +563,24 @@
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
       max-width: 600px;
       width: 100%;
-      max-height: 90vh;
+      max-height: 92vh;
       margin: auto 0 0 0;
-      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.2);
-      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.25);
+      animation: slideUp 0.4s var(--ease-out);
       background: var(--card-bg);
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
+      overflow: hidden;
     }
 
     @media (min-width: 600px) {
       dialog {
         border-radius: var(--radius-lg);
         margin: auto;
-        max-height: 85vh;
-        animation: popIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 88vh;
+        animation: popIn 0.4s var(--ease-out);
       }
     }
 
@@ -585,21 +590,26 @@
     }
 
     @keyframes popIn {
-      from { transform: translateX(-50%) scale(0.95); opacity: 0; }
+      from { transform: translateX(-50%) scale(0.9); opacity: 0; }
       to { transform: translateX(-50%) scale(1); opacity: 1; }
     }
 
     dialog::backdrop {
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      animation: fadeIn 0.2s ease;
+      background: rgba(44, 36, 22, 0.6);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal-header {
       position: sticky;
       top: 0;
       z-index: 10;
-      padding: 16px 20px;
+      padding: 20px 24px;
       background: var(--card-bg);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -608,214 +618,235 @@
     }
 
     .modal-title {
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: 22px;
       font-weight: 700;
       margin: 0;
       padding-right: 40px;
+      color: var(--text-primary);
     }
 
     .modal-close {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
-      background: var(--secondary-bg);
-      font-size: 24px;
+      background: var(--brand-soft);
+      font-size: 28px;
       line-height: 1;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--text-secondary);
-      transition: all 0.2s ease;
+      transition: all 0.3s var(--ease-spring);
     }
 
     .modal-close:hover {
-      background: #ffebee;
+      background: #FCE8E6;
       color: var(--danger);
       transform: rotate(90deg);
     }
 
     .modal-body {
-      padding: 20px;
+      padding: 24px;
       overflow-y: auto;
-      max-height: calc(90vh - 70px);
+      max-height: calc(92vh - 80px);
     }
 
     /* Product Modal */
     .product-image-large {
       width: 100%;
-      aspect-ratio: 16/10;
+      aspect-ratio: 4/3;
       object-fit: cover;
       border-radius: var(--radius-md);
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #F5F0E8 0%, #EDE6D8 100%);
+      box-shadow: var(--shadow-sm);
     }
 
     .product-description {
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: 15px;
+      line-height: 1.7;
       color: var(--text-secondary);
-      margin-bottom: 20px;
-      padding: 16px;
-      background: var(--secondary-bg);
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--brand-soft);
       border-radius: var(--radius-md);
+      border-left: 4px solid var(--brand-primary);
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .form-label {
       display: block;
       font-size: 13px;
-      font-weight: 600;
-      color: var(--text-color);
-      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
     }
 
-    .form-select, .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      font-size: 15px;
-      background: var(--card-bg);
-      color: var(--text-color);
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .form-select:focus, .form-input:focus {
-      border-color: var(--brand-to);
-      box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
-    }
-
-    .custom-weight-section {
-      margin-top: 12px;
-      padding: 16px;
-      background: var(--secondary-bg);
-      border-radius: var(--radius-md);
-      border: 2px dashed var(--border-color);
-    }
-
-    .custom-weight-section.active {
-      background: var(--card-bg);
-      border-style: solid;
-      border-color: var(--brand-to);
-    }
-
-    .custom-weight-toggle {
+    /* Modern Weight Selector */
+    .weight-selector {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-color);
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .custom-weight-toggle input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      accent-color: var(--brand-from);
+    .weight-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .weight-chip {
+      padding: 12px 20px;
+      border-radius: var(--radius-xl);
+      border: 2px solid var(--border-color);
+      background: var(--card-bg);
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.25s var(--ease-out);
+      color: var(--text-secondary);
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .weight-chip:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-secondary);
+      transform: translateY(-2px);
+    }
+
+    .weight-chip.active {
+      background: var(--brand-gradient);
+      color: white;
+      border-color: transparent;
+      box-shadow: var(--shadow-md);
+    }
+
+    .weight-chip.custom {
+      border-style: dashed;
+      color: var(--brand-secondary);
     }
 
     .custom-weight-input-wrapper {
+      display: none;
+      animation: fadeIn 0.3s ease;
+      margin-top: 8px;
+    }
+
+    .custom-weight-input-wrapper.visible {
       display: flex;
-      align-items: center;
       gap: 12px;
-      margin-top: 12px;
+      align-items: center;
     }
 
     .custom-weight-input {
       flex: 1;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      font-size: 16px;
+      border: 2px solid var(--border-color);
+      font-size: 17px;
       font-weight: 600;
       text-align: center;
       font-family: inherit;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .custom-weight-input:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.12);
     }
 
     .weight-hint {
-      font-size: 12px;
-      color: var(--hint-color);
+      font-size: 13px;
+      color: var(--text-tertiary);
       margin-top: 8px;
-      line-height: 1.4;
+      line-height: 1.5;
+      font-style: italic;
     }
 
     .price-display {
       display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin: 24px 0;
-      padding: 20px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 28px 0;
+      padding: 24px;
+      background: linear-gradient(135deg, var(--brand-soft) 0%, #F9F6F1 100%);
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(201, 168, 124, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .price-display::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
       background: var(--brand-gradient);
-      border-radius: var(--radius-md);
-      color: white;
     }
 
     .price-label {
       font-size: 14px;
-      opacity: 0.9;
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .price-value {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
-      margin-left: auto;
+      color: var(--brand-dark);
+      letter-spacing: -1px;
     }
 
     .price-old {
-      font-size: 16px;
+      font-size: 18px;
       text-decoration: line-through;
-      opacity: 0.7;
-    }
-
-    .discount-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-right: 12px;
+      font-weight: 500;
     }
 
     .btn-primary {
       width: 100%;
-      padding: 16px;
+      padding: 18px;
       border-radius: var(--radius-xl);
       border: none;
       background: var(--brand-gradient);
       color: white;
       font-family: inherit;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 700;
       cursor: pointer;
       box-shadow: var(--shadow-md);
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--ease-out);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
+      letter-spacing: 0.3px;
     }
 
     .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-lg);
     }
 
     .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
+      transform: translateY(-1px);
     }
 
     .btn-primary:disabled {
@@ -827,94 +858,114 @@
     .cart-items {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .cart-item {
       display: flex;
-      gap: 12px;
-      padding: 16px;
-      background: var(--secondary-bg);
-      border-radius: var(--radius-md);
+      gap: 16px;
+      padding: 20px;
+      background: var(--brand-soft);
+      border-radius: var(--radius-lg);
       position: relative;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .cart-item:hover {
+      border-color: var(--border-color);
+      transform: translateX(4px);
     }
 
     .cart-item-image {
-      width: 60px;
-      height: 60px;
-      border-radius: var(--radius-sm);
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-md);
       object-fit: cover;
       background: var(--border-color);
       flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
     }
 
     .cart-item-content {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .cart-item-name {
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 15px;
       margin-bottom: 4px;
-      color: var(--text-color);
+      color: var(--text-primary);
     }
 
     .cart-item-variant {
-      font-size: 12px;
-      color: var(--hint-color);
+      font-size: 13px;
+      color: var(--text-secondary);
       margin-bottom: 8px;
       word-break: break-word;
+      font-weight: 500;
     }
 
     .cart-item-price {
       font-weight: 700;
-      color: var(--brand-from);
-      font-size: 15px;
+      color: var(--brand-secondary);
+      font-size: 17px;
+      letter-spacing: -0.3px;
     }
 
     .cart-item-discount {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--success);
-      font-weight: 600;
-      margin-top: 2px;
+      font-weight: 700;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .cart-item-controls {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 8px;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .qty-control {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: var(--card-bg);
       border-radius: var(--radius-xl);
-      padding: 4px;
+      padding: 6px;
       box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
     }
 
     .qty-btn {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: none;
       background: transparent;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-color);
-      transition: all 0.2s ease;
+      color: var(--text-primary);
+      transition: all 0.2s var(--ease-spring);
+      font-weight: 300;
     }
 
     .qty-btn:hover {
-      background: var(--secondary-bg);
+      background: var(--brand-soft);
+      transform: scale(1.1);
     }
 
     .qty-btn:active {
@@ -922,21 +973,22 @@
     }
 
     .qty-value {
-      min-width: 24px;
+      min-width: 28px;
       text-align: center;
-      font-weight: 600;
-      font-size: 15px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
     }
 
     .remove-btn {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       border: none;
       background: transparent;
-      color: var(--hint-color);
+      color: var(--text-tertiary);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -944,75 +996,102 @@
     }
 
     .remove-btn:hover {
-      background: #ffebee;
+      background: #FCE8E6;
       color: var(--danger);
+      transform: rotate(12deg);
     }
 
     .cart-summary-section {
       border-top: 2px solid var(--border-color);
-      padding-top: 20px;
-      margin-top: 20px;
+      padding-top: 24px;
+      margin-top: 24px;
     }
 
     .summary-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-size: 15px;
+      color: var(--text-secondary);
     }
 
     .summary-row.total {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
-      color: var(--text-color);
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px dashed var(--border-color);
+      color: var(--text-primary);
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 2px dashed var(--border-color);
+      font-family: var(--font-display);
     }
 
     .promo-input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       font-size: 15px;
       margin-top: 8px;
       text-transform: uppercase;
       font-family: inherit;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .promo-input:focus {
+      outline: none;
+      border-color: var(--brand-primary);
     }
 
     .checkout-section {
-      margin-top: 24px;
-      padding-top: 24px;
+      margin-top: 28px;
+      padding-top: 28px;
       border-top: 2px solid var(--border-color);
     }
 
     .section-subtitle {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--text-color);
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      font-family: var(--font-display);
+    }
+
+    .form-select, .form-input, .form-textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border-color);
+      font-size: 15px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-select:focus, .form-input:focus, .form-textarea:focus {
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.12);
     }
 
     .form-textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      font-size: 15px;
-      font-family: inherit;
       resize: vertical;
-      min-height: 80px;
+      min-height: 100px;
+      line-height: 1.5;
     }
 
     .error-message {
       color: var(--danger);
-      font-size: 13px;
-      margin-top: 8px;
-      padding: 12px;
-      background: #ffebee;
-      border-radius: var(--radius-sm);
+      font-size: 14px;
+      margin-top: 12px;
+      padding: 14px;
+      background: #FCE8E6;
+      border-radius: var(--radius-md);
       display: none;
+      font-weight: 500;
+      border-left: 4px solid var(--danger);
     }
 
     .error-message.visible {
@@ -1022,44 +1101,50 @@
 
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
     }
 
     .weighing-notice {
-      margin-top: 16px;
-      padding: 12px 16px;
-      background: #FFF3CD;
-      border: 1px solid #FFEAA7;
+      margin-top: 20px;
+      padding: 16px;
+      background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CD 100%);
+      border: 2px solid #FFEAA7;
       border-radius: var(--radius-md);
-      font-size: 13px;
+      font-size: 14px;
       color: #856404;
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 10px;
+      font-weight: 500;
+      line-height: 1.5;
     }
 
     .weighing-notice::before {
       content: '⚠️';
+      font-size: 20px;
     }
 
     /* Toast Notification */
     .toast {
       position: fixed;
-      top: 20px;
+      top: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: var(--text-color);
+      transform: translateX(-50%) translateY(-120%);
+      background: var(--text-primary);
       color: white;
-      padding: 12px 24px;
+      padding: 16px 28px;
       border-radius: var(--radius-xl);
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
       z-index: 1000;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.4s var(--ease-spring);
       box-shadow: var(--shadow-lg);
       pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .toast.visible {
@@ -1075,18 +1160,6 @@
       background: var(--danger);
     }
 
-    /* Loading State */
-    .skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
     /* Utility */
     .hidden {
       display: none !important;
@@ -1094,6 +1167,16 @@
 
     .text-secondary {
       color: var(--text-secondary);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
     }
   </style>
 </head>
@@ -1148,23 +1231,10 @@
       <img id="product-modal-image" class="product-image-large" src="" alt="">
       <div class="product-description" id="product-modal-description"></div>
 
-      <div class="form-group">
-        <label class="form-label">Вариант</label>
-        <select id="product-variant-select" class="form-select"></select>
+      <div class="form-group" id="variant-group">
+        <label class="form-label">Количество</label>
+        <div id="weight-selector-container"></div>
         <div class="weight-hint" id="variant-hint"></div>
-      </div>
-
-      <div class="form-group" id="custom-weight-block" style="display: none;">
-        <div class="custom-weight-section" id="custom-weight-section">
-          <label class="custom-weight-toggle">
-            <input type="checkbox" id="custom-weight-checkbox">
-            <span>Указать свой вес (в граммах)</span>
-          </label>
-          <div class="custom-weight-input-wrapper" id="custom-weight-input-wrapper" style="display: none;">
-            <input type="number" id="product-custom-weight" class="custom-weight-input" min="1" step="1" placeholder="Например, 350">
-            <span style="color: var(--hint-color); font-weight: 500;">г</span>
-          </div>
-        </div>
       </div>
 
       <div class="form-group" id="flavor-group" style="display: none;">
@@ -1173,7 +1243,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Количество</label>
+        <label class="form-label">Количество упаковок</label>
         <div class="qty-control" style="width: fit-content;">
           <button type="button" class="qty-btn" onclick="adjustQty(-1)">−</button>
           <span class="qty-value" id="product-qty-display">1</span>
@@ -1184,11 +1254,10 @@
       <div class="price-display" id="price-display">
         <div>
           <div class="price-label">Итого</div>
-          <div class="discount-badge" id="discount-badge" style="display: none;"></div>
         </div>
         <div style="text-align: right;">
-          <div class="price-old" id="price-old" style="display: none;"></div>
-          <div class="price-value" id="price-value">0 ₽</div>
+          <span class="price-old" id="price-old" style="display: none;"></span>
+          <span class="price-value" id="price-value">0 ₽</span>
         </div>
       </div>
 
@@ -1214,7 +1283,7 @@
     // ===== Configuration =====
     const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com';
     const CURRENCY = 'RUB';
-    const STORAGE_CART_KEY = 'syromania-cart-v2';
+    const STORAGE_CART_KEY = 'syromania-cart-v3';
     const STORAGE_FAV_KEY = 'syromania-favorites';
     const STORAGE_CHECKOUT_KEY = 'syromania-checkout';
     const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
@@ -1553,7 +1622,7 @@
         id: 'cream',
         name: 'Сливки (33–36%)',
         group: 'dairy',
-        pricePerL: 1450,
+        pricePerKg: 1450,
         ico: '🥛',
         description: 'Натуральные свежие сливки. Срок хранения: 5 суток.',
         img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp'
@@ -1917,8 +1986,7 @@
       'ryazhenka': { type: 'fixed', options: ['0.5 л', '1 л'], isLiquid: true },
       'misti-dahi': { type: 'fixed', options: ['0.5 л', '1 л'], isLiquid: true },
       'whey': { type: 'fixed', options: ['1 л'], isLiquid: true },
-      'cream': { type: 'fixed', options: ['0.2 л', '0.5 л', '1 л'], isLiquid: true },
-      
+      'cream': { type: 'weight', unit: 'г', step: 100, min: 200, max: 2000 }, // Исправлено: сливки по 100г от 200г
       'tvorog': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
       'tvorozhnaya-massa': { type: 'weight', unit: 'г', step: 100, min: 200, max: 2000 },
       'condensed-milk': { type: 'weight', unit: 'г', step: 100, min: 200, max: 2000 },
@@ -1969,6 +2037,7 @@
     let favorites = new Set();
     let currentProduct = null;
     let currentQty = 1;
+    let currentVariant = null;
     let checkoutState = { phone: '', address: '', comment: '', promo: '', city: 'Пенза' };
     let currentFilter = 'all';
 
@@ -2027,17 +2096,14 @@
     }
 
     function setupEventListeners() {
-      // Search
       document.getElementById('search-input').addEventListener('input', debounce(filterAndRender, 300));
       
-      // Header scroll effect
       window.addEventListener('scroll', () => {
         const header = document.getElementById('main-header');
         if (window.scrollY > 10) header.classList.add('scrolled');
         else header.classList.remove('scrolled');
       });
 
-      // Filter chips
       document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
           document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -2047,53 +2113,14 @@
         });
       });
 
-      // Cart button
       document.getElementById('open-cart-btn').addEventListener('click', openCartModal);
-
-      // Custom weight toggle
-      document.getElementById('custom-weight-checkbox').addEventListener('change', function() {
-        const wrapper = document.getElementById('custom-weight-input-wrapper');
-        const section = document.getElementById('custom-weight-section');
-        if (this.checked) {
-          wrapper.style.display = 'flex';
-          section.classList.add('active');
-          const input = document.getElementById('product-custom-weight');
-          if (!input.value) {
-            // Set default based on current selection
-            const variant = document.getElementById('product-variant-select').value;
-            const grams = extractGrams(variant) || getDefaultWeight(currentProduct);
-            input.value = grams;
-          }
-          input.focus();
-        } else {
-          wrapper.style.display = 'none';
-          section.classList.remove('active');
-        }
-        updateProductModalPrice();
-      });
-
-      // Custom weight input
-      document.getElementById('product-custom-weight').addEventListener('input', updateProductModalPrice);
-      
-      // Variant select
-      document.getElementById('product-variant-select').addEventListener('change', () => {
-        // Reset custom weight when variant changes
-        document.getElementById('custom-weight-checkbox').checked = false;
-        document.getElementById('custom-weight-input-wrapper').style.display = 'none';
-        document.getElementById('custom-weight-section').classList.remove('active');
-        updateProductModalPrice();
-      });
     }
 
     function debounce(func, wait) {
       let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
+      return function(...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func.apply(this, args), wait);
       };
     }
 
@@ -2149,12 +2176,13 @@
       }
 
       if (groupByCategory) {
-        GROUPS.forEach(group => {
+        GROUPS.forEach((group, index) => {
           const groupProducts = products.filter(p => p.group === group.id);
           if (groupProducts.length === 0) return;
 
           const section = document.createElement('section');
           section.className = 'section';
+          section.style.animationDelay = `${index * 0.1}s`;
           section.innerHTML = `
             <div class="section-header">
               <div class="section-title">${group.title}</div>
@@ -2180,7 +2208,7 @@
       const card = document.createElement('div');
       card.className = 'product-card';
       card.onclick = (e) => {
-        if (e.target.closest('.fav-btn') || e.target.closest('.quick-add-btn')) return;
+        if (e.target.closest('.fav-btn')) return;
         openProductModal(product.id);
       };
 
@@ -2208,7 +2236,6 @@
             </button>
           </div>
         </div>
-        <button class="quick-add-btn" onclick="quickAdd('${product.id}', event)" title="Быстро добавить">+</button>
       `;
 
       return card;
@@ -2244,25 +2271,13 @@
       currentQty = 1;
       document.getElementById('product-qty-display').textContent = '1';
 
-      // Reset custom weight
-      document.getElementById('custom-weight-checkbox').checked = false;
-      document.getElementById('custom-weight-input-wrapper').style.display = 'none';
-      document.getElementById('custom-weight-section').classList.remove('active');
-      document.getElementById('product-custom-weight').value = '';
-
-      // Set content
       document.getElementById('product-modal-title').textContent = currentProduct.name;
       document.getElementById('product-modal-description').textContent = currentProduct.description || '';
       document.getElementById('product-modal-image').src = currentProduct.img || DEFAULT_IMG;
 
-      renderVariantSelector();
+      renderWeightSelector();
       renderFlavorSelector();
-      updateVariantHint();
       updateProductModalPrice();
-
-      // Show/hide custom weight block
-      const canCustomWeight = currentProduct.pricePerKg && !isPieceProduct(currentProduct);
-      document.getElementById('custom-weight-block').style.display = canCustomWeight ? 'block' : 'none';
 
       document.getElementById('product-modal').showModal();
       if (window.Telegram?.WebApp?.BackButton) window.Telegram.WebApp.BackButton.show();
@@ -2271,55 +2286,162 @@
     function closeProductModal() {
       document.getElementById('product-modal').close();
       currentProduct = null;
+      currentVariant = null;
       if (window.Telegram?.WebApp?.BackButton) window.Telegram.WebApp.BackButton.hide();
     }
 
-    function renderVariantSelector() {
-      const select = document.getElementById('product-variant-select');
-      select.innerHTML = '';
+    function renderWeightSelector() {
+      const container = document.getElementById('weight-selector-container');
+      container.innerHTML = '';
       
       const rule = VARIANT_RULES[currentProduct.id];
       
-      if (rule) {
-        if (rule.type === 'fixed') {
-          rule.options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt;
-            option.textContent = opt;
-            select.appendChild(option);
-          });
-        } else if (rule.type === 'weight') {
-          for (let g = rule.min; g <= rule.max; g += rule.step) {
-            const option = document.createElement('option');
-            option.value = `${g} г`;
-            option.textContent = `${g} г`;
-            select.appendChild(option);
-          }
+      if (rule?.type === 'fixed') {
+        // Для фиксированных вариантов используем чипсы
+        const wrapper = document.createElement('div');
+        wrapper.className = 'weight-chips';
+        
+        rule.options.forEach((opt, idx) => {
+          const chip = document.createElement('button');
+          chip.className = 'weight-chip' + (idx === 0 ? ' active' : '');
+          chip.textContent = opt;
+          chip.onclick = () => {
+            wrapper.querySelectorAll('.weight-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentVariant = opt;
+            updateProductModalPrice();
+          };
+          if (idx === 0) currentVariant = opt;
+          wrapper.appendChild(chip);
+        });
+        
+        container.appendChild(wrapper);
+      } else if (rule?.type === 'weight') {
+        // Для весовых товаров (включая сливки) - чипсы + свой вес
+        const wrapper = document.createElement('div');
+        wrapper.className = 'weight-chips';
+        
+        // Предустановленные значения от min до max с шагом
+        const presets = [];
+        for (let g = rule.min; g <= Math.min(rule.max, 1000); g += rule.step) {
+          presets.push(g);
         }
+        // Добавляем 1.5кг и 2кг если max позволяет
+        if (rule.max >= 1500 && !presets.includes(1500)) presets.push(1500);
+        if (rule.max >= 2000 && !presets.includes(2000)) presets.push(2000);
+        
+        presets.forEach((g, idx) => {
+          const chip = document.createElement('button');
+          chip.className = 'weight-chip' + (idx === 0 ? ' active' : '');
+          chip.textContent = `${g} г`;
+          chip.onclick = () => {
+            wrapper.querySelectorAll('.weight-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            document.getElementById('custom-weight-input').value = '';
+            document.getElementById('custom-weight-wrapper').classList.remove('visible');
+            currentVariant = `${g} г`;
+            updateProductModalPrice();
+          };
+          if (idx === 0) currentVariant = `${g} г`;
+          wrapper.appendChild(chip);
+        });
+        
+        // Кнопка своего веса
+        const customChip = document.createElement('button');
+        customChip.className = 'weight-chip custom';
+        customChip.textContent = 'Свой вес';
+        customChip.onclick = () => {
+          wrapper.querySelectorAll('.weight-chip').forEach(c => c.classList.remove('active'));
+          customChip.classList.add('active');
+          const inputWrap = document.getElementById('custom-weight-wrapper');
+          inputWrap.classList.add('visible');
+          inputWrap.querySelector('input').focus();
+          currentVariant = null; // Будет определено из input
+          updateProductModalPrice();
+        };
+        wrapper.appendChild(customChip);
+        
+        container.appendChild(wrapper);
+        
+        // Поле для своего веса
+        const inputWrap = document.createElement('div');
+        inputWrap.id = 'custom-weight-wrapper';
+        inputWrap.className = 'custom-weight-input-wrapper';
+        inputWrap.innerHTML = `
+          <input type="number" id="custom-weight-input" class="custom-weight-input" 
+                 min="${rule.min}" max="${rule.max}" step="${rule.step}" 
+                 placeholder="Введите вес от ${rule.min} до ${rule.max} г">
+          <span style="color: var(--text-tertiary); font-weight: 600;">г</span>
+        `;
+        container.appendChild(inputWrap);
+        
+        // Обработчик ввода своего веса
+        inputWrap.querySelector('input').addEventListener('input', (e) => {
+          const val = parseInt(e.target.value);
+          if (val >= rule.min && val <= rule.max) {
+            currentVariant = `${val} г`;
+            updateProductModalPrice();
+          }
+        });
       } else {
-        // Default variants based on price type
+        // Дефолт для товаров без правил
+        const wrapper = document.createElement('div');
+        wrapper.className = 'weight-chips';
+        
         if (currentProduct.pricePerKg) {
-          const weights = [200, 300, 500, 1000];
-          weights.forEach(g => {
-            const option = document.createElement('option');
-            option.value = `${g} г`;
-            option.textContent = `${g} г`;
-            select.appendChild(option);
+          [200, 300, 500, 1000].forEach((g, idx) => {
+            const chip = document.createElement('button');
+            chip.className = 'weight-chip' + (idx === 0 ? ' active' : '');
+            chip.textContent = `${g} г`;
+            chip.onclick = () => {
+              wrapper.querySelectorAll('.weight-chip').forEach(c => c.classList.remove('active'));
+              chip.classList.add('active');
+              currentVariant = `${g} г`;
+              updateProductModalPrice();
+            };
+            if (idx === 0) currentVariant = `${g} г`;
+            wrapper.appendChild(chip);
           });
         } else if (currentProduct.pricePerL) {
-          [0.5, 1].forEach(l => {
-            const option = document.createElement('option');
-            option.value = `${l} л`;
-            option.textContent = `${l} л`;
-            select.appendChild(option);
+          ['0.5 л', '1 л'].forEach((l, idx) => {
+            const chip = document.createElement('button');
+            chip.className = 'weight-chip' + (idx === 0 ? ' active' : '');
+            chip.textContent = l;
+            chip.onclick = () => {
+              wrapper.querySelectorAll('.weight-chip').forEach(c => c.classList.remove('active'));
+              chip.classList.add('active');
+              currentVariant = l;
+              updateProductModalPrice();
+            };
+            if (idx === 0) currentVariant = l;
+            wrapper.appendChild(chip);
           });
         } else if (currentProduct.pricePerUnit) {
-          const option = document.createElement('option');
-          option.value = '1 шт';
-          option.textContent = '1 шт';
-          select.appendChild(option);
+          const chip = document.createElement('button');
+          chip.className = 'weight-chip active';
+          chip.textContent = '1 шт';
+          chip.onclick = () => {
+            currentVariant = '1 шт';
+            updateProductModalPrice();
+          };
+          currentVariant = '1 шт';
+          wrapper.appendChild(chip);
         }
+        
+        container.appendChild(wrapper);
       }
+      
+      // Hint text
+      let hintText = '';
+      if (currentProduct.pricePerKg) {
+        if (rule?.type === 'weight') {
+          hintText = `Шаг ${rule.step} г. Доступно от ${rule.min} г до ${rule.max} г. `;
+        }
+        hintText += 'Скидки: 500г−5%, 700г−10%, 1кг−15% (на каждую позицию отдельно)';
+      } else if (currentProduct.pricePerL) {
+        hintText = 'Выберите объём';
+      }
+      document.getElementById('variant-hint').textContent = hintText;
     }
 
     function renderFlavorSelector() {
@@ -2340,33 +2462,6 @@
       }
     }
 
-    function updateVariantHint() {
-      const hint = document.getElementById('variant-hint');
-      if (!hint) return;
-
-      let text = '';
-      const rule = VARIANT_RULES[currentProduct.id];
-      
-      if (currentProduct.pricePerKg) {
-        if (rule?.type === 'weight') {
-          text = `Шаг ${rule.step} г. Можно указать любой вес — цена пересчитается автоматически.`;
-        } else if (currentProduct.pieceWeightRangeText) {
-          text = `Вес одной штуки: ${currentProduct.pieceWeightRangeText}`;
-        } else if (currentProduct.pieceWeightGrams) {
-          text = `Вес одной штуки примерно ${currentProduct.pieceWeightGrams} г`;
-        } else {
-          text = 'Выберите вес или укажите свой';
-        }
-        
-        // Add discount info
-        text += '. Скидки: 500г−5%, 700г−10%, 1кг−15%';
-      } else if (currentProduct.pricePerL) {
-        text = 'Выберите объём';
-      }
-      
-      hint.textContent = text;
-    }
-
     function adjustQty(delta) {
       currentQty = Math.max(1, currentQty + delta);
       document.getElementById('product-qty-display').textContent = currentQty;
@@ -2374,53 +2469,50 @@
     }
 
     function updateProductModalPrice() {
-      if (!currentProduct) return;
+      if (!currentProduct || !currentVariant) return;
       
-      const variant = document.getElementById('product-variant-select').value;
-      const useCustom = document.getElementById('custom-weight-checkbox').checked;
-      let finalVariant = variant;
+      let variantForCalc = currentVariant;
       
-      if (useCustom) {
-        const customWeight = parseInt(document.getElementById('product-custom-weight').value) || 0;
-        if (customWeight > 0) {
-          finalVariant = `${customWeight} г (свой вес)`;
-        }
+      // Если активен свой вес, берем его из инпута
+      const customInput = document.getElementById('custom-weight-input');
+      if (customInput && customInput.value && document.getElementById('custom-weight-wrapper')?.classList.contains('visible')) {
+        variantForCalc = `${customInput.value} г`;
+      }
+      
+      // Добавляем вкус если есть
+      const flavorSelect = document.getElementById('product-flavor-select');
+      if (flavorSelect && flavorSelect.parentElement.style.display !== 'none' && flavorSelect.value) {
+        variantForCalc += ` · ${flavorSelect.value}`;
       }
 
-      const price = calculatePrice(currentProduct.id, finalVariant, currentQty);
+      const price = calculatePrice(currentProduct.id, variantForCalc, currentQty);
       
       document.getElementById('price-value').textContent = formatPrice(price.finalPrice);
       
-      // Show discount info
       const oldPriceEl = document.getElementById('price-old');
-      const discountBadge = document.getElementById('discount-badge');
-      
       if (price.discountRate > 0) {
-        oldPriceEl.style.display = 'block';
+        oldPriceEl.style.display = 'inline';
         oldPriceEl.textContent = formatPrice(price.basePrice);
-        discountBadge.style.display = 'inline-flex';
-        discountBadge.textContent = `Экономия ${price.discountRate * 100}%`;
       } else {
         oldPriceEl.style.display = 'none';
-        discountBadge.style.display = 'none';
       }
     }
 
     function addToCart() {
-      if (!currentProduct) return;
-
-      const variant = document.getElementById('product-variant-select').value;
-      const useCustom = document.getElementById('custom-weight-checkbox').checked;
-      let finalVariant = variant;
-      
-      if (useCustom) {
-        const customWeight = parseInt(document.getElementById('product-custom-weight').value) || 0;
-        if (customWeight > 0) {
-          finalVariant = `${customWeight} г (свой вес)`;
-        }
+      if (!currentProduct || !currentVariant) {
+        showToast('Выберите вес товара', 'error');
+        return;
       }
 
-      // Add flavor if exists
+      let finalVariant = currentVariant;
+      
+      // Проверяем кастомный вес
+      const customInput = document.getElementById('custom-weight-input');
+      if (customInput && customInput.value && document.getElementById('custom-weight-wrapper')?.classList.contains('visible')) {
+        finalVariant = `${customInput.value} г`;
+      }
+      
+      // Добавляем вкус
       const flavorSelect = document.getElementById('product-flavor-select');
       if (flavorSelect && flavorSelect.parentElement.style.display !== 'none' && flavorSelect.value) {
         finalVariant += ` · ${flavorSelect.value}`;
@@ -2453,52 +2545,6 @@
       }
     }
 
-    function quickAdd(productId, event) {
-      event.stopPropagation();
-      const product = PRODUCTS.find(p => p.id === productId);
-      if (!product) return;
-
-      // Determine default variant
-      let variant = '1 шт';
-      if (product.pricePerKg) {
-        const rule = VARIANT_RULES[product.id];
-        if (rule?.type === 'fixed') {
-          variant = rule.options[0];
-        } else if (rule?.type === 'weight') {
-          variant = `${rule.min} г`;
-        } else {
-          variant = '200 г';
-        }
-      } else if (product.pricePerL) {
-        variant = '1 л';
-      }
-
-      const existingIndex = cart.findIndex(item => 
-        item.id === productId && item.variant === variant
-      );
-
-      if (existingIndex > -1) {
-        cart[existingIndex].qty += 1;
-      } else {
-        cart.push({
-          id: product.id,
-          name: product.name,
-          group: product.group,
-          variant: variant,
-          qty: 1,
-          img: product.img || DEFAULT_IMG
-        });
-      }
-
-      saveState();
-      updateCartUI();
-      showToast(`${product.name} добавлен`, 'success');
-      
-      if (window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-      }
-    }
-
     // ===== Cart =====
     function updateCartUI() {
       const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -2513,14 +2559,14 @@
       if (cart.length > 0) {
         btn.disabled = false;
         countEl.textContent = totalCount;
-        btn.querySelector('.cart-count').style.display = 'inline-block';
-        btn.lastElementChild.textContent = formatPrice(totalSum);
+        countEl.style.display = 'inline-block';
+        btn.querySelector('span:last-child').textContent = formatPrice(totalSum);
         if (window.Telegram?.WebApp?.MainButton) window.Telegram.WebApp.MainButton.show();
       } else {
         btn.disabled = true;
         countEl.textContent = '0';
-        btn.querySelector('.cart-count').style.display = 'none';
-        btn.lastElementChild.textContent = '→';
+        countEl.style.display = 'none';
+        btn.querySelector('span:last-child').textContent = '→';
         if (window.Telegram?.WebApp?.MainButton) window.Telegram.WebApp.MainButton.hide();
       }
     }
@@ -2592,7 +2638,7 @@
         
         <div class="cart-summary-section">
           <div class="summary-row">
-            <span>Сумма</span>
+            <span>Сумма без скидки</span>
             <span>${formatPrice(totalBase)}</span>
           </div>
           ${hasDiscount ? `
@@ -2602,11 +2648,11 @@
             </div>
           ` : ''}
           <div class="summary-row total">
-            <span>Итого</span>
+            <span>Итого к оплате</span>
             <span>${formatPrice(total)}</span>
           </div>
           
-          <div class="form-group" style="margin-top: 16px;">
+          <div class="form-group" style="margin-top: 20px;">
             <label class="form-label">Промокод</label>
             <input type="text" class="promo-input" id="checkout-promo" placeholder="Введите промокод" value="${checkoutState.promo || ''}">
           </div>
@@ -2646,7 +2692,7 @@
             </div>
           ` : ''}
           
-          <button class="btn-primary" onclick="submitOrder()" style="margin-top: 20px;">
+          <button class="btn-primary" onclick="submitOrder()" style="margin-top: 24px;">
             Оформить заказ
           </button>
         </div>
@@ -2681,7 +2727,7 @@
       saveState();
       updateCartUI();
       renderCartContents();
-      if (cart.length === 0) closeCartModal();
+      if (cart.length === 0) setTimeout(closeCartModal, 300);
     }
 
     // ===== Order Submission =====
@@ -2714,7 +2760,6 @@
       
       errorEl.classList.remove('visible');
 
-      // Build payload
       const payload = {
         type: 'cart',
         source: 'miniapp',
@@ -2730,7 +2775,7 @@
         },
         meta: {
           ts: Date.now(),
-          schema_ver: 'v2'
+          schema_ver: 'v3'
         }
       };
 
@@ -2753,7 +2798,6 @@
 
       payload.total = total;
 
-      // Add Telegram user info if available
       if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
         const u = window.Telegram.WebApp.initDataUnsafe.user;
         payload.telegram = {
@@ -2764,7 +2808,6 @@
         };
       }
 
-      // Send to backend
       axios.post(`${BACKEND}/order`, payload)
         .then(() => {
           showToast('Заказ успешно отправлен!', 'success');
@@ -2787,56 +2830,60 @@
         });
     }
 
-    // ===== Price Calculation =====
+    // ===== Price Calculation (Исправлено: скидка только на конкретную позицию) =====
     function calculatePrice(productId, variant, qty) {
       const product = PRODUCTS.find(p => p.id === productId);
       if (!product) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
 
       let basePrice = 0;
       let weightGrams = 0;
+      const isEligibleForDiscount = CHEESE_GROUP_IDS.has(product.group);
 
       if (product.pricePerKg) {
         weightGrams = extractGrams(variant) || getDefaultWeight(product) || 200;
-        basePrice = (weightGrams / 1000) * product.pricePerKg * qty;
+        const totalWeight = weightGrams * qty;
+        basePrice = (totalWeight / 1000) * product.pricePerKg;
+        
+        // Скидка считается только для общего веса этой конкретной позиции
+        const discountRate = isEligibleForDiscount ? getDiscountRateForWeight(totalWeight) : 0;
+        const finalPrice = Math.round(basePrice * (1 - discountRate));
+        
+        return {
+          basePrice: Math.round(basePrice),
+          finalPrice,
+          discountRate
+        };
       } else if (product.pricePerL) {
         const liters = extractLiters(variant) || 1;
         basePrice = liters * product.pricePerL * qty;
+        return {
+          basePrice: Math.round(basePrice),
+          finalPrice: Math.round(basePrice),
+          discountRate: 0
+        };
       } else if (product.pricePerUnit) {
         basePrice = product.pricePerUnit * qty;
+        return {
+          basePrice: Math.round(basePrice),
+          finalPrice: Math.round(basePrice),
+          discountRate: 0
+        };
       }
 
-      // Calculate discount based on total weight of this product in cart
-      const discountRate = getDiscountRate(productId, weightGrams * qty);
-      const finalPrice = Math.round(basePrice * (1 - discountRate));
-
-      return {
-        basePrice: Math.round(basePrice),
-        finalPrice,
-        discountRate
-      };
+      return { basePrice: 0, finalPrice: 0, discountRate: 0 };
     }
 
-    function getDiscountRate(productId, addedWeight = 0) {
-      const product = PRODUCTS.find(p => p.id === productId);
-      if (!product || !CHEESE_GROUP_IDS.has(product.group)) return 0;
-
-      // Calculate total weight of this product already in cart
-      const cartWeight = cart
-        .filter(item => item.id === productId)
-        .reduce((sum, item) => sum + (extractGrams(item.variant) || 0) * item.qty, 0);
-      
-      const totalWeight = cartWeight + addedWeight;
-      
+    // Новая функция: скидка только на основе переданного веса (без учета корзины)
+    function getDiscountRateForWeight(totalWeightGrams) {
       let rate = 0;
       for (const threshold of DISCOUNT_THRESHOLDS) {
-        if (totalWeight >= threshold.g) rate = threshold.rate;
+        if (totalWeightGrams >= threshold.g) rate = threshold.rate;
       }
       return rate;
     }
 
     function extractGrams(variant) {
       if (!variant) return 0;
-      // Match patterns like "200 г", "≈200 г", "(≈200 г)", "200г", "1 кг"
       const match = variant.match(/(?:\(|≈|~)?\s*(\d+(?:\.\d+)?)\s*(г|кг|гр)/i);
       if (!match) return 0;
       const value = parseFloat(match[1]);
@@ -2855,11 +2902,6 @@
       if (rule?.defaultWeight) return rule.defaultWeight;
       if (product.pieceWeightGrams) return product.pieceWeightGrams;
       return 200;
-    }
-
-    function isPieceProduct(product) {
-      const rule = VARIANT_RULES[product.id];
-      return rule?.type === 'fixed' && rule.defaultWeight && !rule.isLiquid;
     }
 
     // ===== Utilities =====
@@ -2927,7 +2969,6 @@
       }
     };
 
-    window.quickAdd = quickAdd;
     window.changeCartQty = changeCartQty;
     window.removeFromCart = removeFromCart;
     window.closeProductModal = closeProductModal;
