@@ -384,31 +384,6 @@
       letter-spacing: 0.05em;
     }
 
-    .share-btn {
-      position: absolute;
-      top: 12px;
-      right: 48px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid var(--border-light);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      z-index: 5;
-    }
-
-    .share-btn:hover { 
-      transform: scale(1.1); 
-      color: var(--accent-gold);
-    }
-
     .fav-btn {
       position: absolute;
       top: 12px;
@@ -450,6 +425,8 @@
       box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
       transition: all 0.2s;
       z-index: 5;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     .quick-add-btn:hover {
@@ -915,12 +892,19 @@
       flex-wrap: wrap;
     }
 
+    .price-old {
+      font-size: 20px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      font-weight: 500;
+    }
+
     .price-diff {
       font-size: 14px;
       color: #2e7d32;
       font-weight: 600;
       background: #e8f5e9;
-      padding: 4px 12px;
+      padding: 6px 12px;
       border-radius: 999px;
     }
 
@@ -1067,22 +1051,26 @@
     @keyframes fly-right { to { transform: translate(40px, 0) scale(0); opacity: 0; } }
     @keyframes fly-up { to { transform: translate(0, -50px) scale(0); opacity: 0; } }
 
-    /* Loader */
+    /* 3D Cube Loader - Styled for Cheese Theme */
     .loader-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(250, 248, 245, 0.95);
+      background: rgba(250, 248, 245, 0.98);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 10000;
+      gap: 40px;
     }
 
     .loader-overlay.active { display: flex; }
 
     .loader {
       --duration: 3s;
+      --primary: #C9A962;
+      --primary-light: #E8B86D;
+      --primary-rgba: rgba(201, 169, 98, 0);
       width: 200px;
       height: 320px;
       position: relative;
@@ -1093,11 +1081,253 @@
       .loader { zoom: 0.44; }
     }
 
+    .loader:before, .loader:after {
+      --r: 20.5deg;
+      content: "";
+      width: 320px;
+      height: 140px;
+      position: absolute;
+      right: 32%;
+      bottom: -11px;
+      background: #F5F0E8;
+      transform: translateZ(200px) rotate(var(--r));
+      animation: mask var(--duration) linear forwards infinite;
+    }
+
+    .loader:after {
+      --r: -20.5deg;
+      right: auto;
+      left: 32%;
+    }
+
+    .loader .ground {
+      position: absolute;
+      left: -50px;
+      bottom: -120px;
+      transform-style: preserve-3d;
+      transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1);
+    }
+
+    .loader .ground div {
+      transform: rotateX(90deg) rotateY(0deg) translate(-48px, -120px) translateZ(100px) scale(0);
+      width: 200px;
+      height: 200px;
+      background: var(--primary);
+      background: linear-gradient(45deg, var(--primary) 0%, var(--primary) 50%, var(--primary-light) 50%, var(--primary-light) 100%);
+      transform-style: preserve-3d;
+      animation: ground var(--duration) linear forwards infinite;
+    }
+
+    .loader .ground div:before, .loader .ground div:after {
+      --rx: 90deg;
+      --ry: 0deg;
+      --x: 44px;
+      --y: 162px;
+      --z: -50px;
+      content: "";
+      width: 156px;
+      height: 300px;
+      opacity: 0;
+      background: linear-gradient(var(--primary), var(--primary-rgba));
+      position: absolute;
+      transform: rotateX(var(--rx)) rotateY(var(--ry)) translate(var(--x), var(--y)) translateZ(var(--z));
+      animation: ground-shine var(--duration) linear forwards infinite;
+    }
+
+    .loader .ground div:after {
+      --rx: 90deg;
+      --ry: 90deg;
+      --x: 0;
+      --y: 177px;
+      --z: 150px;
+    }
+
+    .loader .box {
+      --x: 0;
+      --y: 0;
+      position: absolute;
+      animation: var(--duration) linear forwards infinite;
+      transform: translate(var(--x), var(--y));
+    }
+
+    .loader .box div {
+      background-color: var(--primary);
+      width: 48px;
+      height: 48px;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: var(--duration) ease forwards infinite;
+      transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0);
+    }
+
+    .loader .box div:before, .loader .box div:after {
+      --rx: 90deg;
+      --ry: 0deg;
+      --z: 24px;
+      --y: -24px;
+      --x: 0;
+      content: "";
+      position: absolute;
+      background-color: inherit;
+      width: inherit;
+      height: inherit;
+      transform: rotateX(var(--rx)) rotateY(var(--ry)) translate(var(--x), var(--y)) translateZ(var(--z));
+      filter: brightness(var(--b, 1.2));
+    }
+
+    .loader .box div:after {
+      --rx: 0deg;
+      --ry: 90deg;
+      --x: 24px;
+      --y: 0;
+      --b: 1.4;
+    }
+
+    .loader .box.box0 { --x: -220px; --y: -120px; left: 58px; top: 108px; }
+    .loader .box.box1 { --x: -260px; --y: 120px; left: 25px; top: 120px; }
+    .loader .box.box2 { --x: 120px; --y: -190px; left: 58px; top: 64px; }
+    .loader .box.box3 { --x: 280px; --y: -40px; left: 91px; top: 120px; }
+    .loader .box.box4 { --x: 60px; --y: 200px; left: 58px; top: 132px; }
+    .loader .box.box5 { --x: -220px; --y: -120px; left: 25px; top: 76px; }
+    .loader .box.box6 { --x: -260px; --y: 120px; left: 91px; top: 76px; }
+    .loader .box.box7 { --x: -240px; --y: 200px; left: 58px; top: 87px; }
+
+    .loader .box0 { animation-name: box-move0; }
+    .loader .box0 div { animation-name: box-scale0; }
+    .loader .box1 { animation-name: box-move1; }
+    .loader .box1 div { animation-name: box-scale1; }
+    .loader .box2 { animation-name: box-move2; }
+    .loader .box2 div { animation-name: box-scale2; }
+    .loader .box3 { animation-name: box-move3; }
+    .loader .box3 div { animation-name: box-scale3; }
+    .loader .box4 { animation-name: box-move4; }
+    .loader .box4 div { animation-name: box-scale4; }
+    .loader .box5 { animation-name: box-move5; }
+    .loader .box5 div { animation-name: box-scale5; }
+    .loader .box6 { animation-name: box-move6; }
+    .loader .box6 div { animation-name: box-scale6; }
+    .loader .box7 { animation-name: box-move7; }
+    .loader .box7 div { animation-name: box-scale7; }
+
+    @keyframes box-move0 {
+      12% { transform: translate(var(--x), var(--y)); }
+      25%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale0 {
+      6% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      14%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move1 {
+      16% { transform: translate(var(--x), var(--y)); }
+      29%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale1 {
+      10% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      18%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move2 {
+      20% { transform: translate(var(--x), var(--y)); }
+      33%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale2 {
+      14% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      22%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move3 {
+      24% { transform: translate(var(--x), var(--y)); }
+      37%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale3 {
+      18% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      26%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move4 {
+      28% { transform: translate(var(--x), var(--y)); }
+      41%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale4 {
+      22% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      30%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move5 {
+      32% { transform: translate(var(--x), var(--y)); }
+      45%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale5 {
+      26% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      34%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move6 {
+      36% { transform: translate(var(--x), var(--y)); }
+      49%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale6 {
+      30% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      38%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes box-move7 {
+      40% { transform: translate(var(--x), var(--y)); }
+      53%, 52% { transform: translate(0, 0); }
+      80% { transform: translate(0, -32px); }
+      90%, 100% { transform: translate(0, 188px); }
+    }
+
+    @keyframes box-scale7 {
+      34% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0); }
+      42%, 100% { transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(1); }
+    }
+
+    @keyframes ground {
+      0%, 65% { transform: rotateX(90deg) rotateY(0deg) translate(-48px, -120px) translateZ(100px) scale(0); }
+      75%, 90% { transform: rotateX(90deg) rotateY(0deg) translate(-48px, -120px) translateZ(100px) scale(1); }
+      100% { transform: rotateX(90deg) rotateY(0deg) translate(-48px, -120px) translateZ(100px) scale(0); }
+    }
+
+    @keyframes ground-shine {
+      0%, 70% { opacity: 0; }
+      75%, 87% { opacity: 0.2; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes mask {
+      0%, 65% { opacity: 0; }
+      66%, 100% { opacity: 1; }
+    }
+
     .loader-text {
-      margin-top: 40px;
       color: var(--text-secondary);
       font-size: 16px;
       font-weight: 500;
+      text-align: center;
+      margin-top: 20px;
     }
 
     /* Bottom Nav */
@@ -1235,6 +1465,30 @@
       color: var(--accent-gold);
       margin-left: auto;
       align-self: center;
+      text-align: right;
+    }
+
+    .cart-item-price .old {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      font-weight: 500;
+      display: block;
+    }
+
+    .cart-item-price .new {
+      display: block;
+    }
+
+    .cart-item-price .save {
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+      background: #e8f5e9;
+      padding: 2px 6px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 2px;
     }
 
     .cart-summary {
@@ -1245,16 +1499,33 @@
       margin-bottom: 20px;
     }
 
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .cart-total-row.discount {
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
     .cart-total {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
     }
 
     .cart-total-label {
       font-size: 16px;
-      color: var(--text-secondary);
+      color: var(--text-primary);
+      font-weight: 600;
     }
 
     .cart-total-price {
@@ -1443,6 +1714,7 @@
           </div>
         </div>
         <div class="price-display">
+          <span id="modal-price-old" class="price-old" style="display:none"></span>
           <span id="modal-price">0 ₽</span>
           <span class="price-diff" id="price-diff"></span>
         </div>
@@ -1528,13 +1800,38 @@
     </div>
   </div>
 
-  <!-- Loader -->
+  <!-- 3D Cube Loader -->
   <div class="loader-overlay" id="loader">
     <div class="loader">
-      <div style="width: 200px; height: 200px; border: 4px solid var(--border-light); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+      <div class="box box0">
+        <div></div>
+      </div>
+      <div class="box box1">
+        <div></div>
+      </div>
+      <div class="box box2">
+        <div></div>
+      </div>
+      <div class="box box3">
+        <div></div>
+      </div>
+      <div class="box box4">
+        <div></div>
+      </div>
+      <div class="box box5">
+        <div></div>
+      </div>
+      <div class="box box6">
+        <div></div>
+      </div>
+      <div class="box box7">
+        <div></div>
+      </div>
+      <div class="ground">
+        <div></div>
+      </div>
     </div>
     <div class="loader-text">Отправляем заказ...</div>
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
   </div>
 
   <!-- Bottom Navigation -->
@@ -1584,9 +1881,9 @@
     const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
 
     const DISCOUNT_THRESHOLDS = [
-      { g: 500, rate: 0.05 },
-      { g: 700, rate: 0.10 },
-      { g: 1000, rate: 0.15 },
+      { g: 500, rate: 0.05, label: '−5%' },
+      { g: 700, rate: 0.10, label: '−10%' },
+      { g: 1000, rate: 0.15, label: '−15%' },
     ];
 
     // ==================== DATA ====================
@@ -1596,10 +1893,10 @@
         baseGroup: 'cheese',
         priority: 1,
         variants: [
-          { id: 'halloumi', name: 'Халлуми классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 225 },
-          { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp', description: 'Идеален для жарки или без обжарки. Средиземноморские нотки. Срок хранения: 7 суток.', fixedWeight: 225 },
-          { id: 'halloumi-tomato-basil-garlic', name: 'Халлуми томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp', description: 'Идеален для жарки, хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 225 },
-          { id: 'halloumi-tomato-paprika', name: 'Халлуми с вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp', description: 'Идеален для жарки, появляется корочка. Срок хранения: 7 суток.', fixedWeight: 225 }
+          { id: 'halloumi', name: 'Халлуми классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp', description: 'Идеален для жарки или без обжарки. Средиземноморские нотки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-tomato-basil-garlic', name: 'Халлуми томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp', description: 'Идеален для жарки, хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-tomato-paprika', name: 'Халлуми с вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp', description: 'Идеален для жарки, появляется корочка. Срок хранения: 7 суток.', fixedWeight: 250 }
         ]
       },
       'panir-group': {
@@ -1633,6 +1930,129 @@
           { id: 'tvorozhnaya-massa-chernosliv', name: 'Творожная масса с черносливом', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с черносливом. Срок хранения: 5 суток.' },
           { id: 'tvorozhnaya-massa-kuraga', name: 'Творожная масса с курагой', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с курагой. Срок хранения: 5 суток.' }
         ]
+      },
+      // Новые группы
+      'kosichka-group': {
+        displayName: 'Сыр косичка',
+        baseGroup: 'cheese',
+        priority: 5,
+        variants: [
+          { id: 'kosichka', name: 'Сыр косичка', pricePerKg: 1900, img: DEFAULT_IMG, description: 'Слегка солёный, подходит ко всему. Срок хранения: 7 суток.', fixedWeight: 200 },
+          { id: 'kosichka-smoked', name: 'Сыр косичка копчёная', pricePerKg: 2000, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/kosichka-smoked.webp', description: 'Холодное копчение, лёгкая солёность. Срок хранения: 30 суток.', fixedWeight: 200 }
+        ]
+      },
+      'caciotta-group': {
+        displayName: 'Качотта',
+        baseGroup: 'cheese',
+        priority: 6,
+        variants: [
+          { id: 'caciotta', name: 'Качотта', pricePerKg: 2200, img: 'https://static.tildacdn.com/tild6165-3265-4834-a236-366661346562/caciotta.webp', description: 'Мягкий итальянский сыр. Срок хранения: 7 суток.' },
+          { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', pricePerKg: 2250, img: DEFAULT_IMG, description: 'С ореховым привкусом пажитника. Срок хранения: 7 суток.' }
+        ]
+      },
+      'hard-cheese-group': {
+        displayName: 'Твёрдые сыры',
+        baseGroup: 'cheese',
+        priority: 7,
+        variants: [
+          { id: 'hard-village', name: 'Твёрдый деревенский сыр', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/hard-village.webp', description: 'Твёрдый деревенский сыр готовится из творога с приправами, который обжаривается. Срок хранения: 7 суток.' },
+          { id: 'hard-smoked', name: 'Твёрдый копчёный сыр', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6662-3930-4663-b132-316135626136/hard-smoked.webp', description: 'Готовится из творога с приправами, обжаривается, затем коптится. Нежный копчёный вкус. Срок хранения: до 30 суток.' }
+        ]
+      },
+      'rolls-group': {
+        displayName: 'Сырные рулеты',
+        baseGroup: 'cheese',
+        priority: 8,
+        variants: [
+          { id: 'rolls-olives-walnut', name: 'Рулет с маслинами и грецким орехом', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-olives-walnut.webp', description: 'Можно подать как закуску к любому столу — домашнему или праздничному. Срок хранения: 7 суток.' },
+          { id: 'rolls-apricot-cedar', name: 'Рулет с курагой и кедровым орехом', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-apricot-cedar.webp', description: 'Слегка сладковатый благодаря творожному сыру, кураге и орехам. Срок хранения: 7 суток.' }
+        ]
+      },
+      'cookies-group': {
+        displayName: 'Печенье',
+        baseGroup: 'bakery',
+        priority: 9,
+        variants: [
+          { id: 'cookies-tvorog', name: 'Печенье творожное', pricePerKg: 600, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/tvorpech.webp', description: 'Мягкое домашнее печенье на твороге.' },
+          { id: 'cookies-oat', name: 'Печенье овсяное', pricePerKg: 600, img: DEFAULT_IMG, description: 'Овсяное печенье к чаю.' },
+          { id: 'cookies-nut', name: 'Ореховые пальчики', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp', description: 'Печенье с орехами — хрустящие пальчики.' },
+          { id: 'cookies-carob', name: 'Печенье кэробовое', pricePerKg: 600, img: DEFAULT_IMG, description: 'Печенье с кэробом вместо какао.' },
+          { id: 'cookies-sandy', name: 'Печенье песочное', pricePerKg: 600, img: DEFAULT_IMG, description: 'Рассыпчатое песочное печенье.' }
+        ]
+      },
+      'muffin-group': {
+        displayName: 'Кексы',
+        baseGroup: 'bakery',
+        priority: 10,
+        variants: [
+          { id: 'muffin-plain', name: 'Кексы обычные', pricePerKg: 500, img: DEFAULT_IMG, description: 'Домашние кексы.' },
+          { id: 'muffin-carob', name: 'Кексы с кэробом', pricePerKg: 550, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/carobkeks.webp', description: 'Кексы с кэробом.' },
+          { id: 'muffin-raisin', name: 'Кексы с изюмом', pricePerKg: 550, img: 'https://static.tildacdn.com/tild3465-3162-4436-a235-363763383339/muffin-raisin.webp', description: 'Кексы с изюмом.' }
+        ]
+      },
+      'casserole-group': {
+        displayName: 'Творожная запеканка',
+        baseGroup: 'bakery',
+        priority: 11,
+        variants: [
+          { id: 'casserole-plain', name: 'Запеканка классическая', pricePerUnit: 260, img: DEFAULT_IMG, description: 'Домашняя творожная запеканка без добавок.' },
+          { id: 'casserole-raisin', name: 'Запеканка с изюмом', pricePerUnit: 260, img: DEFAULT_IMG, description: 'Запеканка с изюмом.' }
+        ]
+      },
+      'coconut-kuchen-group': {
+        displayName: 'Кокосовый пирог',
+        baseGroup: 'bakery',
+        priority: 12,
+        variants: [
+          { id: 'coconut-kuchen-1kg', name: 'Кокосовый пирог 1 кг', pricePerUnit: 1800, img: DEFAULT_IMG, description: 'Кокосовый пирог (форма ~1 кг).' },
+          { id: 'coconut-kuchen-05kg', name: 'Кокосовый пирог 0.5 кг', pricePerUnit: 1000, img: DEFAULT_IMG, description: 'Кокосовый пирог (форма ~0.5 кг).' }
+        ]
+      },
+      'napoleon-group': {
+        displayName: 'Торт Наполеон',
+        baseGroup: 'bakery',
+        priority: 13,
+        variants: [
+          { id: 'napoleon-1kg', name: 'Наполеон 1 кг', pricePerUnit: 1300, img: DEFAULT_IMG, description: 'Классический Наполеон (около 1 кг).' },
+          { id: 'napoleon-05kg', name: 'Наполеон 0.5 кг', pricePerUnit: 750, img: DEFAULT_IMG, description: 'Классический Наполеон (около 0.5 кг).' }
+        ]
+      },
+      'bliny-group': {
+        displayName: 'Блины',
+        baseGroup: 'bakery',
+        priority: 14,
+        variants: [
+          { id: 'bliny-10', name: 'Блины (10 шт)', pricePerUnit: 330, img: DEFAULT_IMG, description: 'Тонкие блинчики, 10 шт.' },
+          { id: 'bliny-5', name: 'Блины (5 шт)', pricePerUnit: 220, img: DEFAULT_IMG, description: 'Тонкие блинчики, 5 шт.' },
+          { id: 'bliny-tvorog-5', name: 'Блины с творогом (5 шт)', pricePerUnit: 300, img: DEFAULT_IMG, description: 'Блины с начинкой из творога или творога с изюмом.' }
+        ]
+      },
+      'syrniki-group': {
+        displayName: 'Сырники',
+        baseGroup: 'bakery',
+        priority: 15,
+        variants: [
+          { id: 'syrniki-10', name: 'Сырники (10 шт)', pricePerUnit: 520, img: DEFAULT_IMG, description: 'Домашние сырники, 10 шт.' },
+          { id: 'syrniki-5', name: 'Сырники (5 шт)', pricePerUnit: 280, img: DEFAULT_IMG, description: 'Домашние сырники, 5 шт.' }
+        ]
+      },
+      'chapati-group': {
+        displayName: 'Чапати',
+        baseGroup: 'bakery',
+        priority: 16,
+        variants: [
+          { id: 'chapati-10', name: 'Чапати (10 шт)', pricePerUnit: 270, img: 'https://static.tildacdn.com/tild6332-6239-4538-b839-356132356236/chapati-10.webp', description: 'Состав: мука пшеничная высшего сорта, ржаная мука, вода, соль, сливочное масло. Срок хранения: 2 суток в холодильнике.' },
+          { id: 'chapati-wholewheat-10', name: 'Чапати цельнозерновые (10 шт)', pricePerUnit: 320, img: DEFAULT_IMG, description: 'Чапати из цельнозерновой муки.' }
+        ]
+      },
+      'potato-cake-group': {
+        displayName: 'Пирожное Картошка',
+        baseGroup: 'sweets',
+        priority: 17,
+        variants: [
+          { id: 'potato-cake-5', name: 'Картошка (5 шт)', pricePerUnit: 400, img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp', description: 'Домашние пирожные «Картошка» из цельнозерновой муки и варёной сгущёнки. В коробке 5 шт.' },
+          { id: 'potato-cake-2', name: 'Картошка (2 шт)', pricePerUnit: 190, img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp', description: 'Домашние пирожные «Картошка» (2 шт) из цельнозерновой муки и варёной сгущёнки.' }
+        ]
       }
     };
 
@@ -1643,19 +2063,33 @@
       { id: 'suluguni', name: 'Сулугуни', group: 'cheese', pricePerKg: 1700, img: 'https://static.tildacdn.com/tild3238-3866-4366-a436-623236363261/suluguni.webp', description: 'Умеренно солёный, слоистый и эластичный. Срок хранения: 7 суток.' },
       { id: 'suluguni-smoked', name: 'Сулугуни копчёный', group: 'cheese', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6435-3838-4463-b431-353765323333/suluguni-smoked.webp', description: 'С лёгкой копчёностью. Срок хранения: 30 суток.' },
       { id: 'imeretian', name: 'Имеретинский', group: 'cheese', pricePerKg: 1500, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/imeretian.webp', description: 'Прекрасный рассольный сыр. Срок хранения: 7 суток.' },
+      { id: 'imeretian-dill-garlic', name: 'Имеретинский с зеленью и чесноком', group: 'cheese', pricePerKg: 1600, img: 'https://static.tildacdn.com/tild6435-3539-4337-a561-386438636230/__.webp', description: 'Свежий рассольный сыр с ароматной зеленью и чесноком. Срок хранения: 7 суток.' },
       { id: 'spicy-klubok', name: 'Пряные клубочки', group: 'cheese', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3463-6166-4665-a439-323264653939/spicy-klubok.webp', description: 'Нестандартный вкусный сыр. Срок хранения: 7 суток.', fixedWeight: 150, hit: true },
       { id: 'ricotta', name: 'Творожный сыр (рикотта)', group: 'cheese', pricePerKg: 1400, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta.webp', description: 'Нежный сыр. Срок хранения: 7 суток.' },
+      { id: 'ricotta-herbs', name: 'Творожный сыр с зеленью', group: 'cheese', pricePerKg: 1500, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta-herbs.webp', description: 'Нежный, свежий, универсальный. Срок хранения: 7 суток.' },
+      
+      // Молочка
       { id: 'milk', name: 'Молоко', group: 'dairy', pricePerL: 150, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/milk.webp', description: 'Молоко отборное цельное. Срок хранения: 3–5 суток.', volumes: [0.5, 1] },
       { id: 'milk-topped', name: 'Молоко топлёное', group: 'dairy', pricePerL: 250, img: 'https://static.tildacdn.com/tild3839-3163-4066-a633-306366346631/milk-topped.webp', description: 'Настоящее цельное топлёное молоко. Срок хранения: 5–7 суток.', volumes: [0.5, 1] },
+      { id: 'yogurt', name: 'Йогурт', group: 'dairy', pricePerL: 260, img: DEFAULT_IMG, description: 'Самый настоящий йогурт из отборного молока и натуральной закваски. Срок хранения: 5 суток.', volumes: [0.5, 1] },
+      { id: 'ryazhenka', name: 'Ряженка', group: 'dairy', pricePerL: 280, img: DEFAULT_IMG, description: 'Натуральная ряженка из молока. Срок хранения: до 5 суток.', volumes: [0.5, 1] },
+      { id: 'misti-dahi', name: 'Мистхи-Дахи', group: 'dairy', pricePerL: 300, img: DEFAULT_IMG, description: 'Кисломолочный напиток. Срок хранения: 5 суток.', volumes: [0.5, 1] },
+      { id: 'whey', name: 'Сыворотка', group: 'dairy', pricePerL: 60, img: DEFAULT_IMG, description: 'Молочный низкокалорийный продукт. Срок хранения: 3 суток.', volumes: [1] },
+      { id: 'cream', name: 'Сливки (33–36%)', group: 'dairy', pricePerL: 1450, img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp', description: 'Натуральные свежие сливки. Срок хранения: 5 суток. На 3–4 сутки могут стать сметаной.', volumes: [0.2, 0.5, 1] },
       { id: 'tvorog', name: 'Творог', group: 'dairy', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3136-3730-4134-b466-613138343764/tvorog.webp', description: 'Творожный нежный вкус. Срок хранения: 3–5 суток.' },
-      { id: 'cream', name: 'Сливки (33–36%)', group: 'dairy', pricePerL: 1450, img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp', description: 'Натуральные свежие сливки. Срок хранения: 5 суток.', volumes: [0.2, 0.5, 1] },
+      { id: 'butter', name: 'Сливочное масло (шарик)', group: 'dairy', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/butter.webp', description: 'Натуральное сливочное масло, как готовила бабушка. Без добавления сахара или соли. Приблизительный вес шарика — 200 г.', fixedWeight: 200 },
+      { id: 'ghee', name: 'Топлёное масло (ГХИ)', group: 'dairy', pricePerKg: 2900, img: DEFAULT_IMG, description: 'Состав: сливочное масло. Жирность ~99%. Идеально для жарки. Срок хранения: больше 10 лет.' },
+      { id: 'condensed-milk', name: 'Варёная сгущёнка', group: 'dairy', pricePerKg: 1000, img: DEFAULT_IMG, description: 'Натуральная варёная сгущёнка, густая и карамельная. Срок хранения: 7 суток.' },
+      
+      // Сладости
       { id: 'barfi-classic', name: 'Бурфи классический (набор)', group: 'sweets', pricePerUnit: 350, img: 'https://static.tildacdn.com/tild3430-3231-4562-b164-366638313434/barfi-classic.webp', description: 'Нежный молочный десерт. В наборе 5 шт.', hit: true },
-      { id: 'barfi-sesame', name: 'Бурфи кунжутный (набор)', group: 'sweets', pricePerUnit: 490, img: 'https://static.tildacdn.com/tild3439-6135-4861-a531-316233303166/_.webp', description: 'Бурфи с кунжутом, 7 шт.', hit: true },
-      { id: 'cookies-tvorog', name: 'Печенье творожное', group: 'bakery', pricePerKg: 600, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/tvorpech.webp', description: 'Мягкое домашнее печенье на твороге.', weights: [500, 1000] },
-      { id: 'cookies-nut', name: 'Ореховые пальчики', group: 'bakery', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp', description: 'Печенье с орехами.', weights: [500, 1000] },
-      { id: 'muffin-carob', name: 'Кексы с кэробом', group: 'bakery', pricePerKg: 550, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/carobkeks.webp', description: 'Кексы с кэробом.', weights: [500, 1000] },
-      { id: 'muffin-raisin', name: 'Кексы с изюмом', group: 'bakery', pricePerKg: 550, img: 'https://static.tildacdn.com/tild3465-3162-4436-a235-363763383339/muffin-raisin.webp', description: 'Кексы с изюмом.', weights: [500, 1000] },
-      { id: 'chapati-10', name: 'Чапати (10 шт)', group: 'bakery', pricePerUnit: 270, img: 'https://static.tildacdn.com/tild6332-6239-4538-b839-356132356236/chapati-10.webp', description: 'Состав: мука пшеничная, ржаная мука, вода, соль, сливочное масло.' }
+      { id: 'barfi-hazelnut', name: 'Бурфи с фундуком (набор)', group: 'sweets', pricePerUnit: 350, img: 'https://static.tildacdn.com/tild3065-3332-4466-a536-353130343264/barfi-hazelnut.webp', description: 'Бурфи с фундуком, 5 шт в наборе.' },
+      { id: 'barfi-sesame', name: 'Бурфи кунжутный (набор)', group: 'sweets', pricePerUnit: 490, img: 'https://static.tildacdn.com/tild3439-6135-4861-a531-316233303166/_.webp', description: 'Бурфи с кунжутом, 7 шт в наборе.', hit: true },
+      { id: 'halva', name: 'Халва', group: 'sweets', pricePerUnit: 200, img: 'https://static.tildacdn.com/tild3566-6566-4464-b531-306364646164/photo.webp', description: 'Самая настоящая халва. Натуральный состав: тростниковый сахар, вода, семена подсолнечника, сливочное масло. Срок хранения: 14 дней.' },
+      
+      // Выпечка отдельная
+      { id: 'crazy-cake', name: 'Сумасшедший пирог', group: 'bakery', pricePerUnit: 600, img: DEFAULT_IMG, description: 'Домашний пирог к чаю.' },
+      { id: 'apple-pie', name: 'Яблочный пирог', group: 'bakery', pricePerUnit: 560, img: DEFAULT_IMG, description: 'Домашний яблочный пирог.' }
     ];
 
     const ALL_PRODUCTS = [
@@ -1817,7 +2251,6 @@
         { id: 'bakery', title: 'Выпечка', icon: '🥐' }
       ];
 
-      // Сортируем по приоритету групп
       let productsToRender = [...ALL_PRODUCTS].sort((a, b) => {
         const pa = a.groupId ? (PRODUCT_VARIANTS[a.groupId]?.priority || 99) : 99;
         const pb = b.groupId ? (PRODUCT_VARIANTS[b.groupId]?.priority || 99) : 99;
@@ -1855,11 +2288,10 @@
                   <div class="product-image-wrap" onclick="openProductModal('${product.id}')">
                     <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}" onerror="this.src='${DEFAULT_IMG}'">
                     ${product.hit ? '<span class="product-badge-hit">ХИТ</span>' : ''}
-                    <button class="share-btn" onclick="event.stopPropagation(); shareProduct('${product.id}')" title="Поделиться">↗</button>
                     <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${product.id}')" data-id="${product.id}">
                       ${isFav ? '♥' : '♡'}
                     </button>
-                    <button class="quick-add-btn" onclick="event.stopPropagation(); quickAdd('${product.id}', this)" title="Быстро добавить">+</button>
+                    <button class="quick-add-btn" onclick="event.stopPropagation(); window.quickAdd('${product.id}', this)" title="Быстро добавить">+</button>
                   </div>
                   <div class="product-info" onclick="openProductModal('${product.id}')">
                     <div class="product-name">${product.name}</div>
@@ -1869,7 +2301,7 @@
                     ${hasMultipleVariants ? `
                       <div class="variant-selector" onclick="event.stopPropagation()">
                         ${groupVariants.map(v => `
-                          <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="switchVariantInGrid('${product.groupId}', '${v.id}', this)">
+                          <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="window.switchVariantInGrid('${product.groupId}', '${v.id}', this)">
                             ${v.name.split(' ').pop()}
                           </button>
                         `).join('')}
@@ -1887,7 +2319,7 @@
     }
 
     // ==================== ACTIONS ====================
-    function switchVariantInGrid(groupId, variantId, btn) {
+    window.switchVariantInGrid = function(groupId, variantId, btn) {
       event.stopPropagation();
       const group = PRODUCT_VARIANTS[groupId];
       const variant = group.variants.find(v => v.id === variantId);
@@ -1908,7 +2340,7 @@
       
       card.querySelector('.product-image-wrap').setAttribute('onclick', `openProductModal('${variantId}')`);
       card.querySelector('.product-info').setAttribute('onclick', `openProductModal('${variantId}')`);
-      card.querySelector('.quick-add-btn').setAttribute('onclick', `event.stopPropagation(); quickAdd('${variantId}', this)`);
+      card.querySelector('.quick-add-btn').setAttribute('onclick', `event.stopPropagation(); window.quickAdd('${variantId}', this)`);
       
       const favBtn = card.querySelector('.fav-btn');
       favBtn.setAttribute('onclick', `event.stopPropagation(); toggleFavorite('${variantId}')`);
@@ -1929,7 +2361,7 @@
       }
     }
 
-    function quickAdd(productId, btnElement) {
+    window.quickAdd = function(productId, btnElement) {
       let product = ALL_PRODUCTS.find(p => p.id === productId);
       if (!product) return;
 
@@ -1969,23 +2401,6 @@
 
       showToast('Добавлено в корзину');
       if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-    }
-
-    function shareProduct(productId) {
-      const product = ALL_PRODUCTS.find(p => p.id === productId);
-      if (!product) return;
-      
-      const text = `🧀 ${product.name}\n💰 ${product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : fmtRub(product.pricePerUnit)}\n\nВ магазине "Сыромания"`;
-      const url = window.location.href.split('?')[0] + '?product=' + productId;
-      
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
-      } else if (navigator.share) {
-        navigator.share({ title: product.name, text: text, url: url });
-      } else {
-        navigator.clipboard.writeText(url);
-        showToast('Ссылка скопирована');
-      }
     }
 
     // ==================== MODAL ====================
@@ -2102,30 +2517,58 @@
 
     function updateModalPrice() {
       if (!currentVariant) return;
-      let basePrice = 0, priceText = '', diffText = '';
-      const isCheese = currentVariant.group === 'cheese';
-
-      if (currentVariant.pricePerKg && selectedWeight) {
-        basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
+      let basePrice = 0, priceText = '', diffText = '', oldPriceText = '';
+      
+      // Считаем с учетом общего веса в корзине для скидки
+      let totalWeightForDiscount = 0;
+      if (currentVariant.group === 'cheese' && currentVariant.pricePerKg) {
+        const existingQty = cart
+          .filter(item => item.id === currentVariant.id)
+          .reduce((sum, item) => sum + (item.weight || 0) * item.qty, 0);
+        // Для модалки показываем цену как если бы добавили текущее количество к существующему
+        const simulatedTotalWeight = existingQty + (selectedWeight || 0) * currentQty;
+        
         let discountRate = 0;
-        if (isCheese) {
-          for (const threshold of DISCOUNT_THRESHOLDS) {
-            if (selectedWeight >= threshold.g) discountRate = threshold.rate;
+        let discountLabel = '';
+        for (const threshold of DISCOUNT_THRESHOLDS) {
+          if (simulatedTotalWeight >= threshold.g) {
+            discountRate = threshold.rate;
+            discountLabel = threshold.label;
           }
         }
-        if (discountRate > 0) {
-          const discounted = basePrice * (1 - discountRate);
-          priceText = fmtRub(discounted);
-          diffText = `Экономия ${fmtRub(basePrice - discounted)}`;
-        } else priceText = fmtRub(basePrice);
-      } else if (currentVariant.pricePerUnit) {
-        basePrice = currentVariant.pricePerUnit * currentQty;
-        priceText = fmtRub(basePrice);
-      } else if (currentVariant.pricePerL && selectedVolume) {
-        basePrice = currentVariant.pricePerL * selectedVolume * currentQty;
-        priceText = fmtRub(basePrice);
+        
+        if (selectedWeight) {
+          basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
+          if (discountRate > 0) {
+            const discounted = basePrice * (1 - discountRate);
+            oldPriceText = fmtRub(basePrice);
+            priceText = fmtRub(discounted);
+            diffText = `Выгода ${fmtRub(basePrice - discounted)} (${discountLabel})`;
+          } else {
+            priceText = fmtRub(basePrice);
+          }
+        }
+      } else {
+        if (currentVariant.pricePerKg && selectedWeight) {
+          basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
+          priceText = fmtRub(basePrice);
+        } else if (currentVariant.pricePerUnit) {
+          basePrice = currentVariant.pricePerUnit * currentQty;
+          priceText = fmtRub(basePrice);
+        } else if (currentVariant.pricePerL && selectedVolume) {
+          basePrice = currentVariant.pricePerL * selectedVolume * currentQty;
+          priceText = fmtRub(basePrice);
+        }
       }
 
+      const oldPriceEl = el('modal-price-old');
+      if (oldPriceText) {
+        oldPriceEl.style.display = 'inline';
+        oldPriceEl.textContent = oldPriceText;
+      } else {
+        oldPriceEl.style.display = 'none';
+      }
+      
       el('modal-price').textContent = priceText;
       el('price-diff').textContent = diffText;
     }
@@ -2154,6 +2597,56 @@
       document.body.style.overflow = '';
     }
 
+    function addToCartWithAnimation() {
+      if (!currentVariant) return;
+      
+      let weight = selectedWeight, volume = selectedVolume;
+      if (currentVariant.fixedWeight) weight = currentVariant.fixedWeight;
+      else if (currentVariant.volumes && !volume) volume = currentVariant.volumes[0];
+      
+      const cartItem = {
+        id: currentVariant.id,
+        name: currentVariant.name,
+        img: currentVariant.img,
+        group: currentVariant.group,
+        weight,
+        volume,
+        pricePerKg: currentVariant.pricePerKg,
+        pricePerUnit: currentVariant.pricePerUnit,
+        pricePerL: currentVariant.pricePerL,
+        qty: currentQty
+      };
+
+      const existing = cart.find(item => 
+        item.id === cartItem.id && 
+        item.weight === cartItem.weight && 
+        item.volume === cartItem.volume
+      );
+      
+      if (existing) existing.qty += currentQty;
+      else cart.push(cartItem);
+
+      saveState();
+      updateBadges();
+      renderMiniCart();
+
+      // Sparkle animation
+      const btn = document.querySelector('.cow-button');
+      const rect = btn.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = rect.left + rect.width/2 + 'px';
+        sparkle.style.top = rect.top + rect.height/2 + 'px';
+        sparkle.style.animation = `fly-${['up-left','up-right','left','right','up'][i%5]} 0.6s ease-out forwards`;
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 600);
+      }
+
+      closeProductModal();
+      showToast('Добавлено в корзину');
+    }
+
     // ==================== CART ====================
     function renderMiniCart() {
       const miniCart = el('mini-cart-bar');
@@ -2174,17 +2667,38 @@
       return titles[n%10===1 && n%100!==11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
     }
 
+    // ИСПРАВЛЕНО: Скидка считается от суммарного веса по всем позициям одного товара
+    function calculateItemDiscount(item) {
+      if (item.group !== 'cheese' || !item.pricePerKg || !item.weight) return { rate: 0, label: '' };
+      
+      // Считаем общий вес по всем позициям этого товара в корзине
+      const totalWeight = cart
+        .filter(cartItem => cartItem.id === item.id)
+        .reduce((sum, cartItem) => sum + (cartItem.weight || 0) * cartItem.qty, 0);
+      
+      for (let i = DISCOUNT_THRESHOLDS.length - 1; i >= 0; i--) {
+        if (totalWeight >= DISCOUNT_THRESHOLDS[i].g) {
+          return { rate: DISCOUNT_THRESHOLDS[i].rate, label: DISCOUNT_THRESHOLDS[i].label };
+        }
+      }
+      return { rate: 0, label: '' };
+    }
+
     function calculateCartTotal() {
       return cart.reduce((sum, item) => {
-        const isCheese = item.group === 'cheese';
         if (item.pricePerKg && item.weight) {
-          let discountRate = 0;
-          if (isCheese) {
-            for (const threshold of DISCOUNT_THRESHOLDS) {
-              if (item.weight >= threshold.g) discountRate = threshold.rate;
-            }
-          }
-          return sum + ((item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty);
+          const { rate } = calculateItemDiscount(item);
+          return sum + ((item.weight / 1000) * item.pricePerKg * (1 - rate) * item.qty);
+        } else if (item.pricePerUnit) return sum + (item.pricePerUnit * item.qty);
+        else if (item.pricePerL && item.volume) return sum + (item.pricePerL * item.volume * item.qty);
+        return sum;
+      }, 0);
+    }
+
+    function calculateCartSubtotal() {
+      return cart.reduce((sum, item) => {
+        if (item.pricePerKg && item.weight) {
+          return sum + ((item.weight / 1000) * item.pricePerKg * item.qty);
         } else if (item.pricePerUnit) return sum + (item.pricePerUnit * item.qty);
         else if (item.pricePerL && item.volume) return sum + (item.pricePerL * item.volume * item.qty);
         return sum;
@@ -2204,20 +2718,23 @@
         `;
       } else {
         body.innerHTML = cart.map((item, idx) => {
-          let price = 0;
-          const isCheese = item.group === 'cheese';
+          let basePrice = 0, finalPrice = 0;
+          const { rate, label } = calculateItemDiscount(item);
+          
           if (item.pricePerKg && item.weight) {
-            let discountRate = 0;
-            if (isCheese) {
-              for (const threshold of DISCOUNT_THRESHOLDS) {
-                if (item.weight >= threshold.g) discountRate = threshold.rate;
-              }
-            }
-            price = (item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty;
-          } else if (item.pricePerUnit) price = item.pricePerUnit * item.qty;
-          else if (item.pricePerL && item.volume) price = item.pricePerL * item.volume * item.qty;
+            basePrice = (item.weight / 1000) * item.pricePerKg * item.qty;
+            finalPrice = basePrice * (1 - rate);
+          } else if (item.pricePerUnit) {
+            basePrice = item.pricePerUnit * item.qty;
+            finalPrice = basePrice;
+          } else if (item.pricePerL && item.volume) {
+            basePrice = item.pricePerL * item.volume * item.qty;
+            finalPrice = basePrice;
+          }
 
           const variantText = item.volume ? `${item.volume} л` : `${item.weight} г`;
+          const hasDiscount = rate > 0;
+          
           return `
             <div class="cart-item" data-idx="${idx}">
               <img src="${item.img || DEFAULT_IMG}" class="cart-item-image" alt="">
@@ -2230,16 +2747,33 @@
                   <button class="cart-qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
                 </div>
               </div>
-              <div class="cart-item-price">${fmtRub(price)}</div>
+              <div class="cart-item-price">
+                ${hasDiscount ? `<span class="old">${fmtRub(basePrice)}</span>` : ''}
+                <span class="new">${fmtRub(finalPrice)}</span>
+                ${hasDiscount ? `<span class="save">Скидка ${label}</span>` : ''}
+              </div>
             </div>
           `;
         }).join('');
 
+        const subtotal = calculateCartSubtotal();
         const total = calculateCartTotal();
+        const totalDiscount = subtotal - total;
+
         body.innerHTML += `
           <div class="cart-summary">
+            ${totalDiscount > 0 ? `
+              <div class="cart-total-row">
+                <span>Сумма без скидки:</span>
+                <span>${fmtRub(subtotal)}</span>
+              </div>
+              <div class="cart-total-row discount">
+                <span>Ваша выгода:</span>
+                <span>−${fmtRub(totalDiscount)}</span>
+              </div>
+            ` : ''}
             <div class="cart-total">
-              <span class="cart-total-label">Итого:</span>
+              <span class="cart-total-label">Итого к оплате:</span>
               <span class="cart-total-price">${fmtRub(total)}</span>
             </div>
             <div class="form-group">
@@ -2348,7 +2882,6 @@
         
         const data = await response.json();
         
-        // Сохраняем в историю
         orderHistory.unshift({
           id: data.orderId,
           items: payload.items,
@@ -2492,8 +3025,9 @@
                   <div class="product-card" data-product-id="${product.id}">
                     <div class="product-image-wrap" onclick="openProductModal('${product.id}')">
                       <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}">
+                      ${product.hit ? '<span class="product-badge-hit">ХИТ</span>' : ''}
                       <button class="fav-btn active" onclick="event.stopPropagation(); toggleFavorite('${product.id}')">♥</button>
-                      <button class="quick-add-btn" onclick="event.stopPropagation(); quickAdd('${product.id}', this)">+</button>
+                      <button class="quick-add-btn" onclick="event.stopPropagation(); window.quickAdd('${product.id}', this)">+</button>
                     </div>
                     <div class="product-info" onclick="openProductModal('${product.id}')">
                       <div class="product-name">${product.name}</div>
@@ -2501,7 +3035,7 @@
                       ${hasMultipleVariants ? `
                         <div class="variant-selector" onclick="event.stopPropagation()">
                           ${groupVariants.map(v => `
-                            <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="switchVariantInGrid('${product.groupId}', '${v.id}', this)">
+                            <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="window.switchVariantInGrid('${product.groupId}', '${v.id}', this)">
                               ${v.name.split(' ').pop()}
                             </button>
                           `).join('')}
