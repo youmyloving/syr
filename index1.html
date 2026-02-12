@@ -51,12 +51,54 @@
       padding-bottom: 100px;
     }
 
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(44, 36, 22, 0.95);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Skeleton Loading */
+    .skeleton-card {
+      pointer-events: none;
+    }
+    
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, #e8e0d5 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     /* Header */
     .header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(250, 248, 245, 0.85);
+      background: rgba(250, 248, 245, 0.95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-light);
       padding: 12px 16px;
@@ -90,6 +132,7 @@
       justify-content: center;
       font-weight: 600;
       color: var(--accent-gold);
+      cursor: pointer;
     }
 
     .user-avatar img {
@@ -240,9 +283,36 @@
       color: var(--accent-gold);
     }
 
-    /* Product Grid */
+    /* Products */
     .products-section {
       padding: 0 16px;
+    }
+
+    .products-category {
+      margin-bottom: 32px;
+    }
+
+    .category-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: sticky;
+      top: 140px;
+      background: var(--bg-primary);
+      padding: 8px 0;
+      z-index: 10;
+    }
+
+    .category-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: var(--accent-gradient);
+      border-radius: 2px;
     }
 
     .product-grid {
@@ -265,8 +335,15 @@
       overflow: hidden;
       box-shadow: var(--shadow-soft);
       position: relative;
-      cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .product-card:hover {
@@ -279,13 +356,14 @@
       aspect-ratio: 4/3;
       overflow: hidden;
       background: var(--bg-tertiary);
+      cursor: pointer;
     }
 
     .product-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s;
+      transition: transform 0.3s, opacity 0.3s;
     }
 
     .product-card:hover .product-image {
@@ -306,6 +384,31 @@
       letter-spacing: 0.05em;
     }
 
+    .share-btn {
+      position: absolute;
+      top: 12px;
+      right: 48px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      z-index: 5;
+    }
+
+    .share-btn:hover { 
+      transform: scale(1.1); 
+      color: var(--accent-gold);
+    }
+
     .fav-btn {
       position: absolute;
       top: 12px;
@@ -323,13 +426,72 @@
       font-size: 18px;
       color: var(--text-muted);
       transition: all 0.2s;
+      z-index: 5;
     }
 
     .fav-btn:hover { transform: scale(1.1); }
     .fav-btn.active { color: #e74c3c; border-color: rgba(231, 76, 60, 0.3); }
 
+    .quick-add-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent-gradient);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
+      transition: all 0.2s;
+      z-index: 5;
+    }
+
+    .quick-add-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .quick-add-btn:active {
+      transform: scale(0.95);
+    }
+
+    .quick-add-btn.adding {
+      animation: btnPulse 0.4s ease;
+    }
+
+    @keyframes btnPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.85); }
+      100% { transform: scale(1); }
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(0);
+      animation: rippleEffect 0.6s ease-out;
+      pointer-events: none;
+      width: 20px;
+      height: 20px;
+      margin-left: -10px;
+      margin-top: -10px;
+    }
+
+    @keyframes rippleEffect {
+      to { transform: scale(4); opacity: 0; }
+    }
+
     .product-info {
       padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .product-name {
@@ -342,6 +504,14 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .product-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .product-price {
@@ -350,7 +520,179 @@
       color: var(--accent-gold);
     }
 
-    /* Bottom Sheet Modal */
+    .variant-selector {
+      margin-top: 8px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .variant-chip {
+      padding: 4px 8px;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      background: white;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .variant-chip.active {
+      background: var(--accent-gold);
+      color: white;
+      border-color: var(--accent-gold);
+    }
+
+    /* Mini Cart Bar */
+    .mini-cart-bar {
+      position: fixed;
+      bottom: 90px;
+      left: 16px;
+      right: 16px;
+      background: white;
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 40;
+      transform: translateY(200%);
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-cart-bar.visible {
+      transform: translateY(0);
+    }
+
+    .mini-cart-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mini-cart-count {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .mini-cart-total {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .mini-cart-btn {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* Order History */
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .order-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .order-id {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .order-status {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .order-status.new { background: #e3f2fd; color: #1976d2; }
+    .order-status.processing { background: #fff3e0; color: #f57c00; }
+    .order-status.done { background: #e8f5e9; color: #388e3c; }
+    .order-status.cancelled { background: #ffebee; color: #d32f2f; }
+
+    .order-items-preview {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .order-item-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--bg-tertiary);
+    }
+
+    .order-more {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .order-total {
+      font-weight: 700;
+      color: var(--accent-gold);
+      font-size: 16px;
+    }
+
+    .reorder-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reorder-btn:hover {
+      background: var(--accent-gradient);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -404,6 +746,7 @@
       font-size: 20px;
       font-weight: 700;
       color: var(--text-primary);
+      padding-right: 20px;
     }
 
     .modal-close {
@@ -432,7 +775,7 @@
     .modal-image-container {
       position: relative;
       width: 100%;
-      height: 300px;
+      height: 250px;
       border-radius: var(--radius-md);
       overflow: hidden;
       margin-bottom: 20px;
@@ -480,11 +823,22 @@
       border-color: transparent;
     }
 
+    .weight-section {
+      margin-bottom: 20px;
+    }
+
+    .section-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: block;
+    }
+
     .weight-pills {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 16px;
     }
 
     .weight-pill {
@@ -506,51 +860,68 @@
       border-color: transparent;
     }
 
-    .weight-slider-container {
+    .qty-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
       margin-bottom: 24px;
     }
 
-    .weight-slider-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    .qty-label {
       font-size: 14px;
-      color: var(--text-muted);
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
-    .weight-slider {
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--bg-tertiary);
-      outline: none;
-      -webkit-appearance: none;
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .weight-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 24px;
-      height: 24px;
+    .qty-btn {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: var(--accent-gradient);
+      border: 1px solid var(--border-light);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 20px;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(201, 169, 98, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .qty-btn:hover { border-color: var(--accent-gold); }
+
+    .qty-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 30px;
+      text-align: center;
     }
 
     .price-display {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       color: var(--accent-gold);
       margin-bottom: 8px;
       display: flex;
       align-items: baseline;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .price-diff {
-      font-size: 16px;
-      color: var(--text-muted);
-      font-weight: 500;
+      font-size: 14px;
+      color: #2e7d32;
+      font-weight: 600;
+      background: #e8f5e9;
+      padding: 4px 12px;
+      border-radius: 999px;
     }
 
     .modal-actions {
@@ -576,96 +947,125 @@
 
     .btn-fav.active { color: #e74c3c; border-color: rgba(231, 76, 60, 0.3); }
 
-    .btn-add {
-      flex: 1;
-      height: 56px;
-      border-radius: var(--radius-md);
-      border: none;
-      background: var(--accent-gradient);
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(201, 169, 98, 0.4);
-      transition: all 0.2s;
+    .button-container {
       position: relative;
+      width: 100%;
+      height: 80px;
+      perspective: 1000px;
+      z-index: 1;
+    }
+
+    .cow-arm {
+      position: absolute;
+      width: 50px;
+      height: 80px;
+      top: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      z-index: 5;
+    }
+
+    .cow-arm.left {
+      left: 10px;
+      transform: rotate(-20deg) translateX(20px) scale(0.8);
+    }
+
+    .cow-arm.right {
+      right: 10px;
+      transform: rotate(20deg) translateX(-20px) scale(0.8);
+    }
+
+    .button-container:hover .cow-arm.left {
+      opacity: 1;
+      transform: rotate(0deg) translateX(0) scale(1);
+    }
+
+    .button-container:hover .cow-arm.right {
+      opacity: 1;
+      transform: rotate(0deg) translateX(0) scale(1);
+    }
+
+    .cow-head-wrapper {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      width: 100px;
+      height: 90px;
+      z-index: 5;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      filter: drop-shadow(0 4px 12px rgba(92, 74, 50, 0.2));
+    }
+
+    .button-container:hover .cow-head-wrapper {
+      transform: translateX(-50%) translateY(-60px);
+      z-index: 15;
+    }
+
+    .cow-button {
+      position: relative;
+      width: 100%;
+      height: 60px;
+      border: none;
+      outline: none;
+      background: linear-gradient(180deg, #f4e4c1 0%, #e6d5b0 100%);
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 
+        inset 0 2px 0 rgba(255,255,255,0.6),
+        inset 0 -2px 0 rgba(139, 115, 85, 0.1),
+        0 6px 0 #c9b896,
+        0 8px 20px rgba(92, 74, 50, 0.25),
+        0 12px 30px rgba(212, 175, 55, 0.15);
+      z-index: 10;
+      transform-style: preserve-3d;
+      transition: all 0.2s ease;
       overflow: hidden;
     }
 
-    .btn-add:active { transform: scale(0.98); }
+    .cow-button:active {
+      transform: translateY(6px) scale(0.98);
+      box-shadow: 
+        inset 0 2px 4px rgba(139, 115, 85, 0.2),
+        0 2px 0 #c9b896,
+        0 4px 10px rgba(92, 74, 50, 0.2);
+    }
 
-    /* Cart Button with Plant Effect */
-    .btn-order {
-      position: relative;
-      width: 100%;
-      padding: 18px 32px;
-      background: var(--accent-gradient);
+    .button-text {
+      display: block;
       font-size: 16px;
       font-weight: 700;
-      color: #FFFFFF;
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(201, 169, 98, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-      cursor: pointer;
-      overflow: visible;
-      transition: transform 0.2s;
+      color: #5c4a32;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+      position: relative;
+      z-index: 12;
+      transition: transform 0.3s ease;
     }
 
-    .btn-order:active { transform: scale(0.98); }
+    .button-container:hover .button-text {
+      transform: translateY(2px);
+    }
 
-    .btn-order .leaf {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: auto;
-      opacity: 0;
-      transform: translate(-50%, -50%);
+    .sparkle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: #d4af37;
+      border-radius: 50%;
       pointer-events: none;
-      z-index: -1;
+      z-index: 20;
+      box-shadow: 0 0 6px #d4af37;
     }
 
-    .fil-leaf-1 { fill: #E8B86D; }
-    .fil-leaf-2 { fill: #D4A84B; fill-rule: nonzero; }
-    .fil-leaf-3 { fill: #C9A962; }
-    .fil-leaf-4 { fill: #7A9E6E; }
-    .fil-leaf-5 { fill: #5C8A5A; }
-
-    .btn-order.animating .icon-1 { animation: growLeaf1 0.8s ease forwards; }
-    .btn-order.animating .icon-2 { animation: growLeaf2 0.8s ease 0.1s forwards; }
-    .btn-order.animating .icon-3 { animation: growLeaf3 0.8s ease 0.05s forwards; }
-    .btn-order.animating .icon-4 { animation: growLeaf4 0.8s ease 0.15s forwards; }
-    .btn-order.animating .icon-5 { animation: growLeaf5 0.8s ease 0.2s forwards; }
-
-    @keyframes growLeaf1 {
-      0% { width: 0; opacity: 0; top: 50%; transform: translate(-50%, -50%) rotate(0deg); }
-      50% { width: 60px; opacity: 1; top: -100%; }
-      100% { width: 50px; opacity: 0; top: -150%; transform: translate(-50%, -50%) rotate(10deg); }
-    }
-
-    @keyframes growLeaf2 {
-      0% { width: 0; opacity: 0; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg); }
-      50% { width: 75px; opacity: 1; top: -80%; left: 80%; }
-      100% { width: 65px; opacity: 0; top: -120%; left: 90%; transform: translate(-50%, -50%) rotate(-15deg); }
-    }
-
-    @keyframes growLeaf3 {
-      0% { width: 0; opacity: 0; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg); }
-      50% { width: 55px; opacity: 1; top: -60%; left: 20%; }
-      100% { width: 45px; opacity: 0; top: -100%; left: 10%; transform: translate(-50%, -50%) rotate(8deg); }
-    }
-
-    @keyframes growLeaf4 {
-      0% { width: 0; opacity: 0; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg); }
-      50% { width: 80px; opacity: 1; top: -120%; left: 30%; }
-      100% { width: 70px; opacity: 0; top: -180%; left: 20%; transform: translate(-50%, -50%) rotate(-8deg); }
-    }
-
-    @keyframes growLeaf5 {
-      0% { width: 0; opacity: 0; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg); }
-      50% { width: 85px; opacity: 1; top: -140%; left: 70%; }
-      100% { width: 75px; opacity: 0; top: -200%; left: 85%; transform: translate(-50%, -50%) rotate(12deg); }
-    }
+    @keyframes fly-up-left { to { transform: translate(-30px, -40px) scale(0); opacity: 0; } }
+    @keyframes fly-up-right { to { transform: translate(30px, -40px) scale(0); opacity: 0; } }
+    @keyframes fly-left { to { transform: translate(-40px, 0) scale(0); opacity: 0; } }
+    @keyframes fly-right { to { transform: translate(40px, 0) scale(0); opacity: 0; } }
+    @keyframes fly-up { to { transform: translate(0, -50px) scale(0); opacity: 0; } }
 
     /* Loader */
     .loader-overlay {
@@ -681,51 +1081,23 @@
 
     .loader-overlay.active { display: flex; }
 
-    .loader-container {
+    .loader {
+      --duration: 3s;
+      width: 200px;
+      height: 320px;
       position: relative;
-      height: 100px;
-      width: 100px;
+      transform-style: preserve-3d;
     }
 
-    .loader-box {
-      width: 20px;
-      height: 20px;
-      background: var(--accent-gradient);
-      border-radius: 4px;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      margin-left: -10px;
-      margin-top: -10px;
-      animation: fall 1s ease-in-out infinite;
-    }
-
-    .loader-box:nth-child(1) { animation-delay: 0s; margin-left: -50px; }
-    .loader-box:nth-child(2) { animation-delay: 0.1s; margin-left: -25px; }
-    .loader-box:nth-child(3) { animation-delay: 0.2s; margin-left: 0; }
-    .loader-box:nth-child(4) { animation-delay: 0.3s; margin-left: 25px; }
-    .loader-box:nth-child(5) { animation-delay: 0.4s; margin-left: 50px; }
-
-    @keyframes fall {
-      0%, 100% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      50% { transform: translateY(0) rotate(180deg); }
-      90% { opacity: 1; }
-      100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
-    }
-
-    .ground {
-      width: 120px;
-      height: 4px;
-      background: var(--border-light);
-      border-radius: 2px;
-      margin-top: 80px;
+    @media (max-width: 480px) {
+      .loader { zoom: 0.44; }
     }
 
     .loader-text {
-      margin-top: 24px;
+      margin-top: 40px;
       color: var(--text-secondary);
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 500;
     }
 
     /* Bottom Nav */
@@ -748,14 +1120,17 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      padding: 8px 16px;
+      padding: 8px 12px;
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       position: relative;
+      border: none;
+      background: none;
+      font-family: inherit;
     }
 
     .nav-item.active { color: var(--accent-gold); }
@@ -764,7 +1139,7 @@
     .nav-badge {
       position: absolute;
       top: 4px;
-      right: 8px;
+      right: 4px;
       min-width: 18px;
       height: 18px;
       padding: 0 6px;
@@ -776,6 +1151,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.3s;
+    }
+
+    .nav-badge.pulse {
+      animation: badgePulse 0.3s ease;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
     }
 
     /* Cart Styles */
@@ -786,6 +1171,16 @@
       background: var(--bg-primary);
       border-radius: var(--radius-md);
       margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cart-item.removing {
+      animation: slideOut 0.3s ease forwards;
+    }
+
+    @keyframes slideOut {
+      to { transform: translateX(-100%); opacity: 0; }
     }
 
     .cart-item-image {
@@ -811,44 +1206,20 @@
       margin-bottom: 8px;
     }
 
-    .cart-item-weights {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-
-    .cart-weight-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border-light);
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .cart-weight-btn.active {
-      background: var(--accent-gradient);
-      color: white;
-      border-color: transparent;
-    }
-
     .cart-item-controls {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .qty-btn {
-      width: 32px;
-      height: 32px;
+    .cart-qty-btn {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       border: 1px solid var(--border-light);
       background: var(--bg-secondary);
       color: var(--text-primary);
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -856,13 +1227,14 @@
       transition: all 0.2s;
     }
 
-    .qty-btn:hover { border-color: var(--accent-gold); }
+    .cart-qty-btn:hover { border-color: var(--accent-gold); }
 
     .cart-item-price {
       font-size: 16px;
       font-weight: 700;
       color: var(--accent-gold);
       margin-left: auto;
+      align-self: center;
     }
 
     .cart-summary {
@@ -870,13 +1242,14 @@
       background: var(--bg-warm);
       border-radius: var(--radius-md);
       margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .cart-total {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .cart-total-label {
@@ -937,29 +1310,84 @@
       opacity: 0.5;
     }
 
-    /* Flying Element Animation */
-    .flyer {
-      position: fixed;
-      z-index: 9999;
-      pointer-events: none;
-      border-radius: 12px;
-      object-fit: cover;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    /* Profile Modal */
+    .profile-info {
+      text-align: center;
+      padding: 20px;
     }
 
-    /* Scrollbar Styling */
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--accent-gold);
+      margin: 0 auto 16px;
+      background: var(--bg-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .profile-phone {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
     ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 3px; }
+
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff9800;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      transform: translateY(-100%);
+      transition: transform 0.3s;
+    }
+
+    .offline-indicator.show {
+      transform: translateY(0);
+    }
   </style>
+<base target="_blank">
 </head>
 <body>
+  <div id="offline-indicator" class="offline-indicator">⚠️ Офлайн режим. Заказы сохранятся локально.</div>
+  <div id="toast" class="toast"></div>
+  
+  <div id="mini-cart-bar" class="mini-cart-bar">
+    <div class="mini-cart-info">
+      <span class="mini-cart-count">0 товаров</span>
+      <span class="mini-cart-total">0 ₽</span>
+    </div>
+    <button class="mini-cart-btn" onclick="openCartModal()">Оформить →</button>
+  </div>
+
   <div id="app">
-    <!-- Header -->
     <header class="header">
       <div class="header-top">
         <div class="logo">Сыромания</div>
-        <div class="user-avatar" id="user-avatar">
+        <div class="user-avatar" id="user-avatar" onclick="openProfileModal()">
           <span>С</span>
         </div>
       </div>
@@ -978,22 +1406,14 @@
       </div>
     </header>
 
-    <!-- Hits Section -->
     <section class="hits-section">
       <div class="section-header">
         <h2 class="section-title">🔥 Хиты продаж</h2>
       </div>
-      <div class="hits-scroll" id="hits-scroll">
-        <!-- Hits injected by JS -->
-      </div>
+      <div class="hits-scroll" id="hits-scroll"></div>
     </section>
 
-    <!-- Products Grid -->
-    <section class="products-section">
-      <div class="product-grid" id="product-grid">
-        <!-- Products injected by JS -->
-      </div>
-    </section>
+    <section class="products-section" id="products-section"></section>
   </div>
 
   <!-- Product Modal -->
@@ -1008,34 +1428,71 @@
         <div class="modal-image-container">
           <img src="" alt="" class="modal-image" id="modal-image" />
         </div>
-        
         <p class="modal-description" id="modal-description"></p>
-
-        <!-- Variant Tabs (for grouped products) -->
         <div class="variant-tabs" id="variant-tabs" style="display: none;"></div>
-
-        <!-- Weight Pills -->
-        <div class="weight-pills" id="weight-pills"></div>
-
-        <!-- Weight Slider -->
-        <div class="weight-slider-container">
-          <div class="weight-slider-label">
-            <span>Свой вес</span>
-            <span id="slider-value">500 г</span>
-          </div>
-          <input type="range" class="weight-slider" id="weight-slider" min="100" max="1000" step="50" value="500">
+        <div class="weight-section" id="weight-section">
+          <label class="section-label">Выберите вес</label>
+          <div class="weight-pills" id="weight-pills"></div>
         </div>
-
+        <div class="qty-section">
+          <span class="qty-label">Количество:</span>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-value" id="qty-value">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
         <div class="price-display">
           <span id="modal-price">0 ₽</span>
           <span class="price-diff" id="price-diff"></span>
         </div>
-
         <div class="modal-actions">
           <button class="btn-fav" id="modal-fav-btn" onclick="toggleModalFavorite()">♡</button>
-          <button class="btn-add" id="add-to-cart-btn" onclick="addToCartWithAnimation()">
-            В корзину
-          </button>
+          <div class="button-container" style="flex: 1;">
+            <svg class="cow-arm left" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M45 20 C45 10, 35 5, 25 10 C15 15, 10 30, 15 50 C20 70, 30 85, 35 95 C38 100, 45 100, 50 95 C55 90, 50 70, 48 50 C46 35, 45 25, 45 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+              <ellipse cx="25" cy="30" rx="5" ry="7" fill="#5c4a32" opacity="0.6"/>
+            </svg>
+            <svg class="cow-arm right" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 20 C15 10, 25 5, 35 10 C45 15, 50 30, 45 50 C40 70, 30 85, 25 95 C22 100, 15 100, 10 95 C5 90, 10 70, 12 50 C14 35, 15 25, 15 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+              <ellipse cx="35" cy="35" rx="4" ry="6" fill="#5c4a32" opacity="0.6"/>
+            </svg>
+            <div class="cow-head-wrapper">
+              <svg viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="25" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(-20 25 45)"/>
+                <ellipse cx="115" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(20 115 45)"/>
+                <ellipse cx="25" cy="45" rx="10" ry="14" fill="#e6d5b0" transform="rotate(-20 25 45)"/>
+                <ellipse cx="115" cy="45" rx="10" ry="14" fill="#e6d5b0" transform="rotate(20 115 45)"/>
+                <path d="M35 25 Q30 5, 40 0 Q45 10, 42 20" fill="#d4af37" stroke="#b8941d" stroke-width="1.5"/>
+                <path d="M105 25 Q110 5, 100 0 Q95 10, 98 20" fill="#d4af37" stroke="#b8941d" stroke-width="1.5"/>
+                <circle cx="40" cy="0" r="3" fill="#d4af37"/>
+                <circle cx="100" cy="0" r="3" fill="#d4af37"/>
+                <rect x="30" y="20" width="80" height="85" rx="35" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+                <ellipse cx="50" cy="40" rx="8" ry="10" fill="#5c4a32" opacity="0.8"/>
+                <ellipse cx="95" cy="55" rx="6" ry="8" fill="#5c4a32" opacity="0.7"/>
+                <circle cx="45" cy="75" r="5" fill="#5c4a32" opacity="0.6"/>
+                <path d="M50 22 Q60 30, 70 22 Q80 30, 90 22" stroke="#f4e4c1" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <circle cx="55" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                <circle cx="55" cy="60" r="6" fill="#5c4a32"/>
+                <circle cx="57" cy="58" r="2.5" fill="white"/>
+                <circle cx="85" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                <circle cx="85" cy="60" r="6" fill="#5c4a32"/>
+                <circle cx="87" cy="58" r="2.5" fill="white"/>
+                <path d="M48 55 Q45 52, 42 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
+                <path d="M92 55 Q95 52, 98 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
+                <ellipse cx="70" cy="85" rx="22" ry="18" fill="#f9f0e0"/>
+                <ellipse cx="70" cy="85" rx="18" ry="14" fill="#ffe4e1" opacity="0.5"/>
+                <ellipse cx="64" cy="85" rx="3" ry="4" fill="#5c4a32" opacity="0.6"/>
+                <ellipse cx="76" cy="85" rx="3" ry="4" fill="#5c4a32" opacity="0.6"/>
+                <path d="M62 95 Q70 100, 78 95" stroke="#5c4a32" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <ellipse cx="45" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
+                <ellipse cx="95" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
+              </svg>
+            </div>
+            <button class="cow-button" onclick="addToCartWithAnimation()">
+              <span class="button-text">В корзину</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1049,42 +1506,64 @@
         <h3 class="modal-title">Корзина</h3>
         <button class="modal-close" onclick="closeCartModal()">✕</button>
       </div>
-      <div class="modal-body" id="cart-body">
-        <!-- Cart items injected by JS -->
+      <div class="modal-body" id="cart-body"></div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-sheet" style="max-height: 80vh;">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Профиль</h3>
+        <button class="modal-close" onclick="closeProfileModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-info">
+          <div class="profile-avatar" id="profile-avatar">С</div>
+          <div class="profile-name" id="profile-name">Гость</div>
+          <div class="profile-phone" id="profile-phone">Войдите через Telegram</div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Loader -->
   <div class="loader-overlay" id="loader">
-    <div class="loader-container">
-      <div class="loader-box"></div>
-      <div class="loader-box"></div>
-      <div class="loader-box"></div>
-      <div class="loader-box"></div>
-      <div class="loader-box"></div>
+    <div class="loader">
+      <div style="width: 200px; height: 200px; border: 4px solid var(--border-light); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
     </div>
-    <div class="ground"></div>
     <div class="loader-text">Отправляем заказ...</div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
   </div>
 
   <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a class="nav-item active" onclick="showMain()">
+    <button class="nav-item active" onclick="showMain()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
         <polyline points="9 22 9 12 15 12 15 22"></polyline>
       </svg>
       <span>Главная</span>
-    </a>
-    <a class="nav-item" onclick="showFavorites()">
+    </button>
+    <button class="nav-item" onclick="showFavorites()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>
       <span>Избранное</span>
       <span class="nav-badge" id="fav-badge" style="display: none;">0</span>
-    </a>
-    <a class="nav-item" onclick="openCartModal()">
+    </button>
+    <button class="nav-item" onclick="showOrderHistory()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span>Заказы</span>
+    </button>
+    <button class="nav-item" onclick="openCartModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
@@ -1092,134 +1571,98 @@
       </svg>
       <span>Корзина</span>
       <span class="nav-badge" id="cart-badge" style="display: none;">0</span>
-    </a>
-    <a class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span>Профиль</span>
-    </a>
+    </button>
   </nav>
 
   <script>
-    // Constants
+    // ==================== CONFIG ====================
     const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com';
-    const CURRENCY = 'RUB';
-    const ROUND = Math.round;
-    const HAPTIC_ENABLED = false;
-    const MAX_WEIGHT_GRAMS = 1000;
-    const MIN_WEIGHT_GRAMS = 100;
-    
+    const STORAGE_CART_KEY = 'syromania-cart';
+    const STORAGE_FAVORITES_KEY = 'syromania-favorites';
+    const STORAGE_OFFLINE_ORDERS = 'syromania-offline-orders';
+    const STORAGE_ORDER_HISTORY = 'syromania-order-history';
+    const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
+
     const DISCOUNT_THRESHOLDS = [
       { g: 500, rate: 0.05 },
       { g: 700, rate: 0.10 },
       { g: 1000, rate: 0.15 },
     ];
 
-    const STORAGE_CART_KEY = 'syromania-cart';
-    const STORAGE_FAVORITES_KEY = 'syromania-favorites';
-    const STORAGE_CHECKOUT_KEY = 'syromania-checkout';
-
-    const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
-
-    // Grouped Products Configuration
+    // ==================== DATA ====================
     const PRODUCT_VARIANTS = {
       'halloumi-group': {
         displayName: 'Халлуми',
-        baseGroup: 'brined',
+        baseGroup: 'cheese',
+        priority: 1,
         variants: [
-          { id: 'halloumi', name: 'Классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', pieceWeightGrams: 225, pieceWeightRangeText: '200–250 г' },
-          { id: 'halloumi-paprika-oregano', name: 'С паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp', description: 'Идеален для жарки или без обжарки. Средиземноморские нотки. Срок хранения: 7 суток.', pieceWeightGrams: 225, pieceWeightRangeText: '200–250 г' },
-          { id: 'halloumi-tomato-basil-garlic', name: 'Томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp', description: 'Идеален для жарки, хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', pieceWeightGrams: 225, pieceWeightRangeText: '200–250 г' },
-          { id: 'halloumi-tomato-paprika', name: 'С вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp', description: 'Идеален для жарки, появляется корочка. Срок хранения: 7 суток.', pieceWeightGrams: 225, pieceWeightRangeText: '200–250 г' }
+          { id: 'halloumi', name: 'Халлуми классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 225 },
+          { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp', description: 'Идеален для жарки или без обжарки. Средиземноморские нотки. Срок хранения: 7 суток.', fixedWeight: 225 },
+          { id: 'halloumi-tomato-basil-garlic', name: 'Халлуми томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp', description: 'Идеален для жарки, хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 225 },
+          { id: 'halloumi-tomato-paprika', name: 'Халлуми с вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp', description: 'Идеален для жарки, появляется корочка. Срок хранения: 7 суток.', fixedWeight: 225 }
+        ]
+      },
+      'panir-group': {
+        displayName: 'Панир',
+        baseGroup: 'cheese',
+        priority: 2,
+        variants: [
+          { id: 'panir-classic', name: 'Панир классический', pricePerKg: 1450, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp', description: 'Очень нежный, мягкий, молочный вкус. Срок хранения: 7 суток.' },
+          { id: 'panir-herbs', name: 'Панир с зеленью', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-herbs.webp', description: 'Лёгкий, свежий, будто глоток прохладной воды в жару. Срок хранения: 7 суток.', hit: true },
+          { id: 'panir-spicy', name: 'Панир со специями', pricePerKg: 1650, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-spicy.webp', description: 'Вкус не острый и не перчёный. Очень нежный, ароматный. Срок хранения: 7 суток.' },
+          { id: 'panir-smoked', name: 'Панир копчёный', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-smoked.webp', description: 'Приятный аромат копчёности, вкус гармоничный. Срок хранения: 30 суток.' }
         ]
       },
       'sandesh-group': {
         displayName: 'Сандеш',
         baseGroup: 'sweets',
+        priority: 3,
         variants: [
-          { id: 'sandesh-orange', name: 'Апельсиновый', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp', description: 'Нежный творожный десерт, в который влюбляются с первого укуса. Состав: цельное молоко, тростниковый сахар, цедра апельсина. Срок хранения: 5 суток.' },
-          { id: 'sandesh-walnut', name: 'С грецким орехом', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-walnut.webp', description: 'Творожный десерт с грецким орехом — тает во рту. Состав: цельное молоко, тростниковый сахар, грецкий орех. Срок хранения: 5 суток.' },
-          { id: 'sandesh-carob', name: 'С кэробом', pricePerUnit: 300, img: 'https://static.tildacdn.com/tild6135-6337-4266-b764-613565386238/_.webp', description: 'Творожный десерт с шоколадным вкусом благодаря кэробу и кокосовой стружке. Срок хранения: 5 суток.' }
+          { id: 'sandesh-orange', name: 'Сандеш апельсиновый', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp', description: 'Нежный творожный десерт. Состав: цельное молоко, тростниковый сахар, цедра апельсина. Срок хранения: 5 суток.' },
+          { id: 'sandesh-walnut', name: 'Сандеш с грецким орехом', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-walnut.webp', description: 'Творожный десерт с грецким орехом. Срок хранения: 5 суток.' },
+          { id: 'sandesh-carob', name: 'Сандеш с кэробом', pricePerUnit: 300, img: 'https://static.tildacdn.com/tild6135-6337-4266-b764-613565386238/_.webp', description: 'Творожный десерт с шоколадным вкусом. Срок хранения: 5 суток.' }
         ]
       },
-      'panir-group': {
-        displayName: 'Панир',
-        baseGroup: 'soft',
+      'tvorozhnaya-massa-group': {
+        displayName: 'Творожная масса',
+        baseGroup: 'dairy',
+        priority: 4,
         variants: [
-          { id: 'panir-classic', name: 'Классический', pricePerKg: 1450, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp', description: 'Очень нежный, мягкий, молочный вкус. Срок хранения: 7 суток.' },
-          { id: 'panir-herbs', name: 'С зеленью', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-herbs.webp', description: 'Лёгкий, свежий, будто глоток прохладной воды в жару. Срок хранения: 7 суток.' },
-          { id: 'panir-spicy', name: 'Со специями', pricePerKg: 1650, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-spicy.webp', description: 'Вкус не острый и не перчёный. Очень нежный, ароматный, все специи подобраны в меру. Срок хранения: 7 суток.' },
-          { id: 'panir-smoked', name: 'Копчёный', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-smoked.webp', description: 'Приятный аромат копчёности, вкус гармоничный, без резкости. Срок хранения: 30 суток.' }
+          { id: 'tvorozhnaya-massa-izum', name: 'Творожная масса с изюмом', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с изюмом. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-finik', name: 'Творожная масса с финиками', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с финиками. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-chernosliv', name: 'Творожная масса с черносливом', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с черносливом. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-kuraga', name: 'Творожная масса с курагой', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с курагой. Срок хранения: 5 суток.' }
         ]
       }
     };
 
-    // All Products
-    const PRODUCTS = [
-      { id: 'mozzarella', name: 'Моцарелла', group: 'cheese', pricePerKg: 2000, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/mozzarella.webp', description: 'Нити моцареллы в нежной оболочке. Срок хранения: 3–5 суток. Идеальна к салатам.', pieceWeightGrams: 200, hit: true },
-      { id: 'buratta', name: 'Буратта', group: 'cheese', pricePerKg: 2100, img: DEFAULT_IMG, description: 'Мешочек из моцареллы с начинкой из страчателлы. Срок хранения: 3–5 суток.', pieceWeightGrams: 250 },
+    const INDIVIDUAL_PRODUCTS = [
+      { id: 'mozzarella', name: 'Моцарелла', group: 'cheese', pricePerKg: 2000, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/mozzarella.webp', description: 'Нити моцареллы в нежной оболочке. Срок хранения: 3–5 суток.', fixedWeight: 200, hit: true },
+      { id: 'buratta', name: 'Буратта', group: 'cheese', pricePerKg: 2100, img: DEFAULT_IMG, description: 'Мешочек из моцареллы с начинкой из страчателлы. Срок хранения: 3–5 суток.', fixedWeight: 250 },
       { id: 'stracciatella', name: 'Страчателла', group: 'cheese', pricePerKg: 2150, img: 'https://static.tildacdn.com/tild3832-6430-4462-b663-353438383930/stracciatella.webp', description: 'Нити моцареллы в сливках. Срок хранения: 5–7 суток.' },
       { id: 'suluguni', name: 'Сулугуни', group: 'cheese', pricePerKg: 1700, img: 'https://static.tildacdn.com/tild3238-3866-4366-a436-623236363261/suluguni.webp', description: 'Умеренно солёный, слоистый и эластичный. Срок хранения: 7 суток.' },
-      { id: 'suluguni-smoked', name: 'Сулугуни копчёный', group: 'cheese', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6435-3838-4463-b431-353765323333/suluguni-smoked.webp', description: 'С лёгкой копчёностью, плотная и эластичная структура. Срок хранения: 30 суток.' },
-      { id: 'imeretian', name: 'Имеретинский', group: 'cheese', pricePerKg: 1500, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/imeretian.webp', description: 'Прекрасный рассольный сыр, подходит ко всем блюдам. Срок хранения: 7 суток.' },
-      { id: 'imeretian-dill-garlic', name: 'Имеретинский с зеленью и чесноком', group: 'cheese', pricePerKg: 1600, img: 'https://static.tildacdn.com/tild6435-3539-4337-a561-386438636230/__.webp', description: 'Свежий рассольный сыр с ароматной зеленью и чесноком. Срок хранения: 7 суток.' },
-      { id: 'kosichka', name: 'Сыр косичка', group: 'cheese', pricePerKg: 1900, img: DEFAULT_IMG, description: 'Слегка солёный, подходит ко всему. Срок хранения: 7 суток.', pieceWeightGrams: 200 },
-      { id: 'kosichka-smoked', name: 'Сыр косичка копчёная', group: 'cheese', pricePerKg: 2000, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/kosichka-smoked.webp', description: 'Холодное копчение, лёгкая солёность. Срок хранения: 30 суток.', pieceWeightGrams: 200 },
-      { id: 'spicy-klubok', name: 'Пряные клубочки', group: 'cheese', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3463-6166-4665-a439-323264653939/spicy-klubok.webp', description: 'Нестандартный вкусный сыр, не сильно солёный, нравится всем. Срок хранения: 7 суток.', pieceWeightGrams: 150, hit: true },
-      { id: 'ricotta', name: 'Творожный сыр (рикотта)', group: 'cheese', pricePerKg: 1400, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta.webp', description: 'Нежный сыр, подходит и к бутербродам, и к блюдам. Срок хранения: 7 суток.' },
-      { id: 'ricotta-herbs', name: 'Творожный сыр с зеленью (рикотта)', group: 'cheese', pricePerKg: 1500, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta-herbs.webp', description: 'Нежный, свежий, универсальный — лучше попробовать! Срок хранения: 7 суток.' },
-      { id: 'caciotta', name: 'Качотта', group: 'cheese', pricePerKg: 2200, img: 'https://static.tildacdn.com/tild6165-3265-4834-a236-366661346562/caciotta.webp', description: 'Мягкий итальянский сыр. Срок хранения: 7 суток.' },
-      { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', group: 'cheese', pricePerKg: 2250, img: DEFAULT_IMG, description: 'С ореховым привкусом пажитника. Срок хранения: 7 суток.' },
-      { id: 'hard-village', name: 'Твёрдый деревенский сыр', group: 'cheese', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/hard-village.webp', description: 'Твёрдый деревенский сыр готовится из творога с приправами, который обжаривается. Срок хранения: 7 суток.' },
-      { id: 'hard-smoked', name: 'Твёрдый копчёный сыр', group: 'cheese', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6662-3930-4663-b132-316135626136/hard-smoked.webp', description: 'Готовится из творога с приправами, обжаривается, затем коптится. Нежный копчёный вкус. Срок хранения: до 30 суток.' },
-      { id: 'rolls-olives-walnut', name: 'Сырный рулет с маслинами и грецким орехом', group: 'cheese', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-olives-walnut.webp', description: 'Можно подать как закуску к любому столу — домашнему или праздничному. Срок хранения: 7 суток.' },
-      { id: 'rolls-apricot-cedar', name: 'Сырный рулет с курагой и кедровым орехом', group: 'cheese', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-apricot-cedar.webp', description: 'Слегка сладковатый благодаря творожному сыру, кураге и орехам. Срок хранения: 7 суток.' },
-      { id: 'milk', name: 'Молоко', group: 'dairy', pricePerL: 150, img: DEFAULT_IMG, description: 'Молоко отборное цельное, охлаждённое. Как из детства! Срок хранения: 3–5 суток в холодильнике.' },
-      { id: 'milk-topped', name: 'Молоко топлёное', group: 'dairy', pricePerL: 250, img: 'https://static.tildacdn.com/tild3839-3163-4066-a633-306366346631/milk-topped.webp', description: 'Настоящее цельное топлёное молоко. Имеет густоватую консистенцию, попробовав однажды — уже не разлюбишь! Срок хранения: 5–7 суток в холодильнике.' },
-      { id: 'yogurt', name: 'Йогурт', group: 'dairy', pricePerL: 260, img: DEFAULT_IMG, description: 'Самый настоящий йогурт, приготовленный исключительно из отборного молока и натуральной закваски. Срок хранения: 5 суток в холодильнике.' },
-      { id: 'ryazhenka', name: 'Ряженка', group: 'dairy', pricePerL: 280, img: DEFAULT_IMG, description: 'Натуральная ряженка из молока. Один из любимых напитков всех детей! Срок хранения: до 5 суток в холодильнике.' },
-      { id: 'misti-dahi', name: 'Мистхи-Дахи', group: 'dairy', pricePerL: 300, img: DEFAULT_IMG, description: 'Кисломолочный напиток. Срок хранения: 5 суток.' },
-      { id: 'whey', name: 'Сыворотка', group: 'dairy', pricePerL: 60, img: DEFAULT_IMG, description: 'Молочный низкокалорийный продукт, получаемый в процессе изготовления творога или сыра. Срок хранения: 3 суток в холодильнике.' },
-      { id: 'cream', name: 'Сливки (33–36%)', group: 'dairy', pricePerL: 1450, img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp', description: 'Натуральные свежие сливки. Срок хранения: 5 суток в холодильнике. На 3–4 сутки могут стать сметаной.' },
-      { id: 'tvorog', name: 'Творог', group: 'dairy', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3136-3730-4134-b466-613138343764/tvorog.webp', description: 'Творожный нежный вкус. «Зёрнышки» творога именно такие, какими и должны быть. Срок хранения: 3–5 суток в холодильнике.' },
-      { id: 'butter', name: 'Сливочное масло (шарик)', group: 'dairy', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/butter.webp', description: 'Натуральное сливочное масло, как готовила бабушка. Без добавления сахара или соли. Приблизительный вес шарика — 200 г.', pieceWeightGrams: 200 },
-      { id: 'ghee', name: 'Топлёное масло (ГХИ)', group: 'dairy', pricePerKg: 2900, img: DEFAULT_IMG, description: 'Состав: сливочное масло. Жирность ~99%. ГХИ — самое драгоценное, что можно взять из молока. Идеально для жарки. Срок хранения: больше 10 лет.' },
-      { id: 'condensed-milk', name: 'Варёная сгущёнка', group: 'dairy', pricePerKg: 1000, img: DEFAULT_IMG, description: 'Состав: цельное молоко, тростниковый сахар. Натуральная варёная сгущёнка, густая и карамельная. Срок хранения: 7 суток в холодильнике.' },
-      { id: 'tvorozhnaya-massa', name: 'Творожная масса', group: 'dairy', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с изюмом, финиками, черносливом или курагой. Срок хранения: 5 суток в холодильнике.', flavors: ['С изюмом', 'С финиками', 'С черносливом', 'С курагой'] },
+      { id: 'suluguni-smoked', name: 'Сулугуни копчёный', group: 'cheese', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6435-3838-4463-b431-353765323333/suluguni-smoked.webp', description: 'С лёгкой копчёностью. Срок хранения: 30 суток.' },
+      { id: 'imeretian', name: 'Имеретинский', group: 'cheese', pricePerKg: 1500, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/imeretian.webp', description: 'Прекрасный рассольный сыр. Срок хранения: 7 суток.' },
+      { id: 'spicy-klubok', name: 'Пряные клубочки', group: 'cheese', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3463-6166-4665-a439-323264653939/spicy-klubok.webp', description: 'Нестандартный вкусный сыр. Срок хранения: 7 суток.', fixedWeight: 150, hit: true },
+      { id: 'ricotta', name: 'Творожный сыр (рикотта)', group: 'cheese', pricePerKg: 1400, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta.webp', description: 'Нежный сыр. Срок хранения: 7 суток.' },
+      { id: 'milk', name: 'Молоко', group: 'dairy', pricePerL: 150, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/milk.webp', description: 'Молоко отборное цельное. Срок хранения: 3–5 суток.', volumes: [0.5, 1] },
+      { id: 'milk-topped', name: 'Молоко топлёное', group: 'dairy', pricePerL: 250, img: 'https://static.tildacdn.com/tild3839-3163-4066-a633-306366346631/milk-topped.webp', description: 'Настоящее цельное топлёное молоко. Срок хранения: 5–7 суток.', volumes: [0.5, 1] },
+      { id: 'tvorog', name: 'Творог', group: 'dairy', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3136-3730-4134-b466-613138343764/tvorog.webp', description: 'Творожный нежный вкус. Срок хранения: 3–5 суток.' },
+      { id: 'cream', name: 'Сливки (33–36%)', group: 'dairy', pricePerL: 1450, img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp', description: 'Натуральные свежие сливки. Срок хранения: 5 суток.', volumes: [0.2, 0.5, 1] },
       { id: 'barfi-classic', name: 'Бурфи классический (набор)', group: 'sweets', pricePerUnit: 350, img: 'https://static.tildacdn.com/tild3430-3231-4562-b164-366638313434/barfi-classic.webp', description: 'Нежный молочный десерт. В наборе 5 шт.', hit: true },
-      { id: 'barfi-hazelnut', name: 'Бурфи с фундуком (набор)', group: 'sweets', pricePerUnit: 350, img: 'https://static.tildacdn.com/tild3065-3332-4466-a536-353130343264/barfi-hazelnut.webp', description: 'Бурфи с фундуком, 5 шт в наборе.' },
-      { id: 'barfi-sesame', name: 'Бурфи кунжутный (набор)', group: 'sweets', pricePerUnit: 490, img: 'https://static.tildacdn.com/tild3439-6135-4861-a531-316233303166/_.webp', description: 'Бурфи с кунжутом, 7 шт в наборе.', hit: true },
-      { id: 'halva', name: 'Халва', group: 'sweets', pricePerUnit: 200, img: 'https://static.tildacdn.com/tild3566-6566-4464-b531-306364646164/photo.webp', description: 'Самая настоящая халва, сильно отличается от магазинной. Срок хранения: 14 дней.' },
-      { id: 'potato-cake-5', name: 'Пирожное «Картошка» (5 шт)', group: 'sweets', pricePerUnit: 400, img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp', description: 'Домашние пирожные «Картошка» из цельнозерновой муки и варёной сгущёнки. В коробке 5 шт.' },
-      { id: 'potato-cake-2', name: 'Пирожное «Картошка» (2 шт)', group: 'sweets', pricePerUnit: 190, img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp', description: 'Домашние пирожные «Картошка» (2 шт) из цельнозерновой муки и варёной сгущёнки.' },
-      { id: 'cookies-tvorog', name: 'Печенье творожное', group: 'bakery', pricePerKg: 600, img: DEFAULT_IMG, description: 'Мягкое домашнее печенье на твороге.' },
-      { id: 'cookies-oat', name: 'Печенье овсяное', group: 'bakery', pricePerKg: 600, img: DEFAULT_IMG, description: 'Овсяное печенье к чаю.' },
-      { id: 'cookies-nut', name: 'Ореховые пальчики', group: 'bakery', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp', description: 'Печенье с орехами — хрустящие пальчики.' },
-      { id: 'cookies-carob', name: 'Печенье кэробовое', group: 'bakery', pricePerKg: 600, img: DEFAULT_IMG, description: 'Печенье с кэробом вместо какао.' },
-      { id: 'cookies-sandy', name: 'Печенье песочное', group: 'bakery', pricePerKg: 600, img: DEFAULT_IMG, description: 'Рассыпчатое песочное печенье.' },
-      { id: 'muffin-plain', name: 'Кексы обычные', group: 'bakery', pricePerKg: 500, img: DEFAULT_IMG, description: 'Домашние кексы.' },
-      { id: 'muffin-carob', name: 'Кексы с кэробом', group: 'bakery', pricePerKg: 550, img: DEFAULT_IMG, description: 'Кексы с кэробом.' },
-      { id: 'muffin-raisin', name: 'Кексы с изюмом', group: 'bakery', pricePerKg: 550, img: 'https://static.tildacdn.com/tild3465-3162-4436-a235-363763383339/muffin-raisin.webp', description: 'Кексы с изюмом.' },
-      { id: 'casserole-plain', name: 'Творожная запеканка', group: 'bakery', pricePerUnit: 260, img: DEFAULT_IMG, description: 'Домашняя творожная запеканка без добавок.' },
-      { id: 'casserole-raisin', name: 'Творожная запеканка с изюмом', group: 'bakery', pricePerUnit: 260, img: DEFAULT_IMG, description: 'Запеканка с изюмом.' },
-      { id: 'crazy-cake', name: 'Сумасшедший пирог', group: 'bakery', pricePerUnit: 600, img: DEFAULT_IMG, description: 'Домашний пирог к чаю.' },
-      { id: 'coconut-kuchen-1kg', name: 'Кокосовый пирог 1 кг', group: 'bakery', pricePerUnit: 1800, img: DEFAULT_IMG, description: 'Кокосовый пирог (форма ~1 кг).' },
-      { id: 'coconut-kuchen-05kg', name: 'Кокосовый пирог 0.5 кг', group: 'bakery', pricePerUnit: 1000, img: DEFAULT_IMG, description: 'Кокосовый пирог (форма ~0.5 кг).' },
-      { id: 'napoleon-1kg', name: 'Торт «Наполеон» 1 кг', group: 'bakery', pricePerUnit: 1300, img: DEFAULT_IMG, description: 'Классический Наполеон (около 1 кг).' },
-      { id: 'napoleon-05kg', name: 'Торт «Наполеон» 0.5 кг', group: 'bakery', pricePerUnit: 750, img: DEFAULT_IMG, description: 'Классический Наполеон (около 0.5 кг).' },
-      { id: 'apple-pie', name: 'Яблочный пирог', group: 'bakery', pricePerUnit: 560, img: DEFAULT_IMG, description: 'Домашний яблочный пирог.' },
-      { id: 'bliny-10', name: 'Блины (10 шт)', group: 'bakery', pricePerUnit: 330, img: DEFAULT_IMG, description: 'Тонкие блинчики, 10 шт.' },
-      { id: 'bliny-5', name: 'Блины (5 шт)', group: 'bakery', pricePerUnit: 220, img: DEFAULT_IMG, description: 'Тонкие блинчики, 5 шт.' },
-      { id: 'bliny-tvorog-5', name: 'Блины с творогом/изюмом (5 шт)', group: 'bakery', pricePerUnit: 300, img: DEFAULT_IMG, description: 'Блины с начинкой из творога или творога с изюмом.' },
-      { id: 'syrniki-10', name: 'Сырники (10 шт)', group: 'bakery', pricePerUnit: 520, img: DEFAULT_IMG, description: 'Домашние сырники, 10 шт.' },
-      { id: 'syrniki-5', name: 'Сырники (5 шт)', group: 'bakery', pricePerUnit: 280, img: DEFAULT_IMG, description: 'Домашние сырники, 5 шт.' },
-      { id: 'chapati-10', name: 'Чапати (10 шт)', group: 'bakery', pricePerUnit: 270, img: 'https://static.tildacdn.com/tild6332-6239-4538-b839-356132356236/chapati-10.webp', description: 'Состав: мука пшеничная высшего сорта, ржаная мука, вода, соль, сливочное масло. Срок хранения: 2 суток в холодильнике.' },
-      { id: 'chapati-wholewheat-10', name: 'Чапати цельнозерновые (10 шт)', group: 'bakery', pricePerUnit: 320, img: DEFAULT_IMG, description: 'Чапати из цельнозерновой муки.' }
+      { id: 'barfi-sesame', name: 'Бурфи кунжутный (набор)', group: 'sweets', pricePerUnit: 490, img: 'https://static.tildacdn.com/tild3439-6135-4861-a531-316233303166/_.webp', description: 'Бурфи с кунжутом, 7 шт.', hit: true },
+      { id: 'cookies-tvorog', name: 'Печенье творожное', group: 'bakery', pricePerKg: 600, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/tvorpech.webp', description: 'Мягкое домашнее печенье на твороге.', weights: [500, 1000] },
+      { id: 'cookies-nut', name: 'Ореховые пальчики', group: 'bakery', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp', description: 'Печенье с орехами.', weights: [500, 1000] },
+      { id: 'muffin-carob', name: 'Кексы с кэробом', group: 'bakery', pricePerKg: 550, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/carobkeks.webp', description: 'Кексы с кэробом.', weights: [500, 1000] },
+      { id: 'muffin-raisin', name: 'Кексы с изюмом', group: 'bakery', pricePerKg: 550, img: 'https://static.tildacdn.com/tild3465-3162-4436-a235-363763383339/muffin-raisin.webp', description: 'Кексы с изюмом.', weights: [500, 1000] },
+      { id: 'chapati-10', name: 'Чапати (10 шт)', group: 'bakery', pricePerUnit: 270, img: 'https://static.tildacdn.com/tild6332-6239-4538-b839-356132356236/chapati-10.webp', description: 'Состав: мука пшеничная, ржаная мука, вода, соль, сливочное масло.' }
     ];
 
-    // Hits configuration
+    const ALL_PRODUCTS = [
+      ...INDIVIDUAL_PRODUCTS,
+      ...Object.values(PRODUCT_VARIANTS).flatMap(g => g.variants.map(v => ({...v, group: g.baseGroup, isVariant: true, groupId: Object.keys(PRODUCT_VARIANTS).find(k => PRODUCT_VARIANTS[k] === g)})))
+    ];
+
     const HITS = [
       { id: 'spicy-klubok', name: 'Пряный клубок', reason: 'Бестселлер' },
       { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой', reason: 'Новинка' },
@@ -1228,26 +1671,45 @@
       { id: 'barfi-sesame', name: 'Бурфи кунжутный', reason: 'Выбор недели' }
     ];
 
-    // State
+    // ==================== STATE ====================
     let cart = [];
     let favorites = new Set();
     let currentProduct = null;
     let currentVariant = null;
     let selectedWeight = 500;
+    let selectedVolume = null;
+    let currentQty = 1;
     let currentCategory = 'all';
+    let isOnline = navigator.onLine;
+    let orderHistory = [];
 
-    // Utils
+    // ==================== UTILS ====================
     const fmtRub = (n) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' ₽';
     const el = (id) => document.getElementById(id);
 
-    // Initialize
+    function showToast(message) {
+      const toast = el('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ==================== INIT ====================
     document.addEventListener('DOMContentLoaded', () => {
       loadState();
       setupTelegram();
-      renderHits();
-      renderProducts();
-      setupEventListeners();
-      updateBadges();
+      setupNetworkListeners();
+      showSkeletons();
+      setTimeout(() => {
+        renderHits();
+        renderProductsByCategory();
+        updateBadges();
+        renderMiniCart();
+      }, 500);
+      
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('product');
+      if (productId) setTimeout(() => openProductModal(productId), 800);
     });
 
     function loadState() {
@@ -1256,18 +1718,31 @@
         if (savedCart) cart = JSON.parse(savedCart);
         const savedFav = localStorage.getItem(STORAGE_FAVORITES_KEY);
         if (savedFav) favorites = new Set(JSON.parse(savedFav));
-      } catch (e) {
-        console.error('Error loading state:', e);
-      }
+        const savedHistory = localStorage.getItem(STORAGE_ORDER_HISTORY);
+        if (savedHistory) orderHistory = JSON.parse(savedHistory);
+      } catch (e) { console.error(e); }
     }
 
     function saveState() {
       try {
         localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart));
         localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify([...favorites]));
-      } catch (e) {
-        console.error('Error saving state:', e);
-      }
+        localStorage.setItem(STORAGE_ORDER_HISTORY, JSON.stringify(orderHistory));
+      } catch (e) { console.error(e); }
+    }
+
+    function setupNetworkListeners() {
+      window.addEventListener('online', () => {
+        isOnline = true;
+        el('offline-indicator').classList.remove('show');
+        showToast('Подключение восстановлено');
+        syncOfflineOrders();
+      });
+      
+      window.addEventListener('offline', () => {
+        isOnline = false;
+        el('offline-indicator').classList.add('show');
+      });
     }
 
     function setupTelegram() {
@@ -1276,65 +1751,51 @@
         tg.ready();
         tg.expand();
         
-        // Set user avatar
         const user = tg.initDataUnsafe?.user;
         if (user) {
           const avatar = el('user-avatar');
+          const profileAvatar = el('profile-avatar');
           if (user.photo_url) {
             avatar.innerHTML = `<img src="${user.photo_url}" alt="">`;
+            profileAvatar.innerHTML = `<img src="${user.photo_url}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
           } else {
-            avatar.innerHTML = `<span>${(user.first_name || 'U')[0]}</span>`;
+            const initial = (user.first_name || 'U')[0].toUpperCase();
+            avatar.innerHTML = `<span>${initial}</span>`;
+            profileAvatar.textContent = initial;
           }
+          el('profile-name').textContent = user.first_name || 'Пользователь';
+          el('profile-phone').textContent = user.username ? `@${user.username}` : 'Telegram пользователь';
         }
       }
     }
 
-    function setupEventListeners() {
-      // Category tabs
-      document.querySelectorAll('.category-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          currentCategory = tab.dataset.category;
-          renderProducts();
-        });
-      });
-
-      // Search
-      el('search-input').addEventListener('input', (e) => {
-        renderProducts(e.target.value);
-      });
-
-      // Weight slider
-      el('weight-slider').addEventListener('input', (e) => {
-        selectedWeight = parseInt(e.target.value);
-        el('slider-value').textContent = selectedWeight + ' г';
-        updateModalPrice();
-        updateWeightPills();
-      });
-
-      // Close modals on overlay click
-      el('product-modal').addEventListener('click', (e) => {
-        if (e.target === el('product-modal')) closeProductModal();
-      });
-      el('cart-modal').addEventListener('click', (e) => {
-        if (e.target === el('cart-modal')) closeCartModal();
-      });
+    // ==================== RENDER ====================
+    function showSkeletons() {
+      const container = el('products-section');
+      container.innerHTML = '';
+      for (let i = 0; i < 6; i++) {
+        const div = document.createElement('div');
+        div.className = 'product-card skeleton-card';
+        div.innerHTML = `
+          <div class="skeleton" style="height:160px;width:100%"></div>
+          <div style="padding:16px">
+            <div class="skeleton" style="height:20px;width:80%;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:16px;width:40%"></div>
+          </div>
+        `;
+        container.appendChild(div);
+      }
     }
 
     function renderHits() {
       const container = el('hits-scroll');
       container.innerHTML = HITS.map(hit => {
-        const product = PRODUCTS.find(p => p.id === hit.id) || 
-                       Object.values(PRODUCT_VARIANTS).flatMap(g => g.variants).find(v => v.id === hit.id);
+        const product = ALL_PRODUCTS.find(p => p.id === hit.id);
         if (!product) return '';
-        
-        const price = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : 
-                     product.pricePerUnit ? fmtRub(product.pricePerUnit) : '';
-        
+        const price = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : product.pricePerUnit ? fmtRub(product.pricePerUnit) : '';
         return `
           <div class="hit-card" onclick="openProductModal('${hit.id}')">
-            <img src="${product.img || DEFAULT_IMG}" class="hit-image" alt="${product.name}">
+            <img src="${product.img || DEFAULT_IMG}" class="hit-image" alt="${product.name}" onerror="this.src='${DEFAULT_IMG}'">
             <div class="hit-content">
               <span class="hit-badge">${hit.reason}</span>
               <div class="hit-name">${product.name}</div>
@@ -1345,136 +1806,216 @@
       }).join('');
     }
 
-    function renderProducts(searchTerm = '') {
-      const container = el('product-grid');
-      let filtered = PRODUCTS.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = currentCategory === 'all' || 
-                               (currentCategory === 'cheese' && ['brined', 'soft', 'hard', 'rolls'].includes(p.group)) ||
-                               p.group === currentCategory;
-        return matchesSearch && matchesCategory;
+    function renderProductsByCategory(searchTerm = '') {
+      const container = el('products-section');
+      container.innerHTML = '';
+      
+      const categories = [
+        { id: 'cheese', title: 'Сыры', icon: '🧀' },
+        { id: 'dairy', title: 'Молочка', icon: '🥛' },
+        { id: 'sweets', title: 'Сладости', icon: '🍮' },
+        { id: 'bakery', title: 'Выпечка', icon: '🥐' }
+      ];
+
+      // Сортируем по приоритету групп
+      let productsToRender = [...ALL_PRODUCTS].sort((a, b) => {
+        const pa = a.groupId ? (PRODUCT_VARIANTS[a.groupId]?.priority || 99) : 99;
+        const pb = b.groupId ? (PRODUCT_VARIANTS[b.groupId]?.priority || 99) : 99;
+        return pa - pb;
       });
 
-      // Add grouped products
-      if (currentCategory === 'all' || currentCategory === 'cheese') {
-        // Halloumi variants
-        const halloumiGroup = PRODUCT_VARIANTS['halloumi-group'];
-        filtered.push({
-          id: 'halloumi-group',
-          name: halloumiGroup.displayName,
-          group: halloumiGroup.baseGroup,
-          isGroup: true,
-          variants: halloumiGroup.variants,
-          img: halloumiGroup.variants[0].img,
-          pricePerKg: halloumiGroup.variants[0].pricePerKg
-        });
-      }
-
-      if (currentCategory === 'all' || currentCategory === 'sweets') {
-        // Sandesh variants
-        const sandeshGroup = PRODUCT_VARIANTS['sandesh-group'];
-        filtered.push({
-          id: 'sandesh-group',
-          name: sandeshGroup.displayName,
-          group: sandeshGroup.baseGroup,
-          isGroup: true,
-          variants: sandeshGroup.variants,
-          img: sandeshGroup.variants[0].img,
-          pricePerUnit: sandeshGroup.variants[0].pricePerUnit
-        });
-      }
-
-      if (currentCategory === 'all' || currentCategory === 'cheese') {
-        // Panir variants
-        const panirGroup = PRODUCT_VARIANTS['panir-group'];
-        filtered.push({
-          id: 'panir-group',
-          name: panirGroup.displayName,
-          group: panirGroup.baseGroup,
-          isGroup: true,
-          variants: panirGroup.variants,
-          img: panirGroup.variants[0].img,
-          pricePerKg: panirGroup.variants[0].pricePerKg
-        });
-      }
-
-      container.innerHTML = filtered.map(product => {
-        const isFav = favorites.has(product.id);
-        const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : 
-                         product.pricePerUnit ? fmtRub(product.pricePerUnit) : 
-                         product.pricePerL ? fmtRub(product.pricePerL) + '/л' : '';
+      categories.forEach(cat => {
+        if (currentCategory !== 'all' && currentCategory !== cat.id) return;
         
-        return `
-          <div class="product-card" onclick="openProductModal('${product.id}')">
-            <div class="product-image-wrap">
-              <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}" 
-                   onerror="this.src='${DEFAULT_IMG}'">
-              ${product.hit ? '<span class="product-badge-hit">ХИТ</span>' : ''}
-              <button class="fav-btn ${isFav ? 'active' : ''}" 
-                      onclick="event.stopPropagation(); toggleFavorite('${product.id}')"
-                      data-id="${product.id}">
-                ${isFav ? '♥' : '♡'}
-              </button>
-            </div>
-            <div class="product-info">
-              <div class="product-name">${product.name}</div>
-              <div class="product-price">${priceText}</div>
-            </div>
+        let catProducts = productsToRender.filter(p => {
+          const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesCategory = p.group === cat.id;
+          return matchesSearch && matchesCategory;
+        });
+
+        if (catProducts.length === 0) return;
+
+        const section = document.createElement('div');
+        section.className = 'products-category';
+        
+        section.innerHTML = `
+          <h3 class="category-title">${cat.icon} ${cat.title}</h3>
+          <div class="product-grid">
+            ${catProducts.map(product => {
+              const isFav = favorites.has(product.id);
+              const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : 
+                               product.pricePerUnit ? fmtRub(product.pricePerUnit) : 
+                               product.pricePerL ? fmtRub(product.pricePerL) + '/л' : '';
+              
+              const groupVariants = product.groupId ? PRODUCT_VARIANTS[product.groupId]?.variants : null;
+              const hasMultipleVariants = groupVariants && groupVariants.length > 1;
+              
+              return `
+                <div class="product-card" data-product-id="${product.id}">
+                  <div class="product-image-wrap" onclick="openProductModal('${product.id}')">
+                    <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}" onerror="this.src='${DEFAULT_IMG}'">
+                    ${product.hit ? '<span class="product-badge-hit">ХИТ</span>' : ''}
+                    <button class="share-btn" onclick="event.stopPropagation(); shareProduct('${product.id}')" title="Поделиться">↗</button>
+                    <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${product.id}')" data-id="${product.id}">
+                      ${isFav ? '♥' : '♡'}
+                    </button>
+                    <button class="quick-add-btn" onclick="event.stopPropagation(); quickAdd('${product.id}', this)" title="Быстро добавить">+</button>
+                  </div>
+                  <div class="product-info" onclick="openProductModal('${product.id}')">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-footer">
+                      <div class="product-price">${priceText}</div>
+                    </div>
+                    ${hasMultipleVariants ? `
+                      <div class="variant-selector" onclick="event.stopPropagation()">
+                        ${groupVariants.map(v => `
+                          <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="switchVariantInGrid('${product.groupId}', '${v.id}', this)">
+                            ${v.name.split(' ').pop()}
+                          </button>
+                        `).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         `;
-      }).join('');
+        
+        container.appendChild(section);
+      });
     }
 
-    function openProductModal(productId) {
-      // Check if it's a grouped product
-      let product = PRODUCTS.find(p => p.id === productId);
-      let isGroup = false;
+    // ==================== ACTIONS ====================
+    function switchVariantInGrid(groupId, variantId, btn) {
+      event.stopPropagation();
+      const group = PRODUCT_VARIANTS[groupId];
+      const variant = group.variants.find(v => v.id === variantId);
+      if (!variant) return;
       
-      if (!product) {
-        // Check in variants
-        for (const [groupId, group] of Object.entries(PRODUCT_VARIANTS)) {
-          const variant = group.variants.find(v => v.id === productId);
-          if (variant) {
-            product = { ...variant, groupId, isVariant: true };
-            isGroup = true;
-            break;
-          }
-        }
+      const card = btn.closest('.product-card');
+      const img = card.querySelector('.product-image');
+      img.style.opacity = '0.5';
+      setTimeout(() => {
+        img.src = variant.img || DEFAULT_IMG;
+        img.style.opacity = '1';
+      }, 200);
+      
+      card.querySelector('.product-name').textContent = variant.name;
+      const priceText = variant.pricePerKg ? fmtRub(variant.pricePerKg) + '/кг' : 
+                       variant.pricePerUnit ? fmtRub(variant.pricePerUnit) : '';
+      card.querySelector('.product-price').textContent = priceText;
+      
+      card.querySelector('.product-image-wrap').setAttribute('onclick', `openProductModal('${variantId}')`);
+      card.querySelector('.product-info').setAttribute('onclick', `openProductModal('${variantId}')`);
+      card.querySelector('.quick-add-btn').setAttribute('onclick', `event.stopPropagation(); quickAdd('${variantId}', this)`);
+      
+      const favBtn = card.querySelector('.fav-btn');
+      favBtn.setAttribute('onclick', `event.stopPropagation(); toggleFavorite('${variantId}')`);
+      favBtn.dataset.id = variantId;
+      favBtn.classList.toggle('active', favorites.has(variantId));
+      favBtn.innerHTML = favorites.has(variantId) ? '♥' : '♡';
+      
+      card.querySelectorAll('.variant-chip').forEach(chip => chip.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const badge = card.querySelector('.product-badge-hit');
+      if (badge && !variant.hit) badge.remove();
+      else if (!badge && variant.hit) {
+        const newBadge = document.createElement('span');
+        newBadge.className = 'product-badge-hit';
+        newBadge.textContent = 'ХИТ';
+        card.querySelector('.product-image-wrap').insertBefore(newBadge, card.querySelector('.fav-btn'));
+      }
+    }
+
+    function quickAdd(productId, btnElement) {
+      let product = ALL_PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+
+      let weight = 500, volume = null;
+      if (product.fixedWeight) weight = product.fixedWeight;
+      else if (product.volumes) { weight = null; volume = product.volumes[0]; }
+      else if (product.weights) weight = product.weights[0];
+
+      const cartItem = {
+        id: product.id, name: product.name, img: product.img, group: product.group,
+        weight, volume, pricePerKg: product.pricePerKg, pricePerUnit: product.pricePerUnit, pricePerL: product.pricePerL, qty: 1
+      };
+
+      const existing = cart.find(item => item.id === cartItem.id && item.weight === cartItem.weight && item.volume === cartItem.volume);
+      if (existing) existing.qty++;
+      else cart.push(cartItem);
+
+      saveState();
+      updateBadges();
+      renderMiniCart();
+
+      if (btnElement) {
+        btnElement.classList.add('adding');
+        setTimeout(() => btnElement.classList.remove('adding'), 400);
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        btnElement.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
       }
 
+      const cartBadge = el('cart-badge');
+      if (cartBadge) {
+        cartBadge.classList.add('pulse');
+        setTimeout(() => cartBadge.classList.remove('pulse'), 300);
+      }
+
+      showToast('Добавлено в корзину');
+      if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
+
+    function shareProduct(productId) {
+      const product = ALL_PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+      
+      const text = `🧀 ${product.name}\n💰 ${product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : fmtRub(product.pricePerUnit)}\n\nВ магазине "Сыромания"`;
+      const url = window.location.href.split('?')[0] + '?product=' + productId;
+      
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+      } else if (navigator.share) {
+        navigator.share({ title: product.name, text: text, url: url });
+      } else {
+        navigator.clipboard.writeText(url);
+        showToast('Ссылка скопирована');
+      }
+    }
+
+    // ==================== MODAL ====================
+    function openProductModal(productId) {
+      let product = ALL_PRODUCTS.find(p => p.id === productId);
       if (!product) return;
 
       currentProduct = product;
       currentVariant = product;
-      
-      // Setup modal
+      currentQty = 1;
+      el('qty-value').textContent = '1';
       el('modal-title').textContent = product.name;
       el('modal-description').textContent = product.description || '';
       el('modal-image').src = product.img || DEFAULT_IMG;
       
-      // Setup variant tabs for groups
       const tabsContainer = el('variant-tabs');
-      if (product.isGroup || product.groupId) {
-        const group = PRODUCT_VARIANTS[product.groupId || product.id];
-        if (group) {
+      if (product.groupId && PRODUCT_VARIANTS[product.groupId]) {
+        const group = PRODUCT_VARIANTS[product.groupId];
+        if (group.variants.length > 1) {
           tabsContainer.style.display = 'flex';
-          tabsContainer.innerHTML = group.variants.map((v, idx) => `
-            <button class="variant-tab ${v.id === product.id ? 'active' : ''}" 
-                    onclick="switchVariant('${group.variants[0].id}', '${v.id}')">
-              ${v.name}
+          tabsContainer.innerHTML = group.variants.map((v) => `
+            <button class="variant-tab ${v.id === product.id ? 'active' : ''}" onclick="switchVariant('${product.groupId}', '${v.id}')">
+              ${v.name.split(' ').pop()}
             </button>
           `).join('');
-        } else {
-          tabsContainer.style.display = 'none';
-        }
-      } else {
-        tabsContainer.style.display = 'none';
-      }
+        } else tabsContainer.style.display = 'none';
+      } else tabsContainer.style.display = 'none';
 
-      // Setup weight pills
-      renderWeightPills(product);
+      setupWeightPills(product);
       
-      // Setup favorite button
       const favBtn = el('modal-fav-btn');
       favBtn.classList.toggle('active', favorites.has(productId));
       favBtn.dataset.id = productId;
@@ -1485,95 +2026,103 @@
     }
 
     function switchVariant(groupId, variantId) {
-      // Find the group and variant
-      for (const [key, group] of Object.entries(PRODUCT_VARIANTS)) {
-        const variant = group.variants.find(v => v.id === variantId);
-        if (variant) {
-          currentVariant = variant;
-          el('modal-title').textContent = variant.name;
-          el('modal-description').textContent = variant.description;
-          
-          // Crossfade image
-          const img = el('modal-image');
-          img.style.opacity = 0;
-          setTimeout(() => {
-            img.src = variant.img || DEFAULT_IMG;
-            img.style.opacity = 1;
-          }, 150);
-
-          // Update tabs
-          document.querySelectorAll('.variant-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.textContent.includes(variant.name));
-          });
-
-          updateModalPrice();
-          break;
-        }
-      }
-    }
-
-    function renderWeightPills(product) {
-      const container = el('weight-pills');
-      const weights = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+      const group = PRODUCT_VARIANTS[groupId];
+      const variant = group.variants.find(v => v.id === variantId);
+      if (!variant) return;
       
-      if (!product.pricePerKg) {
-        container.innerHTML = '';
-        el('weight-slider').style.display = 'none';
-        return;
-      }
+      currentVariant = variant;
+      el('modal-title').textContent = variant.name;
+      el('modal-description').textContent = variant.description;
+      const img = el('modal-image');
+      img.style.opacity = 0;
+      setTimeout(() => { img.src = variant.img || DEFAULT_IMG; img.style.opacity = 1; }, 150);
 
-      el('weight-slider').style.display = 'block';
-      container.innerHTML = weights.map(w => `
-        <button class="weight-pill ${w === selectedWeight ? 'active' : ''}" 
-                onclick="selectWeight(${w})">
-          ${w}г
-        </button>
-      `).join('');
-    }
+      document.querySelectorAll('.variant-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.textContent.includes(variant.name.split(' ').pop()));
+      });
 
-    function selectWeight(weight) {
-      selectedWeight = weight;
-      el('weight-slider').value = weight;
-      el('slider-value').textContent = weight + ' г';
-      updateWeightPills();
+      setupWeightPills(variant);
       updateModalPrice();
     }
 
-    function updateWeightPills() {
-      document.querySelectorAll('.weight-pill').forEach(pill => {
-        const w = parseInt(pill.textContent);
-        pill.classList.toggle('active', w === selectedWeight);
-      });
+    function setupWeightPills(product) {
+      const container = el('weight-pills');
+      const section = el('weight-section');
+      selectedWeight = 500; selectedVolume = null;
+      
+      if (product.fixedWeight) {
+        section.style.display = 'block';
+        container.innerHTML = `<div class="weight-pill active">${product.fixedWeight} г</div>`;
+        selectedWeight = product.fixedWeight;
+      } else if (product.volumes) {
+        section.style.display = 'block';
+        container.innerHTML = product.volumes.map((v, idx) => `
+          <button class="weight-pill ${idx === 0 ? 'active' : ''}" onclick="selectVolume(${v}, this)">${v} л</button>
+        `).join('');
+        selectedVolume = product.volumes[0];
+        selectedWeight = null;
+      } else if (product.weights) {
+        section.style.display = 'block';
+        container.innerHTML = product.weights.map((w, idx) => `
+          <button class="weight-pill ${idx === 0 ? 'active' : ''}" onclick="selectWeight(${w}, this)">${w} г</button>
+        `).join('');
+        selectedWeight = product.weights[0];
+      } else if (product.pricePerKg) {
+        section.style.display = 'block';
+        const weights = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+        container.innerHTML = weights.map(w => `
+          <button class="weight-pill ${w === 500 ? 'active' : ''}" onclick="selectWeight(${w}, this)">${w}г</button>
+        `).join('');
+        selectedWeight = 500;
+      } else {
+        section.style.display = 'none';
+        selectedWeight = null;
+      }
+    }
+
+    function selectWeight(weight, btn) {
+      selectedWeight = weight; selectedVolume = null;
+      document.querySelectorAll('.weight-pill').forEach(pill => pill.classList.remove('active'));
+      btn.classList.add('active');
+      updateModalPrice();
+    }
+
+    function selectVolume(volume, btn) {
+      selectedVolume = volume; selectedWeight = null;
+      document.querySelectorAll('.weight-pill').forEach(pill => pill.classList.remove('active'));
+      btn.classList.add('active');
+      updateModalPrice();
+    }
+
+    function changeQty(delta) {
+      currentQty = Math.max(1, currentQty + delta);
+      el('qty-value').textContent = currentQty;
+      updateModalPrice();
     }
 
     function updateModalPrice() {
       if (!currentVariant) return;
-      
-      let basePrice = 0;
-      let priceText = '';
-      let diffText = '';
+      let basePrice = 0, priceText = '', diffText = '';
+      const isCheese = currentVariant.group === 'cheese';
 
-      if (currentVariant.pricePerKg) {
-        basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg;
-        priceText = fmtRub(basePrice);
-        
-        // Calculate discount
+      if (currentVariant.pricePerKg && selectedWeight) {
+        basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
         let discountRate = 0;
-        for (const threshold of DISCOUNT_THRESHOLDS) {
-          if (selectedWeight >= threshold.g) discountRate = threshold.rate;
+        if (isCheese) {
+          for (const threshold of DISCOUNT_THRESHOLDS) {
+            if (selectedWeight >= threshold.g) discountRate = threshold.rate;
+          }
         }
-        
         if (discountRate > 0) {
           const discounted = basePrice * (1 - discountRate);
           priceText = fmtRub(discounted);
-          const saved = basePrice - discounted;
-          diffText = `−${fmtRub(saved)} (скидка ${Math.round(discountRate * 100)}%)`;
-        }
+          diffText = `Экономия ${fmtRub(basePrice - discounted)}`;
+        } else priceText = fmtRub(basePrice);
       } else if (currentVariant.pricePerUnit) {
-        basePrice = currentVariant.pricePerUnit;
+        basePrice = currentVariant.pricePerUnit * currentQty;
         priceText = fmtRub(basePrice);
-      } else if (currentVariant.pricePerL) {
-        basePrice = currentVariant.pricePerL;
+      } else if (currentVariant.pricePerL && selectedVolume) {
+        basePrice = currentVariant.pricePerL * selectedVolume * currentQty;
         priceText = fmtRub(basePrice);
       }
 
@@ -1584,123 +2133,62 @@
     function toggleFavorite(id) {
       if (favorites.has(id)) {
         favorites.delete(id);
+        showToast('Удалено из избранного');
       } else {
         favorites.add(id);
+        showToast('Добавлено в избранное');
       }
       saveState();
       updateBadges();
-      renderProducts(el('search-input').value);
-      
-      // Update modal button if open
-      const modalFav = el('modal-fav-btn');
-      if (modalFav && modalFav.dataset.id === id) {
-        modalFav.classList.toggle('active', favorites.has(id));
-      }
+      renderProductsByCategory(el('search-input').value);
     }
 
     function toggleModalFavorite() {
       const btn = el('modal-fav-btn');
-      const id = btn.dataset.id;
-      toggleFavorite(id);
-    }
-
-    function addToCartWithAnimation() {
-      if (!currentVariant) return;
-
-      // Create flying element
-      const flyer = document.createElement('img');
-      flyer.src = currentVariant.img || DEFAULT_IMG;
-      flyer.className = 'flyer';
-      
-      const rect = el('modal-image').getBoundingClientRect();
-      const cartRect = document.querySelector('.bottom-nav .nav-item:last-child').getBoundingClientRect();
-      
-      flyer.style.width = rect.width + 'px';
-      flyer.style.height = rect.height + 'px';
-      flyer.style.left = rect.left + 'px';
-      flyer.style.top = rect.top + 'px';
-      
-      document.body.appendChild(flyer);
-
-      // Animate
-      const dx = cartRect.left - rect.left + cartRect.width/2 - rect.width/2;
-      const dy = cartRect.top - rect.top + cartRect.height/2 - rect.height/2;
-
-      flyer.animate([
-        { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
-        { transform: `translate(${dx*0.5}px,${dy*0.3}px) scale(0.8) rotate(5deg)`, opacity: 0.9, offset: 0.5 },
-        { transform: `translate(${dx}px,${dy}px) scale(0.2) rotate(15deg)`, opacity: 0 }
-      ], { 
-        duration: 700, 
-        easing: 'cubic-bezier(0.2,0.8,0.2,1)' 
-      }).onfinish = () => {
-        flyer.remove();
-        addToCart();
-        
-        // Pulse cart icon
-        const cartNav = document.querySelector('.bottom-nav .nav-item:nth-child(3)');
-        cartNav.style.transform = 'scale(1.2)';
-        setTimeout(() => cartNav.style.transform = 'scale(1)', 200);
-      };
-    }
-
-    function addToCart() {
-      if (!currentVariant) return;
-
-      const existing = cart.find(item => 
-        item.id === currentVariant.id && item.weight === selectedWeight
-      );
-
-      if (existing) {
-        existing.qty++;
-      } else {
-        cart.push({
-          id: currentVariant.id,
-          name: currentVariant.name,
-          img: currentVariant.img,
-          weight: selectedWeight,
-          pricePerKg: currentVariant.pricePerKg,
-          pricePerUnit: currentVariant.pricePerUnit,
-          qty: 1
-        });
-      }
-
-      saveState();
-      updateBadges();
-      closeProductModal();
-
-      // Haptic
-      if (window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-      }
-    }
-
-    function updateBadges() {
-      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
-      const favCount = favorites.size;
-      
-      const cartBadge = el('cart-badge');
-      const favBadge = el('fav-badge');
-      
-      cartBadge.textContent = cartCount;
-      cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
-      
-      favBadge.textContent = favCount;
-      favBadge.style.display = favCount > 0 ? 'flex' : 'none';
-
-      // Update fav buttons
-      document.querySelectorAll('.fav-btn').forEach(btn => {
-        const id = btn.dataset.id;
-        btn.classList.toggle('active', favorites.has(id));
-        btn.innerHTML = favorites.has(id) ? '♥' : '♡';
-      });
+      toggleFavorite(btn.dataset.id);
+      btn.classList.toggle('active', favorites.has(btn.dataset.id));
     }
 
     function closeProductModal() {
       el('product-modal').classList.remove('active');
       document.body.style.overflow = '';
-      currentProduct = null;
-      currentVariant = null;
+    }
+
+    // ==================== CART ====================
+    function renderMiniCart() {
+      const miniCart = el('mini-cart-bar');
+      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      
+      if (cartCount === 0) {
+        miniCart.classList.remove('visible');
+        return;
+      }
+      
+      const total = calculateCartTotal();
+      miniCart.querySelector('.mini-cart-count').textContent = cartCount + ' ' + declOfNum(cartCount, ['товар', 'товара', 'товаров']);
+      miniCart.querySelector('.mini-cart-total').textContent = fmtRub(total);
+      miniCart.classList.add('visible');
+    }
+
+    function declOfNum(n, titles) {
+      return titles[n%10===1 && n%100!==11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
+    }
+
+    function calculateCartTotal() {
+      return cart.reduce((sum, item) => {
+        const isCheese = item.group === 'cheese';
+        if (item.pricePerKg && item.weight) {
+          let discountRate = 0;
+          if (isCheese) {
+            for (const threshold of DISCOUNT_THRESHOLDS) {
+              if (item.weight >= threshold.g) discountRate = threshold.rate;
+            }
+          }
+          return sum + ((item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty);
+        } else if (item.pricePerUnit) return sum + (item.pricePerUnit * item.qty);
+        else if (item.pricePerL && item.volume) return sum + (item.pricePerL * item.volume * item.qty);
+        return sum;
+      }, 0);
     }
 
     function openCartModal() {
@@ -1717,32 +2205,29 @@
       } else {
         body.innerHTML = cart.map((item, idx) => {
           let price = 0;
-          if (item.pricePerKg) {
+          const isCheese = item.group === 'cheese';
+          if (item.pricePerKg && item.weight) {
             let discountRate = 0;
-            for (const threshold of DISCOUNT_THRESHOLDS) {
-              if (item.weight >= threshold.g) discountRate = threshold.rate;
+            if (isCheese) {
+              for (const threshold of DISCOUNT_THRESHOLDS) {
+                if (item.weight >= threshold.g) discountRate = threshold.rate;
+              }
             }
             price = (item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty;
-          } else if (item.pricePerUnit) {
-            price = item.pricePerUnit * item.qty;
-          }
+          } else if (item.pricePerUnit) price = item.pricePerUnit * item.qty;
+          else if (item.pricePerL && item.volume) price = item.pricePerL * item.volume * item.qty;
 
+          const variantText = item.volume ? `${item.volume} л` : `${item.weight} г`;
           return `
-            <div class="cart-item">
+            <div class="cart-item" data-idx="${idx}">
               <img src="${item.img || DEFAULT_IMG}" class="cart-item-image" alt="">
               <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-variant">${item.weight}г × ${item.qty}</div>
-                <div class="cart-item-weights">
-                  ${[100,200,300,400,500].map(w => `
-                    <button class="cart-weight-btn ${item.weight === w ? 'active' : ''}" 
-                            onclick="changeCartWeight(${idx}, ${w})">${w}г</button>
-                  `).join('')}
-                </div>
+                <div class="cart-item-variant">${variantText} × ${item.qty}</div>
                 <div class="cart-item-controls">
-                  <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
+                  <button class="cart-qty-btn" onclick="changeCartQty(${idx}, -1)">−</button>
                   <span>${item.qty}</span>
-                  <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+                  <button class="cart-qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
                 </div>
               </div>
               <div class="cart-item-price">${fmtRub(price)}</div>
@@ -1750,27 +2235,13 @@
           `;
         }).join('');
 
-        // Add summary and form
-        const total = cart.reduce((sum, item) => {
-          if (item.pricePerKg) {
-            let discountRate = 0;
-            for (const threshold of DISCOUNT_THRESHOLDS) {
-              if (item.weight >= threshold.g) discountRate = threshold.rate;
-            }
-            return sum + ((item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty);
-          } else if (item.pricePerUnit) {
-            return sum + (item.pricePerUnit * item.qty);
-          }
-          return sum;
-        }, 0);
-
+        const total = calculateCartTotal();
         body.innerHTML += `
           <div class="cart-summary">
             <div class="cart-total">
               <span class="cart-total-label">Итого:</span>
               <span class="cart-total-price">${fmtRub(total)}</span>
             </div>
-            
             <div class="form-group">
               <label class="form-label">Город</label>
               <select class="form-select" id="checkout-city">
@@ -1778,49 +2249,20 @@
                 <option value="Москва">Москва</option>
               </select>
             </div>
-            
             <div class="form-group">
               <label class="form-label">Телефон</label>
               <input type="tel" class="form-input" id="checkout-phone" placeholder="+7 (999) 999-99-99">
             </div>
-            
             <div class="form-group">
               <label class="form-label">Адрес доставки</label>
               <textarea class="form-textarea" id="checkout-address" placeholder="Улица, дом, квартира"></textarea>
             </div>
-            
             <div class="form-group">
               <label class="form-label">Комментарий</label>
               <textarea class="form-textarea" id="checkout-comment" placeholder="Пожелания к заказу"></textarea>
             </div>
-
-            <button class="btn-order" id="submit-order-btn" onclick="submitOrder()">
-              Оформить заказ
-              <div class="leaf icon-1">
-                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 208.52 511.88">
-                  <path class="fil-leaf-1" d="M121.86 141.25c16.73,2.91 65.77,9.16 77.74,-14.94 14.49,-29.19 12.6,-56.91 -15.12,-69.09 -11.3,-4.96 -22.28,-7.7 -32.28,-9.66 -24.58,24.72 -41.22,75.51 -43.83,83.82 4.31,3.56 8.81,6.86 13.49,9.87zm-17.26 41.05c2.87,7.92 8.26,29.59 7.63,79.7 -0.16,12.74 -0.48,25.41 -0.81,38.43 -1.4,55.59 -2.96,117.52 7.12,210.69l-7.09 0.75c-10.12,-93.56 -8.56,-155.77 -7.15,-211.61 0.33,-13.06 0.65,-25.77 0.81,-38.35 0.53,-42.42 -3.06,-63.29 -5.69,-72.77 -7.55,8.48 -18.48,15.07 -34.33,16.54 -26.77,2.47 -43.19,-16.99 -52.84,-36.58 16.49,-8.49 65.65,-32.22 98.27,-31.47 1.86,1.42 3.76,2.8 5.69,4.13 -0.15,5.56 -1.43,24.61 -11.62,40.53zm-41.18 -148.65c-0.32,0.84 1.68,9.87 -6.19,10.71 -7.87,0.84 -3.26,-5.14 -6.82,-7.98 -3.57,-2.84 -9.97,-14.59 1.99,-15.96 11.97,-1.37 11.02,13.23 11.02,13.23zm124.63 55.54c0,0 -3.89,14.8 -10.18,18.69 -6.3,3.88 -22.78,7.24 -28.87,0.11 -6.09,-7.14 -1.57,-31.71 17.64,-30.45 19.21,1.26 22.68,8.4 21.42,11.65zm-101.53 67.51c0,0 5.88,5.56 5.46,9.87 -0.42,4.3 -5.78,19.21 -14.07,20.05 -8.29,0.84 -24.15,-6.82 -21.84,-17.53 2.31,-10.71 10.5,-11.34 12.6,-10.6 2.1,0.74 3.36,2.1 17.85,-1.78zm61.49 -109.94c-12.74,-2.33 -23.63,-3.69 -31.15,-7.4 0,0 -2.41,15.22 -4.51,19.74 -2.1,4.51 -6.3,17.32 -14.8,21.1 -8.5,3.78 -9.87,-28.14 4.62,-45.15 0,0 -10.13,-4.4 -22.34,-9.92 -11.47,31.21 -7.3,64.58 -7.28,64.68l-0.48 0.06c9.73,14.77 20.76,28.04 33.37,39.01 3.68,-11.43 19.48,-57.46 42.58,-82.12zm-71.44 -23.1c-16.59,-7.55 -35.59,-16.58 -38.25,-19.47 -1.97,-2.14 -4.87,-3.72 -7.63,-4.2 9.11,27.4 20.23,54.59 34.36,78.62 1.13,1.92 2.28,3.82 3.45,5.7 -0.66,-11.21 -0.85,-36.56 8.07,-60.65zm-49.59 -23.57c-2.34,0.66 -4.05,2.62 -4.09,6.41 -0.1,9.45 -9.03,35.38 -9.03,35.38 0,0 33.07,14.91 22.99,23.1 -10.08,8.19 -25.41,-8.5 -26.35,-9.34 0,0 -5.94,16.24 -8.44,35.85 11.53,-1.14 38.81,-2.11 72.53,8.35 -4.45,-6.19 -8.65,-12.68 -12.61,-19.42 -14.44,-24.56 -25.77,-52.36 -35.01,-80.32zm-25.33 95.01c-0.61,6.01 -0.86,12.26 -0.49,18.39 0,0 56.17,-9.87 57.33,8.71 1.15,18.58 -58.48,9.45 -58.48,9.45 0,0 2.71,16.68 10.73,34.23 16.07,-8.25 62.14,-30.45 95.29,-31.76l-1.75 -1.5 0.01 -0.03c-9.54,-8.13 -18.2,-17.54 -26.08,-27.89l-0.01 0.04c-36.16,-12.16 -65.36,-10.82 -76.53,-9.63z"/>
-                </svg>
-              </div>
-              <div class="leaf icon-2">
-                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 420.62 554.38">
-                  <path class="fil-leaf-2" d="M1.57 554.38c-0.01,-0.44 -2.46,-153.75 -1.23,-217.01 0.74,-38.16 6.99,-96.57 32.48,-148.36 17.72,-36 44.66,-68.8 85.37,-89.54l32.28 -4.39c21.9,-6.8 39.46,-7.7 45.04,-7.81 4.32,4.98 10.37,12.18 17.72,21.54 -0.39,10.62 -6.13,113.86 -82.32,208.5 -31.36,-18.46 -51.28,-57.42 -51.28,-57.42 52.13,-30.97 58.88,-51.52 69.61,-68.07 10.73,-16.56 2.45,-44.16 -11.65,-26.06 -14.11,18.09 -65.01,68.07 -65.01,68.07 -12.27,-87.7 33.12,-110.39 33.12,-110.39l0.34 -0.64c-27.64,18.92 -47.12,44.59 -60.77,72.35 -24.37,49.53 -30.35,105.69 -31.07,142.44 -1.22,63.07 1.22,216.14 1.23,216.58l-13.85 0.22zm216.49 -439.34c17.47,22.75 40.96,56.05 66.08,99.4 0.27,13.62 0.62,100.64 -33.48,153.85 -24.85,-9.4 -40.14,-15.03 -40.14,-15.03 12.57,-11.04 46.61,-87.09 23.3,-91.68 -23.3,-4.6 -47.99,84.63 -47.99,84.63 -21.55,-10.35 -42.58,-21.94 -50.33,-26.28 68.93,-86.04 80.61,-179.05 82.56,-204.89zm71.3 108.53c28.78,50.84 59.27,114.6 85.02,190.51 -4.31,0.96 -8.4,-1.03 -8.4,-1.03 -42.77,-17.04 -82,-32.13 -110.36,-42.88 29.72,-47.26 33.46,-119.21 33.74,-146.6zm106.95 70.68c0,0 -16.4,-14.1 -20.54,-22.84 -4.14,-8.74 -15.18,-3.68 -13.95,4.29 1.23,7.97 11.5,45.69 12.27,51.21 0.77,5.52 20.08,6.13 21,-1.99 0.92,-8.13 2.76,-23.61 1.23,-30.66zm-88.46 28.98c0,0 -8.43,4.29 -7.51,15.49 0.92,11.19 10.89,28.36 18.09,30.66 7.21,2.3 18.7,-25.14 -10.58,-46.15zm-109.42 -240.52c15.35,-63.34 56.21,-82.7 93.65,-82.7 38.33,0 65.31,22.23 65.31,22.23 0,0 -11.65,13.03 -33.42,13.95 -21.77,0.92 -28.52,11.65 -28.98,16.41 -0.46,4.75 1.53,16.25 32.35,18.24 30.82,1.99 55.19,-25.14 55.19,-25.14 16.95,23.84 26.52,45.94 31.83,64.51 -16.87,6.83 -73.84,22.75 -197.04,-4.57 -8.01,-10.2 -14.48,-17.86 -18.9,-22.93zm217.3 32.51c7.8,30.68 3.91,50.53 3.91,50.53 -55.65,4.45 -56.73,-5.98 -77.73,-6.59 -21,-0.61 -22.69,28.06 14.41,34.19 37.1,6.13 63.01,-1.99 63.01,-1.99 -1.13,20.07 -2.53,38.3 -4.11,54.87 -17.3,-0.51 -66.77,-6.48 -137.23,-52.73l-0.13 0.2c-21.09,-34.73 -40.52,-62.06 -55.57,-81.67 118.17,25.28 175.11,10.36 193.44,3.2zm-1.01 136.18c-10.45,105.02 -28.21,141.06 -31.88,153.37 -0.95,3.17 -2.29,5.35 -3.82,6.82 -27.16,-79.89 -59.57,-146.38 -89.72,-198.56l-0.02 -0.57 -0.3 0.01c-1.8,-3.11 -3.59,-6.18 -5.38,-9.19 66.28,41.51 113.43,47.51 131.12,48.12z"/>
-                </svg>
-              </div>
-              <div class="leaf icon-3">
-                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 313.64 405.79">
-                  <path class="fil-leaf-3" d="M268.76 135.61c0,0 -22.17,11.9 -50.23,28.92 -21.12,-5.52 -82.36,-27.74 -81.95,-100.04l-0.14 -0.02c3.32,-12.49 5.48,-21.39 6.11,-24.05 10.61,-20.2 38.05,-50.12 105.57,-37.36 98.73,18.65 57.69,95.74 53.71,98.23 -3.98,2.49 -21.39,6.71 -72.86,-30.59 0,0 -18.15,-14.17 -21.88,12.68 -3.73,26.86 48.99,48.99 61.68,52.23zm-6.57 270.17c-0.06,-0.43 -20.14,-148.39 -56.4,-233.41 -9.42,5.88 -19.19,12.19 -28.79,18.69 0,0 -17.41,-10.44 -27.6,-29.59 -10.2,-19.15 -5.22,-21.76 -13.43,-22.26 -8.21,-0.5 -5.1,34.69 19.52,64.78 0,0 -13.7,11.34 -26.34,23.33 -5.68,-9.69 -18.35,-34.11 -23.43,-66.68l-0.05 -0.01c0.31,-0.8 0.62,-1.59 0.93,-2.38 10.57,-26.8 19.85,-57.53 26.36,-81.01 6.01,61.39 57.45,83.42 80.65,90.27 37.09,86.22 59.66,236.37 59.72,236.8l-11.15 1.45zm-136.16 -175.46c-7.88,7.66 -14.84,15.23 -17.05,19.93 0,0 -7.21,-23.75 -14.42,-18.65 -7.21,5.1 2.11,32.08 2.11,36.8 0,0 -17.66,31.83 -20.89,34.57 -0.83,0.7 -1.66,1.24 -2.49,1.6 -0.23,-13.47 2.61,-34.23 7.4,-57.21 5.42,-26.02 13.33,-54.79 22.1,-79.02 5.96,30.61 18.04,53.25 23.24,61.99zm-56.93 74.37c-0.87,-0.37 -1.72,-1.02 -2.52,-1.97 -2.74,-3.23 -15.17,-25.61 -15.17,-25.61 0,0 6.22,-19.03 15.17,-32.95 8.95,-13.93 -5.84,-15.67 -10.82,-7.21 -4.97,8.46 -12.56,24.74 -12.56,24.74 0,0 -6.31,-12.32 -13.32,-27.52 29.11,-16 53.59,-43.62 66.24,-59.59 -7.75,22.68 -14.67,48.42 -19.56,71.93 -4.83,23.18 -7.69,44.25 -7.46,58.19zm-40.98 -74.37c-7.17,-15.81 -14.58,-33.78 -16.38,-44.11 0,0 40.04,-13.68 46.01,-27.11 5.97,-13.43 -12.68,-19.4 -51.23,4.48 0,0 -7.71,-17.19 -6.37,-43.78 66.5,2.13 113.04,-29.91 128.31,-42.15 -6.46,23.16 -15.53,53 -25.8,79.07 -0.57,1.44 -1.13,2.91 -1.7,4.39 -5.54,7.86 -35.3,48.46 -72.84,69.21zm-27.68 -114.74c0.71,-8.36 2.33,-17.55 5.34,-27.35 0,0 47.75,5.84 50.36,-10.57 2.61,-16.41 -41.28,-5.84 -41.28,-5.84 0,0 25.99,-35.56 60.3,-33.82 28.82,1.46 52.37,13.88 59.18,17.82 -1.11,4.27 -2.41,9.2 -3.89,14.62 -5.75,5.22 -54.72,47.49 -130.01,45.14z"/>
-                </svg>
-              </div>
-              <div class="leaf icon-4">
-                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 359.65 724.72">
-                  <path class="fil-leaf-4" d="M251.9 132.52c5.01,7.69 14.83,26.38 10.9,50 12.23,19.64 25.84,44.23 37.91,76.21 15.43,40.91 28.34,93.9 32.59,164.05 8.43,139.15 26.3,300.52 26.36,300.99l-8.9 0.95c-0.05,-0.47 -17.95,-162.05 -26.39,-301.41 -4.19,-69.11 -16.87,-121.23 -32.03,-161.42 -10.46,-27.74 -22.12,-49.81 -32.97,-67.87 -11.69,25.15 -46.54,32.88 -60.3,31.22 0,0 7.39,-21.36 26.38,-35.61 18.99,-14.24 -34.02,-32.18 -48.79,33.5 0,0 -17.36,-0.38 -44.69,-16.34 11.21,-15.23 54.9,-71.68 91.8,-79.27 13.37,2.8 23.04,4.3 28.14,5zm-123.8 71.95c-11.63,-7.19 -24.9,-17.14 -39.29,-30.93 0,0 33.76,-24 51.43,-32.18 3.94,-1.82 6.23,-3.74 7.22,-5.53 0.4,-0.74 0.59,-1.45 0.57,-2.14 -0.14,-5.14 -11.54,-8.37 -24.93,-3.67 -19.52,6.86 -41.67,17.93 -50.64,27.17 0,0 -14.95,-14.16 -27.28,-30.46 13.73,-5.9 46.68,-16.9 105.36,-19.32 1.37,0.46 2.74,0.91 4.09,1.36 23.42,7.71 43.79,13.08 60.01,16.77 -36.68,13.59 -76.29,64.98 -86.55,78.94zm-85.63 -81.43c-0.55,-0.76 -1.08,-1.53 -1.61,-2.3 -3.4,-4.95 -6.39,-9.96 -8.49,-14.72 0,0 8.59,-1.25 17.61,-3.44 10.4,-2.52 21.36,-6.28 20.37,-10.8 -0.81,-3.7 -4.42,-6.8 -10.79,-8.26 -8.15,-1.86 -20.83,-1.06 -38,4.57 0,0 -20.04,-38.77 -21.36,-44.84 -0.46,-2.1 -0.09,-3.88 0.82,-5.27 21.98,13.27 43.46,24.73 64.03,34.61 26.53,12.75 51.57,22.88 74.23,30.91 -53.49,3.36 -83.97,13.91 -96.81,19.53zm-37.55 -87.92c1.59,-0.53 3.43,-0.65 5.29,-0.31 5.8,1.06 22.42,11.6 51.17,8.44 0,0 5.79,9.17 11.47,13.81 1.59,1.3 3.18,2.25 4.62,2.54 5.68,1.14 7.25,-7.71 1.67,-15.07 -0.9,-1.18 -1.98,-2.33 -3.26,-3.39 0,0 2.1,-0.44 5.61,-1.29 3.8,-0.92 9.25,-2.33 15.46,-4.19 14.66,33.07 29.11,52.04 37.62,61.42 -20.84,-7.6 -43.57,-16.96 -67.53,-28.47 -19.97,-9.59 -40.81,-20.68 -62.13,-33.48zm96.34 -0.79c8.37,-2.65 17.67,-6.03 26.06,-10.07 0,0 7.91,43.25 34.29,54.07 0,0 0.41,0.11 1.05,0.18 3.11,0.38 11.59,0.1 4.32,-16.31l-0.1 -0.23c-8.97,-20.04 -20.57,-40.88 -21.36,-45.89 0,0 15.49,-6.72 36.74,-11.5l1.33 -0.3c2.14,70.96 19.13,103.97 27.19,115.76 -15.3,-3.61 -33.91,-8.65 -55,-15.61 -1.04,-0.34 -2.1,-0.69 -3.15,-1.05l0.05 -0.46 -6.39 -1.7 -1.85 -0.64c-3.65,-3.1 -23.05,-20.99 -43.18,-66.26zm86.77 -30.97c8.74,-1.72 18.24,-3.02 27.9,-3.37 0,0 -7.65,53.01 14.24,63.3 0,0 17.41,7.91 6.33,-60.93 0,0 48,6.33 46.95,59.34 -0.91,45.76 -25.8,62.44 -32.59,66.14 -5.12,-0.73 -13.59,-2.1 -24.84,-4.43l-0.01 -0.77 -7.74 -0.89 -0.69 -0.15c-4.02,-4.5 -27.19,-33.99 -29.55,-118.24z"/>
-                </svg>
-              </div>
-              <div class="leaf icon-5">
-                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 513.57 1042.57">
-                  <path class="fil-leaf-5" d="M207.74 252.52c0,0 -3.36,127.53 94.31,130.89 0,0 36.92,0.67 66.79,-32.89 0,0 -39.94,-10.4 -50.01,-47.99 -10.07,-37.59 63.1,-27.52 82.23,3.36 0,0 17.47,-34.44 35.17,-77.24 -60.5,-36.51 -169.57,-35.65 -182.77,-35.4 -16.15,16.52 -28.62,31.28 -37.69,42.91l-0 -0c-3.79,4.86 -6.98,9.18 -9.61,12.86l0.02 -0.03c-0.48,0.66 -0.93,1.31 -1.37,1.93l-0.05 0.08 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.7 1 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07 -0.05 0.07c1.63,-0.35 3.25,-0.73 4.87,-1.16zm202.05 -202.04c0,0 -10.74,-24.5 15.1,-37.92 25.84,-13.42 40.95,2.68 38.93,7.72 -2.01,5.03 -36.92,38.6 -54.03,30.21zm41.95 28.86c0,0 3.69,-24.84 23.16,-20.14 19.47,4.7 -2.35,24.16 -6.71,25.51 -4.36,1.34 -17.79,3.36 -16.45,-5.37zm-13.33 143.98c6.34,-15.57 12.61,-32.08 18.03,-48.32 0,0 -14.77,-5.71 -43.63,-9.06 -28.86,-3.36 -48.67,-8.06 -47.99,-20.47 0.67,-12.42 19.47,-12.42 31.21,-12.08 11.75,0.34 44.3,9.4 65.45,21.48 0,0 6.06,-15.02 14,-34.26 -13.59,-6.7 -55.53,-24.2 -111.04,-17.16 -44.54,28.56 -79.28,58.2 -105.29,84.07 26.84,-0.04 122.78,2.26 179.27,35.82zm39.24 -107.98c11.26,-27.2 25.32,-60.47 31.48,-72.24 2.59,-4.94 4.04,-8.91 4.44,-12.19l-0.07 0.03c-7.86,2.78 -15.55,5.64 -23.08,8.58l-0.06 0.03c-43.75,17.09 -81.99,36.73 -115.12,57.12 50.7,-3.62 88.86,12.06 102.42,18.68zm-266.36 117.31l-0 0 0.19 -0.24c1.61,-2.06 3.33,-4.22 5.15,-6.47l0.6 -0.74c1.8,-2.22 3.71,-4.51 5.72,-6.89l0.53 -0.62c0.65,-0.77 1.31,-1.54 1.99,-2.33l0.45 -0.53c0.8,-0.93 1.62,-1.87 2.44,-2.82l-0.47 -0.16c26.43,-78.83 20.84,-169.24 18.14,-197.94 -29.06,6.17 -63.45,14.58 -92.65,24.81 0,0 -10.74,27.18 -8.73,47.66 2.01,20.47 10.4,39.6 17.79,47.99 7.38,8.39 -4.03,19.8 -14.1,11.08 -10.07,-8.73 -33.9,-27.86 -31.88,-85.58 0,0 -51.69,29.87 -54.37,96.99 -2.41,60.36 60.31,104.42 124.22,99.27 -29.57,40.64 -52.99,92.96 -71.11,145.44 -34.37,99.52 -49.74,199.84 -51.89,221.41 -1.69,16.94 -9.22,61.56 -18.01,108.82 -8.48,45.59 -18.12,93.5 -24.81,121.32 -13.86,57.6 -20.46,188.53 -20.47,188.9l11.37 0.54c0.02,-0.37 6.56,-130.3 20.16,-186.81 6.77,-28.15 16.45,-76.26 24.95,-121.9 8.84,-47.51 16.42,-92.5 18.15,-109.76 2.13,-21.29 17.32,-120.37 51.32,-218.82 17.84,-51.67 40.86,-103.1 69.86,-142.81 3.19,-7.16 11.12,-24.22 15.49,-29.83zm25.46 -30.01c1.38,-1.51 2.8,-3.04 4.25,-4.58l0.29 -0.31c0.84,-0.89 1.69,-1.8 2.55,-2.7l0.67 -0.7c2.7,-2.84 5.52,-5.73 8.45,-8.67l0.65 -0.65c0.97,-0.98 1.96,-1.96 2.96,-2.95l0.38 -0.38c3.13,-3.09 6.39,-6.23 9.77,-9.41l0.58 -0.54c4.62,-4.35 9.48,-8.77 14.57,-13.25l0.68 -0.6c3.78,-3.32 7.7,-6.68 11.74,-10.06l0.29 -0.24c5.54,-4.63 11.33,-9.29 17.36,-13.99l0.57 -0.44c6.07,-4.71 12.39,-9.44 18.97,-14.18l0.24 -0.17c4.93,-3.55 10.01,-7.1 15.23,-10.64l0.24 -0.16c4.13,-2.8 8.36,-5.6 12.68,-8.38 1.65,-4.78 23.49,-68.56 28.59,-99.33 -14.9,-0.31 -31.83,-0.37 -51.18,-0.15 0,0 -12.75,35.24 -9.73,54.03 3.02,18.79 9.73,34.9 -0.34,37.25 -10.07,2.35 -31.21,-20.47 -17.79,-89.27 0,0 -24.82,3.76 -57.81,10.6 2.58,27.06 8.08,112.25 -14.87,189.88zm130.78 -107.89l1.53 -0.95 0.35 -0.22c7.57,-4.71 15.41,-9.39 23.53,-14l0.16 -0.09c6.06,-3.44 12.27,-6.86 18.63,-10.22l0.29 -0.16c8.49,-4.49 17.26,-8.91 26.3,-13.23l0.6 -0.29c6.76,-3.22 13.68,-6.39 20.75,-9.5l0.12 -0.05c2.34,-1.03 4.7,-2.05 7.07,-3.06l0.5 -0.21c7,-2.98 14.15,-5.89 21.45,-8.74l1.17 -0.46c2.38,-0.92 4.78,-1.84 7.19,-2.75l0.09 -0.03c5.13,-1.93 10.34,-3.82 15.61,-5.68l0.07 -0.03c-2.61,-6.39 -11.96,-9.39 -26.62,-13.87 -18.07,-5.52 -44.02,-9.54 -92.15,-10.8 -4.31,26.52 -20.49,76.07 -26.62,94.33z"/>
-                </svg>
-              </div>
+            <button class="cow-button" style="width:100%;height:56px;border-radius:16px;margin-top:10px" onclick="submitOrder()">
+              <span class="button-text">Оформить заказ</span>
             </button>
           </div>
         `;
@@ -1835,139 +2277,293 @@
       document.body.style.overflow = '';
     }
 
-    function changeQty(idx, delta) {
+    function changeCartQty(idx, delta) {
       if (!cart[idx]) return;
       cart[idx].qty += delta;
-      if (cart[idx].qty <= 0) cart.splice(idx, 1);
-      saveState();
-      updateBadges();
-      openCartModal(); // Re-render
+      if (cart[idx].qty <= 0) {
+        const item = document.querySelector(`.cart-item[data-idx="${idx}"]`);
+        if (item) {
+          item.classList.add('removing');
+          setTimeout(() => {
+            cart.splice(idx, 1);
+            saveState();
+            updateBadges();
+            renderMiniCart();
+            openCartModal();
+          }, 300);
+        } else {
+          cart.splice(idx, 1);
+          saveState();
+          updateBadges();
+          renderMiniCart();
+          openCartModal();
+        }
+      } else {
+        saveState();
+        updateBadges();
+        renderMiniCart();
+        openCartModal();
+      }
     }
 
-    function changeCartWeight(idx, weight) {
-      if (!cart[idx]) return;
-      cart[idx].weight = weight;
-      saveState();
-      openCartModal(); // Re-render
-    }
-
-    function submitOrder() {
-      const btn = el('submit-order-btn');
+    // ==================== ORDERS ====================
+    async function submitOrder() {
       const phone = el('checkout-phone').value;
       const address = el('checkout-address').value;
-      const city = el('checkout-city').value;
-      const comment = el('checkout-comment').value;
+      if (!phone || !address) { showToast('Заполните телефон и адрес'); return; }
 
-      if (!phone || !address) {
-        alert('Пожалуйста, заполните телефон и адрес');
+      const payload = {
+        items: cart,
+        contact: { phone, address, city: el('checkout-city').value, comment: el('checkout-comment').value },
+        telegram_user_id: window.Telegram?.WebApp?.initDataUnsafe?.user?.id,
+        timestamp: Date.now()
+      };
+
+      if (!isOnline) {
+        const offlineOrders = JSON.parse(localStorage.getItem(STORAGE_OFFLINE_ORDERS) || '[]');
+        offlineOrders.push(payload);
+        localStorage.setItem(STORAGE_OFFLINE_ORDERS, JSON.stringify(offlineOrders));
+        showToast('Заказ сохранен локально');
+        closeCartModal();
+        cart = [];
+        saveState();
+        updateBadges();
+        renderMiniCart();
         return;
       }
 
-      // Animate leaves
-      btn.classList.add('animating');
-      
-      setTimeout(() => {
-        // Show loader
-        el('loader').classList.add('active');
-        
-        // Prepare payload
-        const payload = {
-          type: 'cart',
-          items: cart,
-          contact: { phone, address, city, comment },
-          total: cart.reduce((sum, item) => {
-            if (item.pricePerKg) {
-              let discountRate = 0;
-              for (const threshold of DISCOUNT_THRESHOLDS) {
-                if (item.weight >= threshold.g) discountRate = threshold.rate;
-              }
-              return sum + ((item.weight / 1000) * item.pricePerKg * (1 - discountRate) * item.qty);
-            } else if (item.pricePerUnit) {
-              return sum + (item.pricePerUnit * item.qty);
-            }
-            return sum;
-          }, 0),
-          timestamp: Date.now()
-        };
+      await sendOrderToServer(payload);
+    }
 
-        // Send to backend
-        fetch(`${BACKEND}/order`, {
+    async function sendOrderToServer(payload) {
+      el('loader').classList.add('active');
+      try {
+        const response = await fetch(`${BACKEND}/api/order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        })
-        .then(() => {
-          el('loader').classList.remove('active');
-          cart = [];
-          saveState();
-          updateBadges();
-          closeCartModal();
-          
-          if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.showAlert('Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.');
-          } else {
-            alert('Заказ успешно отправлен!');
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          el('loader').classList.remove('active');
-          alert('Ошибка при отправке заказа. Пожалуйста, попробуйте позже.');
-        })
-        .finally(() => {
-          btn.classList.remove('animating');
         });
-      }, 800);
+        
+        if (!response.ok) throw new Error('Server error');
+        
+        const data = await response.json();
+        
+        // Сохраняем в историю
+        orderHistory.unshift({
+          id: data.orderId,
+          items: payload.items,
+          total: calculateCartTotal(),
+          status: 'new',
+          created_at: new Date().toISOString()
+        });
+        saveState();
+        
+        el('loader').classList.remove('active');
+        cart = [];
+        saveState();
+        updateBadges();
+        renderMiniCart();
+        closeCartModal();
+        showToast(`Заказ #${data.orderId} отправлен!`);
+        
+        if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      } catch (err) {
+        console.error(err);
+        el('loader').classList.remove('active');
+        showToast('Ошибка сети. Сохранено локально.');
+        const offlineOrders = JSON.parse(localStorage.getItem(STORAGE_OFFLINE_ORDERS) || '[]');
+        offlineOrders.push(payload);
+        localStorage.setItem(STORAGE_OFFLINE_ORDERS, JSON.stringify(offlineOrders));
+      }
     }
 
-    function showMain() {
+    async function syncOfflineOrders() {
+      const offlineOrders = JSON.parse(localStorage.getItem(STORAGE_OFFLINE_ORDERS) || '[]');
+      if (offlineOrders.length === 0) return;
+      
+      showToast(`Отправка ${offlineOrders.length} сохраненных заказов...`);
+      
+      for (const order of offlineOrders) {
+        try {
+          await fetch(`${BACKEND}/api/order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+          });
+        } catch (e) { console.error('Sync failed', e); }
+      }
+      
+      localStorage.removeItem(STORAGE_OFFLINE_ORDERS);
+      showToast('Все заказы синхронизированы!');
+    }
+
+    function showOrderHistory() {
       document.querySelectorAll('.nav-item').forEach((item, idx) => {
-        item.classList.toggle('active', idx === 0);
+        item.classList.toggle('active', idx === 2);
       });
-      el('search-input').value = '';
+      
+      const container = el('products-section');
+      
+      if (orderHistory.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 60px 20px;">
+            <div class="empty-state-icon">📋</div>
+            <p>История заказов пуста</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="products-category">
+          <h3 class="category-title">📋 История заказов</h3>
+          <div class="orders-list">
+            ${orderHistory.map(order => `
+              <div class="order-card">
+                <div class="order-header">
+                  <span class="order-id">Заказ #${order.id}</span>
+                  <span class="order-status status-${order.status}">${getStatusText(order.status)}</span>
+                </div>
+                <div class="order-items-preview">
+                  ${order.items.slice(0, 3).map(item => `
+                    <img src="${item.img || DEFAULT_IMG}" class="order-item-thumb" alt="">
+                  `).join('')}
+                  ${order.items.length > 3 ? `<span class="order-more">+${order.items.length - 3}</span>` : ''}
+                </div>
+                <div class="order-footer">
+                  <span class="order-date">${new Date(order.created_at).toLocaleDateString()}</span>
+                  <span class="order-total">${fmtRub(order.total)}</span>
+                </div>
+                <button class="reorder-btn" onclick="reorder(${order.id})">↻ Повторить заказ</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function getStatusText(status) {
+      const map = { 'new': 'Новый', 'processing': 'В обработке', 'done': 'Выполнен', 'cancelled': 'Отменен' };
+      return map[status] || status;
+    }
+
+    function reorder(orderId) {
+      const order = orderHistory.find(o => o.id === orderId);
+      if (!order) return;
+      
+      order.items.forEach(item => {
+        cart.push({...item, qty: item.qty || 1});
+      });
+      
+      saveState();
+      updateBadges();
+      renderMiniCart();
+      showToast('Товары добавлены в корзину');
+      openCartModal();
+    }
+
+    // ==================== NAVIGATION ====================
+    function showMain() {
+      document.querySelectorAll('.nav-item').forEach((item, idx) => item.classList.toggle('active', idx === 0));
       currentCategory = 'all';
       document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
       document.querySelector('.category-tab[data-category="all"]').classList.add('active');
-      renderProducts();
+      renderProductsByCategory();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showFavorites() {
-      document.querySelectorAll('.nav-item').forEach((item, idx) => {
-        item.classList.toggle('active', idx === 1);
-      });
-      
-      const container = el('product-grid');
-      const favProducts = PRODUCTS.filter(p => favorites.has(p.id));
+      document.querySelectorAll('.nav-item').forEach((item, idx) => item.classList.toggle('active', idx === 1));
+      const container = el('products-section');
+      const favProducts = ALL_PRODUCTS.filter(p => favorites.has(p.id));
       
       if (favProducts.length === 0) {
+        container.innerHTML = `<div class="empty-state" style="padding: 60px 20px;"><div class="empty-state-icon">♡</div><p>Нет избранных товаров</p></div>`;
+      } else {
         container.innerHTML = `
-          <div class="empty-state" style="grid-column: 1/-1;">
-            <div class="empty-state-icon">♡</div>
-            <p>Нет избранных товаров</p>
+          <div class="products-category">
+            <h3 class="category-title">♡ Избранное</h3>
+            <div class="product-grid">
+              ${favProducts.map(product => {
+                const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : fmtRub(product.pricePerUnit);
+                const groupVariants = product.groupId ? PRODUCT_VARIANTS[product.groupId]?.variants : null;
+                const hasMultipleVariants = groupVariants && groupVariants.length > 1;
+                return `
+                  <div class="product-card" data-product-id="${product.id}">
+                    <div class="product-image-wrap" onclick="openProductModal('${product.id}')">
+                      <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}">
+                      <button class="fav-btn active" onclick="event.stopPropagation(); toggleFavorite('${product.id}')">♥</button>
+                      <button class="quick-add-btn" onclick="event.stopPropagation(); quickAdd('${product.id}', this)">+</button>
+                    </div>
+                    <div class="product-info" onclick="openProductModal('${product.id}')">
+                      <div class="product-name">${product.name}</div>
+                      <div class="product-footer"><div class="product-price">${priceText}</div></div>
+                      ${hasMultipleVariants ? `
+                        <div class="variant-selector" onclick="event.stopPropagation()">
+                          ${groupVariants.map(v => `
+                            <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="switchVariantInGrid('${product.groupId}', '${v.id}', this)">
+                              ${v.name.split(' ').pop()}
+                            </button>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
           </div>
         `;
-      } else {
-        container.innerHTML = favProducts.map(product => {
-          const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : 
-                           product.pricePerUnit ? fmtRub(product.pricePerUnit) : '';
-          return `
-            <div class="product-card" onclick="openProductModal('${product.id}')">
-              <div class="product-image-wrap">
-                <img src="${product.img || DEFAULT_IMG}" class="product-image" alt="${product.name}">
-                <button class="fav-btn active" onclick="event.stopPropagation(); toggleFavorite('${product.id}')">
-                  ♥
-                </button>
-              </div>
-              <div class="product-info">
-                <div class="product-name">${product.name}</div>
-                <div class="product-price">${priceText}</div>
-              </div>
-            </div>
-          `;
-        }).join('');
       }
     }
+
+    function openProfileModal() {
+      el('profile-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProfileModal() {
+      el('profile-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function updateBadges() {
+      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const favCount = favorites.size;
+      
+      const cartBadge = el('cart-badge');
+      const favBadge = el('fav-badge');
+      
+      cartBadge.textContent = cartCount;
+      cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+      
+      favBadge.textContent = favCount;
+      favBadge.style.display = favCount > 0 ? 'flex' : 'none';
+
+      document.querySelectorAll('.fav-btn').forEach(btn => {
+        const id = btn.dataset.id;
+        if (id) {
+          btn.classList.toggle('active', favorites.has(id));
+          btn.innerHTML = favorites.has(id) ? '♥' : '♡';
+        }
+      });
+    }
+
+    // Search listener
+    document.addEventListener('DOMContentLoaded', () => {
+      el('search-input').addEventListener('input', (e) => {
+        renderProductsByCategory(e.target.value);
+      });
+      
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentCategory = tab.dataset.category;
+          renderProductsByCategory(el('search-input').value);
+        });
+      });
+    });
   </script>
 </body>
 </html>
