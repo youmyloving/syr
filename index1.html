@@ -149,7 +149,7 @@
 
     .search-input {
       width: 100%;
-      padding: 12px 16px 12px 44px;
+      padding: 12px 40px 12px 44px;
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
       background: var(--bg-secondary);
@@ -170,6 +170,38 @@
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s;
+    }
+
+    .search-clear.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .search-clear:hover {
+      background: var(--accent-gold);
+      color: white;
     }
 
     /* Categories */
@@ -495,31 +527,6 @@
       font-size: 18px;
       font-weight: 700;
       color: var(--accent-gold);
-    }
-
-    .variant-selector {
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .variant-chip {
-      padding: 4px 8px;
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      background: white;
-      color: var(--text-secondary);
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-    }
-
-    .variant-chip.active {
-      background: var(--accent-gold);
-      color: white;
-      border-color: var(--accent-gold);
     }
 
     /* Mini Cart Bar */
@@ -912,6 +919,7 @@
       display: flex;
       gap: 12px;
       margin-top: 24px;
+      margin-bottom: 40px;
     }
 
     .btn-fav {
@@ -931,6 +939,7 @@
 
     .btn-fav.active { color: #e74c3c; border-color: rgba(231, 76, 60, 0.3); }
 
+    /* Cow Button Container */
     .button-container {
       position: relative;
       width: 100%;
@@ -960,12 +969,15 @@
       transform: rotate(20deg) translateX(-20px) scale(0.8);
     }
 
-    .button-container:hover .cow-arm.left {
+    /* Show arms on hover (desktop) and touch (mobile) */
+    .button-container:hover .cow-arm.left,
+    .button-container.active .cow-arm.left {
       opacity: 1;
       transform: rotate(0deg) translateX(0) scale(1);
     }
 
-    .button-container:hover .cow-arm.right {
+    .button-container:hover .cow-arm.right,
+    .button-container.active .cow-arm.right {
       opacity: 1;
       transform: rotate(0deg) translateX(0) scale(1);
     }
@@ -983,7 +995,8 @@
       filter: drop-shadow(0 4px 12px rgba(92, 74, 50, 0.2));
     }
 
-    .button-container:hover .cow-head-wrapper {
+    .button-container:hover .cow-head-wrapper,
+    .button-container.active .cow-head-wrapper {
       transform: translateX(-50%) translateY(-60px);
       z-index: 15;
     }
@@ -1007,6 +1020,7 @@
       transform-style: preserve-3d;
       transition: all 0.2s ease;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .cow-button:active {
@@ -1030,7 +1044,8 @@
       transition: transform 0.3s ease;
     }
 
-    .button-container:hover .button-text {
+    .button-container:hover .button-text,
+    .button-container.active .button-text {
       transform: translateY(2px);
     }
 
@@ -1051,7 +1066,7 @@
     @keyframes fly-right { to { transform: translate(40px, 0) scale(0); opacity: 0; } }
     @keyframes fly-up { to { transform: translate(0, -50px) scale(0); opacity: 0; } }
 
-    /* 3D Cube Loader - Styled for Cheese Theme */
+    /* 3D Cube Loader */
     .loader-overlay {
       position: fixed;
       inset: 0;
@@ -1665,7 +1680,8 @@
       
       <div class="search-container">
         <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" id="search-input" placeholder="Поиск по названию..." />
+        <input type="text" class="search-input" id="search-input" placeholder="Поиск по названию..." autocomplete="off" />
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
       </div>
 
       <div class="categories" id="categories">
@@ -1720,16 +1736,20 @@
         </div>
         <div class="modal-actions">
           <button class="btn-fav" id="modal-fav-btn" onclick="toggleModalFavorite()">♡</button>
-          <div class="button-container" style="flex: 1;">
+          
+          <!-- Cow Button Container -->
+          <div class="button-container" id="cowButtonContainer" style="flex: 1;">
             <svg class="cow-arm left" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M45 20 C45 10, 35 5, 25 10 C15 15, 10 30, 15 50 C20 70, 30 85, 35 95 C38 100, 45 100, 50 95 C55 90, 50 70, 48 50 C46 35, 45 25, 45 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
               <ellipse cx="25" cy="30" rx="5" ry="7" fill="#5c4a32" opacity="0.6"/>
+              <path d="M20 85 Q25 90, 30 85" stroke="#e6d5b0" stroke-width="2" stroke-linecap="round" fill="none"/>
             </svg>
             <svg class="cow-arm right" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M15 20 C15 10, 25 5, 35 10 C45 15, 50 30, 45 50 C40 70, 30 85, 25 95 C22 100, 15 100, 10 95 C5 90, 10 70, 12 50 C14 35, 15 25, 15 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
               <ellipse cx="35" cy="35" rx="4" ry="6" fill="#5c4a32" opacity="0.6"/>
+              <path d="M30 85 Q35 90, 40 85" stroke="#e6d5b0" stroke-width="2" stroke-linecap="round" fill="none"/>
             </svg>
-            <div class="cow-head-wrapper">
+            <div class="cow-head-wrapper" id="cowHead">
               <svg viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="25" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(-20 25 45)"/>
                 <ellipse cx="115" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(20 115 45)"/>
@@ -1742,14 +1762,16 @@
                 <rect x="30" y="20" width="80" height="85" rx="35" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
                 <ellipse cx="50" cy="40" rx="8" ry="10" fill="#5c4a32" opacity="0.8"/>
                 <ellipse cx="95" cy="55" rx="6" ry="8" fill="#5c4a32" opacity="0.7"/>
-                <circle cx="45" cy="75" r="5" fill="#5c4a32" opacity="0.6"/>
+                <circle cx="45" cy="80" r="5" fill="#5c4a32" opacity="0.6"/>
                 <path d="M50 22 Q60 30, 70 22 Q80 30, 90 22" stroke="#f4e4c1" stroke-width="3" stroke-linecap="round" fill="none"/>
-                <circle cx="55" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
-                <circle cx="55" cy="60" r="6" fill="#5c4a32"/>
-                <circle cx="57" cy="58" r="2.5" fill="white"/>
-                <circle cx="85" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
-                <circle cx="85" cy="60" r="6" fill="#5c4a32"/>
-                <circle cx="87" cy="58" r="2.5" fill="white"/>
+                <g class="eyes">
+                  <circle cx="55" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                  <circle cx="55" cy="60" r="6" fill="#5c4a32"/>
+                  <circle cx="57" cy="58" r="2.5" fill="white"/>
+                  <circle cx="85" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                  <circle cx="85" cy="60" r="6" fill="#5c4a32"/>
+                  <circle cx="87" cy="58" r="2.5" fill="white"/>
+                </g>
                 <path d="M48 55 Q45 52, 42 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
                 <path d="M92 55 Q95 52, 98 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
                 <ellipse cx="70" cy="85" rx="22" ry="18" fill="#f9f0e0"/>
@@ -1761,7 +1783,7 @@
                 <ellipse cx="95" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
               </svg>
             </div>
-            <button class="cow-button" onclick="addToCartWithAnimation()">
+            <button class="cow-button" id="mainCowButton" onclick="addToCartWithAnimation()">
               <span class="button-text">В корзину</span>
             </button>
           </div>
@@ -1803,33 +1825,15 @@
   <!-- 3D Cube Loader -->
   <div class="loader-overlay" id="loader">
     <div class="loader">
-      <div class="box box0">
-        <div></div>
-      </div>
-      <div class="box box1">
-        <div></div>
-      </div>
-      <div class="box box2">
-        <div></div>
-      </div>
-      <div class="box box3">
-        <div></div>
-      </div>
-      <div class="box box4">
-        <div></div>
-      </div>
-      <div class="box box5">
-        <div></div>
-      </div>
-      <div class="box box6">
-        <div></div>
-      </div>
-      <div class="box box7">
-        <div></div>
-      </div>
-      <div class="ground">
-        <div></div>
-      </div>
+      <div class="box box0"><div></div></div>
+      <div class="box box1"><div></div></div>
+      <div class="box box2"><div></div></div>
+      <div class="box box3"><div></div></div>
+      <div class="box box4"><div></div></div>
+      <div class="box box5"><div></div></div>
+      <div class="box box6"><div></div></div>
+      <div class="box box7"><div></div></div>
+      <div class="ground"><div></div></div>
     </div>
     <div class="loader-text">Отправляем заказ...</div>
   </div>
@@ -1931,7 +1935,6 @@
           { id: 'tvorozhnaya-massa-kuraga', name: 'Творожная масса с курагой', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с курагой. Срок хранения: 5 суток.' }
         ]
       },
-      // Новые группы
       'kosichka-group': {
         displayName: 'Сыр косичка',
         baseGroup: 'cheese',
@@ -2133,6 +2136,8 @@
       loadState();
       setupTelegram();
       setupNetworkListeners();
+      setupSearch();
+      setupCowButton();
       showSkeletons();
       setTimeout(() => {
         renderHits();
@@ -2145,6 +2150,79 @@
       const productId = params.get('product');
       if (productId) setTimeout(() => openProductModal(productId), 800);
     });
+
+    function setupSearch() {
+      const searchInput = el('search-input');
+      const searchClear = el('search-clear');
+      
+      searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        renderProductsByCategory(value);
+        searchClear.classList.toggle('visible', value.length > 0);
+      });
+      
+      // Handle escape key
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          clearSearch();
+        }
+      });
+    }
+
+    function clearSearch() {
+      const searchInput = el('search-input');
+      searchInput.value = '';
+      searchInput.blur();
+      renderProductsByCategory('');
+      el('search-clear').classList.remove('visible');
+    }
+
+    function setupCowButton() {
+      const container = el('cowButtonContainer');
+      const button = el('mainCowButton');
+      
+      // Touch events for mobile
+      button.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        container.classList.add('active');
+        this.style.transform = 'translateY(6px) scale(0.98)';
+      }, {passive: false});
+
+      button.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        container.classList.remove('active');
+        this.style.transform = '';
+        setTimeout(() => {
+          addToCartWithAnimation();
+        }, 50);
+      });
+
+      // Mouse events follow CSS hover, but we ensure sparkles work
+      button.addEventListener('click', function(e) {
+        // Create ripple
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const ripple = document.createElement('span');
+        ripple.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(212, 175, 55, 0) 70%);
+          transform: scale(0);
+          animation: ripple-animation 0.6s ease-out;
+          pointer-events: none;
+          left: ${x}px;
+          top: ${y}px;
+          width: 100px;
+          height: 100px;
+          margin-left: -50px;
+          margin-top: -50px;
+        `;
+        button.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    }
 
     function loadState() {
       try {
@@ -2240,6 +2318,7 @@
       }).join('');
     }
 
+    // ИЗМЕНЕНО: Убраны чипы вариантов из карточек в сетке
     function renderProductsByCategory(searchTerm = '') {
       const container = el('products-section');
       container.innerHTML = '';
@@ -2271,6 +2350,7 @@
         const section = document.createElement('div');
         section.className = 'products-category';
         
+        // УБРАНЫ ЧИПЫ ВАРИАНТОВ ИЗ КАРТОЧЕК
         section.innerHTML = `
           <h3 class="category-title">${cat.icon} ${cat.title}</h3>
           <div class="product-grid">
@@ -2279,9 +2359,6 @@
               const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : 
                                product.pricePerUnit ? fmtRub(product.pricePerUnit) : 
                                product.pricePerL ? fmtRub(product.pricePerL) + '/л' : '';
-              
-              const groupVariants = product.groupId ? PRODUCT_VARIANTS[product.groupId]?.variants : null;
-              const hasMultipleVariants = groupVariants && groupVariants.length > 1;
               
               return `
                 <div class="product-card" data-product-id="${product.id}">
@@ -2298,15 +2375,6 @@
                     <div class="product-footer">
                       <div class="product-price">${priceText}</div>
                     </div>
-                    ${hasMultipleVariants ? `
-                      <div class="variant-selector" onclick="event.stopPropagation()">
-                        ${groupVariants.map(v => `
-                          <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="window.switchVariantInGrid('${product.groupId}', '${v.id}', this)">
-                            ${v.name.split(' ').pop()}
-                          </button>
-                        `).join('')}
-                      </div>
-                    ` : ''}
                   </div>
                 </div>
               `;
@@ -2319,48 +2387,6 @@
     }
 
     // ==================== ACTIONS ====================
-    window.switchVariantInGrid = function(groupId, variantId, btn) {
-      event.stopPropagation();
-      const group = PRODUCT_VARIANTS[groupId];
-      const variant = group.variants.find(v => v.id === variantId);
-      if (!variant) return;
-      
-      const card = btn.closest('.product-card');
-      const img = card.querySelector('.product-image');
-      img.style.opacity = '0.5';
-      setTimeout(() => {
-        img.src = variant.img || DEFAULT_IMG;
-        img.style.opacity = '1';
-      }, 200);
-      
-      card.querySelector('.product-name').textContent = variant.name;
-      const priceText = variant.pricePerKg ? fmtRub(variant.pricePerKg) + '/кг' : 
-                       variant.pricePerUnit ? fmtRub(variant.pricePerUnit) : '';
-      card.querySelector('.product-price').textContent = priceText;
-      
-      card.querySelector('.product-image-wrap').setAttribute('onclick', `openProductModal('${variantId}')`);
-      card.querySelector('.product-info').setAttribute('onclick', `openProductModal('${variantId}')`);
-      card.querySelector('.quick-add-btn').setAttribute('onclick', `event.stopPropagation(); window.quickAdd('${variantId}', this)`);
-      
-      const favBtn = card.querySelector('.fav-btn');
-      favBtn.setAttribute('onclick', `event.stopPropagation(); toggleFavorite('${variantId}')`);
-      favBtn.dataset.id = variantId;
-      favBtn.classList.toggle('active', favorites.has(variantId));
-      favBtn.innerHTML = favorites.has(variantId) ? '♥' : '♡';
-      
-      card.querySelectorAll('.variant-chip').forEach(chip => chip.classList.remove('active'));
-      btn.classList.add('active');
-      
-      const badge = card.querySelector('.product-badge-hit');
-      if (badge && !variant.hit) badge.remove();
-      else if (!badge && variant.hit) {
-        const newBadge = document.createElement('span');
-        newBadge.className = 'product-badge-hit';
-        newBadge.textContent = 'ХИТ';
-        card.querySelector('.product-image-wrap').insertBefore(newBadge, card.querySelector('.fav-btn'));
-      }
-    }
-
     window.quickAdd = function(productId, btnElement) {
       let product = ALL_PRODUCTS.find(p => p.id === productId);
       if (!product) return;
@@ -2519,13 +2545,11 @@
       if (!currentVariant) return;
       let basePrice = 0, priceText = '', diffText = '', oldPriceText = '';
       
-      // Считаем с учетом общего веса в корзине для скидки
       let totalWeightForDiscount = 0;
       if (currentVariant.group === 'cheese' && currentVariant.pricePerKg) {
         const existingQty = cart
           .filter(item => item.id === currentVariant.id)
           .reduce((sum, item) => sum + (item.weight || 0) * item.qty, 0);
-        // Для модалки показываем цену как если бы добавили текущее количество к существующему
         const simulatedTotalWeight = existingQty + (selectedWeight || 0) * currentQty;
         
         let discountRate = 0;
@@ -2597,6 +2621,7 @@
       document.body.style.overflow = '';
     }
 
+    // ИСПРАВЛЕНО: Добавлена анимация искр при добавлении в корзину
     function addToCartWithAnimation() {
       if (!currentVariant) return;
       
@@ -2630,21 +2655,35 @@
       updateBadges();
       renderMiniCart();
 
-      // Sparkle animation
-      const btn = document.querySelector('.cow-button');
-      const rect = btn.getBoundingClientRect();
+      // Sparkle animation from cow button
+      const container = el('cowButtonContainer');
+      const rect = container.getBoundingClientRect();
+      const animations = ['fly-up-left', 'fly-up-right', 'fly-left', 'fly-right', 'fly-up', 'fly-up-left', 'fly-up-right', 'fly-up'];
+      
       for (let i = 0; i < 8; i++) {
         const sparkle = document.createElement('div');
         sparkle.className = 'sparkle';
-        sparkle.style.left = rect.left + rect.width/2 + 'px';
-        sparkle.style.top = rect.top + rect.height/2 + 'px';
-        sparkle.style.animation = `fly-${['up-left','up-right','left','right','up'][i%5]} 0.6s ease-out forwards`;
+        sparkle.style.left = (rect.left + rect.width / 2) + 'px';
+        sparkle.style.top = (rect.top + 20) + 'px';
+        
+        const size = 6 + Math.random() * 6;
+        sparkle.style.width = size + 'px';
+        sparkle.style.height = size + 'px';
+        sparkle.style.background = Math.random() > 0.5 ? '#d4af37' : '#f4e4c1';
+        
+        sparkle.style.animation = `${animations[i]} 0.6s ease-out forwards`;
+        sparkle.style.animationDelay = (i * 0.02) + 's';
+        
         document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 600);
+        setTimeout(() => sparkle.remove(), 700);
       }
 
       closeProductModal();
       showToast('Добавлено в корзину');
+      
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      }
     }
 
     // ==================== CART ====================
@@ -2667,11 +2706,9 @@
       return titles[n%10===1 && n%100!==11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
     }
 
-    // ИСПРАВЛЕНО: Скидка считается от суммарного веса по всем позициям одного товара
     function calculateItemDiscount(item) {
       if (item.group !== 'cheese' || !item.pricePerKg || !item.weight) return { rate: 0, label: '' };
       
-      // Считаем общий вес по всем позициям этого товара в корзине
       const totalWeight = cart
         .filter(cartItem => cartItem.id === item.id)
         .reduce((sum, cartItem) => sum + (cartItem.weight || 0) * cartItem.qty, 0);
@@ -3001,7 +3038,7 @@
       currentCategory = 'all';
       document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
       document.querySelector('.category-tab[data-category="all"]').classList.add('active');
-      renderProductsByCategory();
+      renderProductsByCategory(el('search-input').value);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -3019,8 +3056,6 @@
             <div class="product-grid">
               ${favProducts.map(product => {
                 const priceText = product.pricePerKg ? fmtRub(product.pricePerKg) + '/кг' : fmtRub(product.pricePerUnit);
-                const groupVariants = product.groupId ? PRODUCT_VARIANTS[product.groupId]?.variants : null;
-                const hasMultipleVariants = groupVariants && groupVariants.length > 1;
                 return `
                   <div class="product-card" data-product-id="${product.id}">
                     <div class="product-image-wrap" onclick="openProductModal('${product.id}')">
@@ -3032,15 +3067,6 @@
                     <div class="product-info" onclick="openProductModal('${product.id}')">
                       <div class="product-name">${product.name}</div>
                       <div class="product-footer"><div class="product-price">${priceText}</div></div>
-                      ${hasMultipleVariants ? `
-                        <div class="variant-selector" onclick="event.stopPropagation()">
-                          ${groupVariants.map(v => `
-                            <button class="variant-chip ${v.id === product.id ? 'active' : ''}" onclick="window.switchVariantInGrid('${product.groupId}', '${v.id}', this)">
-                              ${v.name.split(' ').pop()}
-                            </button>
-                          `).join('')}
-                        </div>
-                      ` : ''}
                     </div>
                   </div>
                 `;
@@ -3083,12 +3109,8 @@
       });
     }
 
-    // Search listener
+    // Category listeners
     document.addEventListener('DOMContentLoaded', () => {
-      el('search-input').addEventListener('input', (e) => {
-        renderProductsByCategory(e.target.value);
-      });
-      
       document.querySelectorAll('.category-tab').forEach(tab => {
         tab.addEventListener('click', () => {
           document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
