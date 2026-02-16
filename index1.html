@@ -93,15 +93,20 @@
       100% { background-position: -200% 0; }
     }
 
-    /* Header */
+    /* Header - Sticky with hide/show */
     .header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(250, 248, 245, 0.95);
+      background: rgba(250, 248, 245, 0.98);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-light);
       padding: 12px 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .header.hidden {
+      transform: translateY(-100%);
     }
 
     .header-top {
@@ -844,6 +849,7 @@
       border-color: transparent;
     }
 
+    /* Animated Counter */
     .qty-section {
       display: flex;
       align-items: center;
@@ -876,23 +882,36 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      user-select: none;
     }
 
     .qty-btn:hover { border-color: var(--accent-gold); }
+    .qty-btn:active { transform: scale(0.95); background: var(--bg-tertiary); }
 
     .qty-value {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--text-primary);
-      min-width: 30px;
+      min-width: 40px;
       text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .qty-value.changed {
+      animation: countPop 0.3s ease;
+    }
+
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); color: var(--accent-gold); }
+      100% { transform: scale(1); }
     }
 
     .price-display {
       font-size: 28px;
       font-weight: 700;
       color: var(--accent-gold);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       align-items: baseline;
       gap: 12px;
@@ -913,6 +932,78 @@
       background: #e8f5e9;
       padding: 6px 12px;
       border-radius: 999px;
+    }
+
+    /* Discount Progress Bar */
+    .discount-progress-container {
+      margin: 16px 0;
+      padding: 16px;
+      background: var(--bg-warm);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+
+    .discount-progress-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .discount-progress-bar {
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .discount-progress-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .discount-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .discount-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      position: relative;
+      height: 16px;
+    }
+
+    .discount-mark {
+      position: absolute;
+      transform: translateX(-50%);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .discount-mark.active {
+      color: var(--accent-gold);
+      font-weight: 700;
+      transform: translateX(-50%) scale(1.1);
     }
 
     .modal-actions {
@@ -969,7 +1060,6 @@
       transform: rotate(20deg) translateX(-20px) scale(0.8);
     }
 
-    /* Show arms on hover (desktop) and touch (mobile) */
     .button-container:hover .cow-arm.left,
     .button-container.active .cow-arm.left {
       opacity: 1;
@@ -1408,7 +1498,7 @@
       50% { transform: scale(1.3); }
     }
 
-    /* Cart Styles */
+    /* Cart Styles with Swipe */
     .cart-item {
       display: flex;
       gap: 12px;
@@ -1418,10 +1508,38 @@
       margin-bottom: 12px;
       position: relative;
       overflow: hidden;
+      touch-action: pan-y;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+
+    .cart-item.swiped {
+      transform: translateX(-80px);
     }
 
     .cart-item.removing {
       animation: slideOut 0.3s ease forwards;
+    }
+
+    .cart-item-delete {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      background: #e74c3c;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .cart-item.swiped .cart-item-delete {
+      transform: translateX(0);
     }
 
     @keyframes slideOut {
@@ -1655,7 +1773,6 @@
       transform: translateY(0);
     }
   </style>
-<base target="_blank">
 </head>
 <body>
   <div id="offline-indicator" class="offline-indicator">⚠️ Офлайн режим. Заказы сохранятся локально.</div>
@@ -1670,7 +1787,7 @@
   </div>
 
   <div id="app">
-    <header class="header">
+    <header class="header" id="main-header">
       <div class="header-top">
         <div class="logo">Сыромания</div>
         <div class="user-avatar" id="user-avatar" onclick="openProfileModal()">
@@ -1734,6 +1851,23 @@
           <span id="modal-price">0 ₽</span>
           <span class="price-diff" id="price-diff"></span>
         </div>
+        
+        <!-- Discount Progress Bar -->
+        <div class="discount-progress-container" id="discount-progress" style="display: none;">
+          <div class="discount-progress-text">
+            <span id="discount-text">До скидки 5% осталось 200г</span>
+            <span id="discount-next">−5%</span>
+          </div>
+          <div class="discount-progress-bar">
+            <div class="discount-progress-fill" id="discount-fill" style="width: 0%"></div>
+          </div>
+          <div class="discount-marks" id="discount-marks">
+            <span class="discount-mark" style="left: 50%">500г</span>
+            <span class="discount-mark" style="left: 70%">700г</span>
+            <span class="discount-mark" style="left: 100%">1кг</span>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button class="btn-fav" id="modal-fav-btn" onclick="toggleModalFavorite()">♡</button>
           
@@ -1783,7 +1917,540 @@
                 <ellipse cx="95" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
               </svg>
             </div>
-            <button class="cow-button" id="mainCowButton" onclick="addToCartWithAnimation()">
+            <button class="cow-button" id="mainCowButton">
+              <span class="button-text">В корзину</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="modal-sheet" style="max-height: 95vh;">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Корзина</h3>
+        <button class="modal-close" onclick="closeCartModal()">✕</button>
+      </div>
+      <div class="modal-body" id="cart-body"></div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-sheet" style="max-height: 80vh;">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Профиль</h3>
+        <button class="modal-close" onclick="closeProfileModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-info">
+          <div class="profile-avatar" id="profile-avatar">С</div>
+          <div class="profile-name" id="profile-name">Гость</div>
+          <div class="profile-phone" id="profile-phone">Войдите через Telegram</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Cube Loader -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader">
+      <div class="box box0"><div></div></div>
+      <div class="box box1"><div></div></div>
+      <div class="box box2"><div></div></div>
+      <div class="box box3"><div></div></div>
+      <div class="box box4"><div></div></div>
+      <div class="box box5"><div></div></div>
+      <div class="box box6"><div></div></div>
+      <div class="box box7"><div></div></div>
+      <div class="ground"><div></div></div>
+    </div>
+    <div class="loader-text">Отправляем заказ...</div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Главная</span>
+    </button>
+    <button class="nav-item" onclick="showFavorites()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      <span>Избранное</span>
+      <span class="nav-badge" id="fav-badge" style="display: none;">0</span>
+    </button>
+    <button class="nav-item" onclick="showOrderHistory()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span>Заказы</span>
+    </button>
+    <button class="nav-item" onclick="openCartModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span>Корзина</span>
+      <span class="nav-badge" id="cart-badge" style="display: none;">0</span>
+    </button>
+  </nav>
+
+  <script>
+    // ==================== CONFIG ====================
+    const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com';
+    const STORAGE_CART_KEY = 'syromania-cart';
+    const STORAGE_FAVORITES_KEY = 'syromania-favorites';
+    const STORAGE_OFFLINE_ORDERS = 'syromania-offline-orders';
+    const STORAGE_ORDER_HISTORY = 'syromania-order-history';
+    const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
+
+    const DISCOUNT_THRESHOLDS = [
+      { g: 500, rate: 0.05, label: '−5%' },
+      { g: 700, rate: 0.10, label: '−10%' },
+      { g: 1000, rate: 0.15, label: '−15%' },
+    ];
+
+    // ==================== DATA ====================
+    const PRODUCT_VARIANTS = {
+      'halloumi-group': {
+        displayName: 'Халлуми',
+        baseGroup: 'cheese',
+        priority: 1,
+        variants: [
+          { id: 'halloumi', name: 'Халлуми классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp', description: 'Идеален для жарки или без обжарки. Средиземноморские нотки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-tomato-basil-garlic', name: 'Халлуми томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp', description: 'Идеален для жарки, хрустящая корочка. Можно есть и без обжарки. Срок хранения: 7 суток.', fixedWeight: 250 },
+          { id: 'halloumi-tomato-paprika', name: 'Халлуми с вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp', description: 'Идеален для жарки, появляется корочка. Срок хранения: 7 суток.', fixedWeight: 250 }
+        ]
+      },
+      'panir-group': {
+        displayName: 'Панир',
+        baseGroup: 'cheese',
+        priority: 2,
+        variants: [
+          { id: 'panir-classic', name: 'Панир классический', pricePerKg: 1450, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp', description: 'Очень нежный, мягкий, молочный вкус. Срок хранения: 7 суток.' },
+          { id: 'panir-herbs', name: 'Панир с зеленью', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-herbs.webp', description: 'Лёгкий, свежий, будто глоток прохладной воды в жару. Срок хранения: 7 суток.', hit: true },
+          { id: 'panir-spicy', name: 'Панир со специями', pricePerKg: 1650, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-spicy.webp', description: 'Вкус не острый и не перчёный. Очень нежный, ароматный. Срок хранения: 7 суток.' },
+          { id: 'panir-smoked', name: 'Панир копчёный', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-smoked.webp', description: 'Приятный аромат копчёности, вкус гармоничный. Срок хранения: 30 суток.' }
+        ]
+      },
+      'sandesh-group': {
+        displayName: 'Сандеш',
+        baseGroup: 'sweets',
+        priority: 3,
+        variants: [
+          { id: 'sandesh-orange', name: 'Сандеш апельсиновый', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp', description: 'Нежный творожный десерт. Состав: цельное молоко, тростниковый сахар, цедра апельсина. Срок хранения: 5 суток.' },
+          { id: 'sandesh-walnut', name: 'Сандеш с грецким орехом', pricePerUnit: 300, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-walnut.webp', description: 'Творожный десерт с грецким орехом. Срок хранения: 5 суток.' },
+          { id: 'sandesh-carob', name: 'Сандеш с кэробом', pricePerUnit: 300, img: 'https://static.tildacdn.com/tild6135-6337-4266-b764-613565386238/_.webp', description: 'Творожный десерт с шоколадным вкусом. Срок хранения: 5 суток.' }
+        ]
+      },
+      'tvorozhnaya-massa-group': {
+        displayName: 'Творожная масса',
+        baseGroup: 'dairy',
+        priority: 4,
+        variants: [
+          { id: 'tvorozhnaya-massa-izum', name: 'Творожная масса с изюмом', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с изюмом. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-finik', name: 'Творожная масса с финиками', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с финиками. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-chernosliv', name: 'Творожная масса с черносливом', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с черносливом. Срок хранения: 5 суток.' },
+          { id: 'tvorozhnaya-massa-kuraga', name: 'Творожная масса с курагой', pricePerKg: 850, img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', description: 'Творожная масса с курагой. Срок хранения: 5 суток.' }
+        ]
+      },
+      'kosichka-group': {
+        displayName: 'Сыр косичка',
+        baseGroup: 'cheese',
+        priority: 5,
+        variants: [
+          { id: 'kosichka', name: 'Сыр косичка', pricePerKg: 1900, img: DEFAULT_IMG, description: 'Слегка солёный, подходит ко всему. Срок хранения: 7 суток.', fixedWeight: 200 },
+          { id: 'kosichka-smoked', name: 'Сыр косичка копчёная', pricePerKg: 2000, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/kosichka-smoked.webp', description: 'Холодное копчение, лёгкая солёность. Срок хранения: 30 суток.', fixedWeight: 200 }
+        ]
+      },
+      'caciotta-group': {
+        displayName: 'Качотта',
+        baseGroup: 'cheese',
+        priority: 6,
+        variants: [
+          { id: 'caciotta', name: 'Качотта', pricePerKg: 2200, img: 'https://static.tildacdn.com/tild6165-3265-4834-a236-366661346562/caciotta.webp', description: 'Мягкий итальянский сыр. Срок хранения: 7 суток.' },
+          { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', pricePerKg: 2250, img: DEFAULT_IMG, description: 'С ореховым привкусом пажитника. Срок хранения: 7 суток.' }
+        ]
+      },
+      'hard-cheese-group': {
+        displayName: 'Твёрдые сыры',
+        baseGroup: 'cheese',
+        priority: 7,
+        variants: [
+          { id: 'hard-village', name: 'Твёрдый деревенский сыр', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/hard-village.webp', description: 'Твёрдый деревенский сыр готовится из творога с приправами, который обжаривается. Срок хранения: 7 суток.' },
+          { id: 'hard-smoked', name: 'Твёрдый копчёный сыр', pricePerKg: 1800, img: 'https://static.tildacdn.com/tild6662-3930-4663-b132-316135626136/hard-smoked.webp', description: 'Готовится из творога с приправами, обжаривается, затем коптится. Нежный копчёный вкус. Срок хранения: до 30 суток.' }
+        ]
+      },
+      'rolls-group': {
+        displayName: 'Сырные рулеты',
+        baseGroup: 'cheese',
+        priority: 8,
+        variants: [
+          { id: 'rolls-olives-walnut', name: 'Рулет с маслинами и грецким орехом', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-olives-walnut.webp', description: 'Можно подать как закуску к любому столу — домашнему или праздничному. Срок хранения: 7 суток.' },
+          { id: 'rolls-apricot-cedar', name: 'Рулет с курагой и кедровым орехом', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-apricot-cedar.webp', description: 'Слегка сладковатый благодаря творожному сыру, кураге и орехам. Срок хранения: 7 суток.' }
+        ]
+      },
+      'cookies-group': {
+        displayName: 'Печенье',
+        baseGroup: 'bakery',
+        priority: 9,
+        variants: [
+          { id: 'cookies-tvorog', name: 'Печенье творожное', pricePerKg: 600, img: 'https://raw.githubusercontent.com/youmyloving/foto/8e1c70a1f95f629fe6e91a9165fa200ad6c14d5e/tvorpech.webp', description: 'Мягкое домашнее печенье на твороге.' },
+          { id: 'cookies-oat', name: 'Печенье овсяное', pricePerKg: 600, img: DEFAULT_IMG, description: 'Овсяное печенье к чаю.' },
+          { id: 'cookies-nut', name: 'Ореховые пальчики', pricePerKg: 700, img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp', description: 'Печенье с орехами — хрустящие пальчики.' },
+          { id: 'cookies-carob', name: 'Печенье кэробовое', pricePerKg: 600, img: DEFAULT_IMG, description: 'Печенье с кэробом вместо какао.' },
+          { id: 'cookies-sandy', name: 'Печенье песочное', pricePerKg: 600, img: DEFAULT_IMG, description: 'Рассыпчатое песочное печенье.' }
+        ]
+      },
+      'muffin-group': {
+        displayName: 'Кексы',
+        baseGroup: 'bakery',
+        priority: 10,
+        variants: [
+          { id: 'muffin-plain', name: 'Кексы обычные', pricePerKg: 500, img: DEFAULT_IMG, description: 'Домашние кексы.' },
+          { id: 'muffin-carob', name: 'Кексы с кэробом', pricePerKg: 550, img: 'https://raw.githubusercontent.com/youmyloving/f); }
+
+    .cart-item-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-left: auto;
+      align-self: center;
+      text-align: right;
+    }
+
+    .cart-item-price .old {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      font-weight: 500;
+      display: block;
+    }
+
+    .cart-item-price .new {
+      display: block;
+    }
+
+    .cart-item-price .save {
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+      background: #e8f5e9;
+      padding: 2px 6px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .cart-summary {
+      padding: 20px;
+      background: var(--bg-warm);
+      border-radius: var(--radius-md);
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .cart-total-row.discount {
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .cart-total-label {
+      font-size: 16px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .cart-total-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      font-size: 15px;
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Profile Modal */
+    .profile-info {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--accent-gold);
+      margin: 0 auto 16px;
+      background: var(--bg-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .profile-phone {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+    ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 3px; }
+
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff9800;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      transform: translateY(-100%);
+      transition: transform 0.3s;
+    }
+
+    .offline-indicator.show {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div id="offline-indicator" class="offline-indicator">⚠️ Офлайн режим. Заказы сохранятся локально.</div>
+  <div id="toast" class="toast"></div>
+  
+  <div id="mini-cart-bar" class="mini-cart-bar">
+    <div class="mini-cart-info">
+      <span class="mini-cart-count">0 товаров</span>
+      <span class="mini-cart-total">0 ₽</span>
+    </div>
+    <button class="mini-cart-btn" onclick="openCartModal()">Оформить →</button>
+  </div>
+
+  <div id="app">
+    <header class="header" id="main-header">
+      <div class="header-top">
+        <div class="logo">Сыромания</div>
+        <div class="user-avatar" id="user-avatar" onclick="openProfileModal()">
+          <span>С</span>
+        </div>
+      </div>
+      
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="search-input" placeholder="Поиск по названию..." autocomplete="off" />
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+      </div>
+
+      <div class="categories" id="categories">
+        <button class="category-tab active" data-category="all">Все</button>
+        <button class="category-tab" data-category="cheese">Сыры</button>
+        <button class="category-tab" data-category="dairy">Молочка</button>
+        <button class="category-tab" data-category="sweets">Сладости</button>
+        <button class="category-tab" data-category="bakery">Выпечка</button>
+      </div>
+    </header>
+
+    <section class="hits-section">
+      <div class="section-header">
+        <h2 class="section-title">🔥 Хиты продаж</h2>
+      </div>
+      <div class="hits-scroll" id="hits-scroll"></div>
+    </section>
+
+    <section class="products-section" id="products-section"></section>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Название товара</h3>
+        <button class="modal-close" onclick="closeProductModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-image-container">
+          <img src="" alt="" class="modal-image" id="modal-image" />
+        </div>
+        <p class="modal-description" id="modal-description"></p>
+        <div class="variant-tabs" id="variant-tabs" style="display: none;"></div>
+        <div class="weight-section" id="weight-section">
+          <label class="section-label">Выберите вес</label>
+          <div class="weight-pills" id="weight-pills"></div>
+        </div>
+        <div class="qty-section">
+          <span class="qty-label">Количество:</span>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-value" id="qty-value">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <div class="price-display">
+          <span id="modal-price-old" class="price-old" style="display:none"></span>
+          <span id="modal-price">0 ₽</span>
+          <span class="price-diff" id="price-diff"></span>
+        </div>
+        
+        <!-- Discount Progress Bar -->
+        <div class="discount-progress-container" id="discount-progress" style="display: none;">
+          <div class="discount-progress-text">
+            <span id="discount-text">До скидки 5% осталось 200г</span>
+            <span id="discount-next">−5%</span>
+          </div>
+          <div class="discount-progress-bar">
+            <div class="discount-progress-fill" id="discount-fill" style="width: 0%"></div>
+          </div>
+          <div class="discount-marks" id="discount-marks">
+            <span class="discount-mark" style="left: 50%">500г</span>
+            <span class="discount-mark" style="left: 70%">700г</span>
+            <span class="discount-mark" style="left: 100%">1кг</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-fav" id="modal-fav-btn" onclick="toggleModalFavorite()">♡</button>
+          
+          <!-- Cow Button Container -->
+          <div class="button-container" id="cowButtonContainer" style="flex: 1;">
+            <svg class="cow-arm left" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M45 20 C45 10, 35 5, 25 10 C15 15, 10 30, 15 50 C20 70, 30 85, 35 95 C38 100, 45 100, 50 95 C55 90, 50 70, 48 50 C46 35, 45 25, 45 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+              <ellipse cx="25" cy="30" rx="5" ry="7" fill="#5c4a32" opacity="0.6"/>
+              <path d="M20 85 Q25 90, 30 85" stroke="#e6d5b0" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+            <svg class="cow-arm right" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 20 C15 10, 25 5, 35 10 C45 15, 50 30, 45 50 C40 70, 30 85, 25 95 C22 100, 15 100, 10 95 C5 90, 10 70, 12 50 C14 35, 15 25, 15 20Z" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+              <ellipse cx="35" cy="35" rx="4" ry="6" fill="#5c4a32" opacity="0.6"/>
+              <path d="M30 85 Q35 90, 40 85" stroke="#e6d5b0" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="cow-head-wrapper" id="cowHead">
+              <svg viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="25" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(-20 25 45)"/>
+                <ellipse cx="115" cy="45" rx="18" ry="22" fill="#f4e4c1" stroke="#5c4a32" stroke-width="2" transform="rotate(20 115 45)"/>
+                <ellipse cx="25" cy="45" rx="10" ry="14" fill="#e6d5b0" transform="rotate(-20 25 45)"/>
+                <ellipse cx="115" cy="45" rx="10" ry="14" fill="#e6d5b0" transform="rotate(20 115 45)"/>
+                <path d="M35 25 Q30 5, 40 0 Q45 10, 42 20" fill="#d4af37" stroke="#b8941d" stroke-width="1.5"/>
+                <path d="M105 25 Q110 5, 100 0 Q95 10, 98 20" fill="#d4af37" stroke="#b8941d" stroke-width="1.5"/>
+                <circle cx="40" cy="0" r="3" fill="#d4af37"/>
+                <circle cx="100" cy="0" r="3" fill="#d4af37"/>
+                <rect x="30" y="20" width="80" height="85" rx="35" fill="#fffdf9" stroke="#5c4a32" stroke-width="2"/>
+                <ellipse cx="50" cy="40" rx="8" ry="10" fill="#5c4a32" opacity="0.8"/>
+                <ellipse cx="95" cy="55" rx="6" ry="8" fill="#5c4a32" opacity="0.7"/>
+                <circle cx="45" cy="80" r="5" fill="#5c4a32" opacity="0.6"/>
+                <path d="M50 22 Q60 30, 70 22 Q80 30, 90 22" stroke="#f4e4c1" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <g class="eyes">
+                  <circle cx="55" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                  <circle cx="55" cy="60" r="6" fill="#5c4a32"/>
+                  <circle cx="57" cy="58" r="2.5" fill="white"/>
+                  <circle cx="85" cy="60" r="10" fill="white" stroke="#5c4a32" stroke-width="1.5"/>
+                  <circle cx="85" cy="60" r="6" fill="#5c4a32"/>
+                  <circle cx="87" cy="58" r="2.5" fill="white"/>
+                </g>
+                <path d="M48 55 Q45 52, 42 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
+                <path d="M92 55 Q95 52, 98 54" stroke="#5c4a32" stroke-width="1" stroke-linecap="round" fill="none"/>
+                <ellipse cx="70" cy="85" rx="22" ry="18" fill="#f9f0e0"/>
+                <ellipse cx="70" cy="85" rx="18" ry="14" fill="#ffe4e1" opacity="0.5"/>
+                <ellipse cx="64" cy="85" rx="3" ry="4" fill="#5c4a32" opacity="0.6"/>
+                <ellipse cx="76" cy="85" rx="3" ry="4" fill="#5c4a32" opacity="0.6"/>
+                <path d="M62 95 Q70 100, 78 95" stroke="#5c4a32" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <ellipse cx="45" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
+                <ellipse cx="95" cy="75" rx="6" ry="4" fill="#ffb6c1" opacity="0.4"/>
+              </svg>
+            </div>
+            <button class="cow-button" id="mainCowButton">
               <span class="button-text">В корзину</span>
             </button>
           </div>
@@ -2119,6 +2786,8 @@
     let currentCategory = 'all';
     let isOnline = navigator.onLine;
     let orderHistory = [];
+    let lastScrollY = 0;
+    let cowButtonTimer = null;
 
     // ==================== UTILS ====================
     const fmtRub = (n) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' ₽';
@@ -2137,6 +2806,7 @@
       setupTelegram();
       setupNetworkListeners();
       setupSearch();
+      setupScrollHeader();
       setupCowButton();
       showSkeletons();
       setTimeout(() => {
@@ -2151,22 +2821,75 @@
       if (productId) setTimeout(() => openProductModal(productId), 800);
     });
 
+    function setupScrollHeader() {
+      const header = el('main-header');
+      let ticking = false;
+      
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+              // Scrolling down
+              header.classList.add('hidden');
+            } else {
+              // Scrolling up
+              header.classList.remove('hidden');
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
+
     function setupSearch() {
       const searchInput = el('search-input');
       const searchClear = el('search-clear');
       
+      // Input handler
       searchInput.addEventListener('input', (e) => {
         const value = e.target.value;
         renderProductsByCategory(value);
         searchClear.classList.toggle('visible', value.length > 0);
       });
       
-      // Handle escape key
+      // Enter key - blur and close keyboard
       searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          searchInput.blur();
+          // Scroll to first product
+          const firstProduct = document.querySelector('.product-card');
+          if (firstProduct) {
+            firstProduct.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
         if (e.key === 'Escape') {
           clearSearch();
         }
       });
+      
+      // Blur when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+          searchInput.blur();
+        }
+      });
+      
+      // Blur on scroll (for mobile)
+      let scrollTimeout;
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          if (document.activeElement === searchInput) {
+            searchInput.blur();
+          }
+        }, 100);
+      }, { passive: true });
     }
 
     function clearSearch() {
@@ -2181,46 +2904,40 @@
       const container = el('cowButtonContainer');
       const button = el('mainCowButton');
       
-      // Touch events for mobile
-      button.addEventListener('touchstart', function(e) {
+      // Handle click with delay to show animation
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Add active class to show cow
+        container.classList.add('active');
+        
+        // Clear any existing timer
+        if (cowButtonTimer) clearTimeout(cowButtonTimer);
+        
+        // Wait for animation to be visible (600ms)
+        cowButtonTimer = setTimeout(() => {
+          addToCartWithAnimation();
+          container.classList.remove('active');
+        }, 600);
+      });
+      
+      // Touch events for mobile (keep pressed to see cow)
+      button.addEventListener('touchstart', (e) => {
         e.preventDefault();
         container.classList.add('active');
-        this.style.transform = 'translateY(6px) scale(0.98)';
+        button.style.transform = 'translateY(6px) scale(0.98)';
       }, {passive: false});
 
-      button.addEventListener('touchend', function(e) {
+      button.addEventListener('touchend', (e) => {
         e.preventDefault();
-        container.classList.remove('active');
-        this.style.transform = '';
-        setTimeout(() => {
-          addToCartWithAnimation();
-        }, 50);
-      });
-
-      // Mouse events follow CSS hover, but we ensure sparkles work
-      button.addEventListener('click', function(e) {
-        // Create ripple
-        const rect = button.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        button.style.transform = '';
         
-        const ripple = document.createElement('span');
-        ripple.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(212, 175, 55, 0) 70%);
-          transform: scale(0);
-          animation: ripple-animation 0.6s ease-out;
-          pointer-events: none;
-          left: ${x}px;
-          top: ${y}px;
-          width: 100px;
-          height: 100px;
-          margin-left: -50px;
-          margin-top: -50px;
-        `;
-        button.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
+        if (cowButtonTimer) clearTimeout(cowButtonTimer);
+        cowButtonTimer = setTimeout(() => {
+          addToCartWithAnimation();
+          container.classList.remove('active');
+        }, 600);
       });
     }
 
@@ -2318,7 +3035,6 @@
       }).join('');
     }
 
-    // ИЗМЕНЕНО: Убраны чипы вариантов из карточек в сетке
     function renderProductsByCategory(searchTerm = '') {
       const container = el('products-section');
       container.innerHTML = '';
@@ -2350,7 +3066,6 @@
         const section = document.createElement('div');
         section.className = 'products-category';
         
-        // УБРАНЫ ЧИПЫ ВАРИАНТОВ ИЗ КАРТОЧЕК
         section.innerHTML = `
           <h3 class="category-title">${cat.icon} ${cat.title}</h3>
           <div class="product-grid">
@@ -2536,34 +3251,68 @@
     }
 
     function changeQty(delta) {
+      const oldQty = currentQty;
       currentQty = Math.max(1, currentQty + delta);
-      el('qty-value').textContent = currentQty;
+      const qtyEl = el('qty-value');
+      qtyEl.textContent = currentQty;
+      
+      // Animation
+      if (oldQty !== currentQty) {
+        qtyEl.classList.remove('changed');
+        void qtyEl.offsetWidth; // Trigger reflow
+        qtyEl.classList.add('changed');
+        setTimeout(() => qtyEl.classList.remove('changed'), 300);
+      }
+      
       updateModalPrice();
     }
 
+    // ИСПРАВЛЕНО: Логика скидки теперь корректна - проверяем общий вес
     function updateModalPrice() {
       if (!currentVariant) return;
       let basePrice = 0, priceText = '', diffText = '', oldPriceText = '';
       
-      let totalWeightForDiscount = 0;
+      // Reset discount UI
+      const progressContainer = el('discount-progress');
+      
       if (currentVariant.group === 'cheese' && currentVariant.pricePerKg) {
-        const existingQty = cart
+        // Считаем текущий вес этого товара в корзине
+        const existingWeight = cart
           .filter(item => item.id === currentVariant.id)
           .reduce((sum, item) => sum + (item.weight || 0) * item.qty, 0);
-        const simulatedTotalWeight = existingQty + (selectedWeight || 0) * currentQty;
         
+        // Общий вес с учетом текущего выбора
+        const currentSelectionWeight = (selectedWeight || 0) * currentQty;
+        const simulatedTotalWeight = existingWeight + currentSelectionWeight;
+        
+        // Определяем скидку ТОЛЬКО если общий вес >= 500г
         let discountRate = 0;
         let discountLabel = '';
+        let nextThreshold = null;
+        let prevThreshold = { g: 0, rate: 0 };
+        
         for (const threshold of DISCOUNT_THRESHOLDS) {
           if (simulatedTotalWeight >= threshold.g) {
             discountRate = threshold.rate;
             discountLabel = threshold.label;
+            prevThreshold = threshold;
+          } else if (!nextThreshold) {
+            nextThreshold = threshold;
+            break;
           }
+        }
+        
+        // Показываем прогресс-бар только для весовых товаров
+        if (progressContainer) {
+          progressContainer.style.display = 'block';
+          updateDiscountProgress(simulatedTotalWeight, prevThreshold, nextThreshold);
         }
         
         if (selectedWeight) {
           basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
-          if (discountRate > 0) {
+          
+          // Применяем скидку только если достигли порога
+          if (discountRate > 0 && simulatedTotalWeight >= 500) {
             const discounted = basePrice * (1 - discountRate);
             oldPriceText = fmtRub(basePrice);
             priceText = fmtRub(discounted);
@@ -2573,6 +3322,8 @@
           }
         }
       } else {
+        if (progressContainer) progressContainer.style.display = 'none';
+        
         if (currentVariant.pricePerKg && selectedWeight) {
           basePrice = (selectedWeight / 1000) * currentVariant.pricePerKg * currentQty;
           priceText = fmtRub(basePrice);
@@ -2586,7 +3337,7 @@
       }
 
       const oldPriceEl = el('modal-price-old');
-      if (oldPriceText) {
+      if (oldPriceText && discountRate > 0) {
         oldPriceEl.style.display = 'inline';
         oldPriceEl.textContent = oldPriceText;
       } else {
@@ -2595,6 +3346,43 @@
       
       el('modal-price').textContent = priceText;
       el('price-diff').textContent = diffText;
+    }
+
+    function updateDiscountProgress(currentWeight, prevThreshold, nextThreshold) {
+      const fill = el('discount-fill');
+      const text = el('discount-text');
+      const nextLabel = el('discount-next');
+      const marks = document.querySelectorAll('.discount-mark');
+      
+      // Reset marks
+      marks.forEach(mark => mark.classList.remove('active'));
+      
+      if (!nextThreshold) {
+        // Достигли максимальной скидки
+        fill.style.width = '100%';
+        text.textContent = 'Максимальная скидка 15% достигнута!';
+        nextLabel.textContent = '−15%';
+        marks[2].classList.add('active');
+      } else {
+        const range = nextThreshold.g - prevThreshold.g;
+        const progress = currentWeight - prevThreshold.g;
+        const percent = Math.min(100, Math.max(0, (progress / range) * 100));
+        
+        fill.style.width = percent + '%';
+        
+        const remaining = nextThreshold.g - currentWeight;
+        if (remaining > 0) {
+          text.textContent = `До скидки ${nextThreshold.label} осталось ${remaining}г`;
+        } else {
+          text.textContent = `Скидка ${nextThreshold.label} активна!`;
+        }
+        nextLabel.textContent = nextThreshold.label;
+        
+        // Активируем метки
+        if (currentWeight >= 500) marks[0].classList.add('active');
+        if (currentWeight >= 700) marks[1].classList.add('active');
+        if (currentWeight >= 1000) marks[2].classList.add('active');
+      }
     }
 
     function toggleFavorite(id) {
@@ -2619,9 +3407,11 @@
     function closeProductModal() {
       el('product-modal').classList.remove('active');
       document.body.style.overflow = '';
+      // Clear cow button timer if modal closed before animation
+      if (cowButtonTimer) clearTimeout(cowButtonTimer);
+      el('cowButtonContainer').classList.remove('active');
     }
 
-    // ИСПРАВЛЕНО: Добавлена анимация искр при добавлении в корзину
     function addToCartWithAnimation() {
       if (!currentVariant) return;
       
@@ -2742,6 +3532,45 @@
       }, 0);
     }
 
+    // Swipe to delete functionality
+    function setupSwipeToDelete(element, onDelete) {
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      
+      element.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        element.style.transition = 'none';
+      }, {passive: true});
+      
+      element.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+        const diff = currentX - startX;
+        
+        if (diff < 0 && diff > -80) {
+          element.style.transform = `translateX(${diff}px)`;
+        } else if (diff <= -80) {
+          element.style.transform = `translateX(-80px)`;
+        }
+      }, {passive: true});
+      
+      element.addEventListener('touchend', () => {
+        isDragging = false;
+        element.style.transition = 'transform 0.3s ease';
+        
+        const diff = currentX - startX;
+        if (diff < -40) {
+          element.classList.add('swiped');
+          element.style.transform = '';
+        } else {
+          element.classList.remove('swiped');
+          element.style.transform = '';
+        }
+      });
+    }
+
     function openCartModal() {
       const body = el('cart-body');
       
@@ -2789,9 +3618,17 @@
                 <span class="new">${fmtRub(finalPrice)}</span>
                 ${hasDiscount ? `<span class="save">Скидка ${label}</span>` : ''}
               </div>
+              <div class="cart-item-delete" onclick="deleteCartItem(${idx})">🗑</div>
             </div>
           `;
         }).join('');
+
+        // Setup swipe for each item
+        setTimeout(() => {
+          document.querySelectorAll('.cart-item').forEach((item, idx) => {
+            setupSwipeToDelete(item, () => deleteCartItem(idx));
+          });
+        }, 100);
 
         const subtotal = calculateCartSubtotal();
         const total = calculateCartTotal();
@@ -2843,6 +3680,20 @@
       document.body.style.overflow = 'hidden';
     }
 
+    function deleteCartItem(idx) {
+      const item = document.querySelector(`.cart-item[data-idx="${idx}"]`);
+      if (item) {
+        item.classList.add('removing');
+        setTimeout(() => {
+          cart.splice(idx, 1);
+          saveState();
+          updateBadges();
+          renderMiniCart();
+          openCartModal();
+        }, 300);
+      }
+    }
+
     function closeCartModal() {
       el('cart-modal').classList.remove('active');
       document.body.style.overflow = '';
@@ -2852,23 +3703,7 @@
       if (!cart[idx]) return;
       cart[idx].qty += delta;
       if (cart[idx].qty <= 0) {
-        const item = document.querySelector(`.cart-item[data-idx="${idx}"]`);
-        if (item) {
-          item.classList.add('removing');
-          setTimeout(() => {
-            cart.splice(idx, 1);
-            saveState();
-            updateBadges();
-            renderMiniCart();
-            openCartModal();
-          }, 300);
-        } else {
-          cart.splice(idx, 1);
-          saveState();
-          updateBadges();
-          renderMiniCart();
-          openCartModal();
-        }
+        deleteCartItem(idx);
       } else {
         saveState();
         updateBadges();
