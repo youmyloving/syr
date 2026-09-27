@@ -7,617 +7,137 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root {
-      --brand-from:#82571c;
-      --brand-to:#bd9952;
-      --brand-gradient:linear-gradient(135deg,#82571c,#bd9952);
-
-      --bg-color:#F7F0E3;
-      --card-bg:#FFFFFF;
-      --secondary-bg:#FFF7E6;
-      --header-bg:rgba(255,248,236,0.96);
-      --text-color:#251F14;
-      --hint-color:#8A7F6A;
-      --border-color:#E2D4BD;
-      --danger:#E74C3C;
-      --success:#2E8B57;
-
-      --radius-lg:14px;
-      --radius-md:10px;
-      --shadow-soft:0 8px 24px rgba(0,0,0,0.06);
-
-      --font-main:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    }
-
-    * {
-      box-sizing:border-box;
-    }
-
-    body {
-      margin:0;
-      font-family:var(--font-main);
-      background:var(--bg-color);
-      color:var(--text-color);
-      -webkit-font-smoothing:antialiased;
-    }
-
-    #app {
-      max-width:900px;
-      margin:0 auto;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-    }
-
-    header {
-      position:sticky;
-      top:0;
-      z-index:50;
-      padding:10px 12px 8px;
-      background:var(--header-bg);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid var(--border-color);
-    }
-
-    .top-row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:8px;
-    }
-
-    #user-profile {
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .user-avatar {
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      background:var(--secondary-bg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      font-weight:600;
-      font-size:15px;
-    }
-
-    .user-avatar img {
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
-    .user-name {
-      font-size:14px;
-      font-weight:600;
-    }
-
-    .header-title {
-      font-weight:700;
-      font-size:18px;
-      text-align:right;
-      background:var(--brand-gradient);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-
-    .search-row {
-      display:flex;
-      gap:8px;
-      margin-bottom:8px;
-    }
-
-    .search-row input {
-      flex:1;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid var(--border-color);
-      font-size:14px;
-      background:#FFFDF8;
-    }
-
-    .filters-row {
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      align-items:center;
-      margin-bottom:6px;
-    }
-
-    .filters-row select {
-      flex:1;
-      min-width:120px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--border-color);
-      font-size:13px;
-      background:#FFFDF8;
-    }
-
-    .chip {
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      padding:4px 9px;
-      border-radius:999px;
-      border:1px solid var(--border-color);
-      background:rgba(255,255,255,0.9);
-      font-size:11px;
-      white-space:nowrap;
-    }
-
-    .chip input {
-      margin:0;
-    }
-
-    #favorites-bar {
-      display:none;
-      margin-top:4px;
-      gap:6px;
-      flex-wrap:nowrap;
-      overflow-x:auto;
-      padding-bottom:3px;
-    }
-
-    .fav-chip {
-      border-radius:999px;
-      border:none;
-      padding:4px 10px;
-      font-size:11px;
-      background:var(--secondary-bg);
-      white-space:nowrap;
-    }
-
-    main {
-      flex:1;
-      padding:10px 10px 90px;
-    }
-
-    .section {
-      margin-bottom:18px;
-    }
-
-    .section-title {
-      display:flex;
-      align-items:center;
-      margin:4px 4px 8px;
-    }
-
-    .section-title.small {
-      margin-top:10px;
-    }
-
-    .section-title::before {
-      content:'';
-      width:4px;
-      height:18px;
-      border-radius:999px;
-      background:var(--brand-gradient);
-      margin-right:6px;
-    }
-
-    .section-pill {
-      display:inline-flex;
-      align-items:center;
-      padding:4px 10px;
-      border-radius:999px;
-      background:#FFF3DF;
-      font-size:12px;
-      font-weight:600;
-      letter-spacing:0.02em;
-      text-transform:uppercase;
-    }
-
-    .product-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-      gap:10px;
-    }
-
-    .product-card {
-      background:var(--card-bg);
-      border-radius:var(--radius-lg);
-      padding:10px;
-      box-shadow:var(--shadow-soft);
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      cursor:pointer;
-      position:relative;
-    }
-
-    .product-thumb {
-      width:100%;
-      height:110px;
-      border-radius:var(--radius-md);
-      overflow:hidden;
-      background:#F2E8D7;
-      margin-bottom:4px;
-    }
-
-    .product-thumb img {
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
-    .product-card .name {
-      font-size:14px;
-      font-weight:600;
-      margin-bottom:2px;
-    }
-
-    .product-row {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      margin-top:2px;
-    }
-
-    .price {
-      font-size:13px;
-      font-weight:600;
-    }
-
-    .badge-piece {
-      font-size:10px;
-      padding:2px 6px;
-      border-radius:999px;
-      background:#FFF3DF;
-      color:#6A5020;
-      margin-left:auto;
-    }
-
-    .fav-btn {
-      border:none;
-      background:transparent;
-      font-size:16px;
-      padding:0 2px;
-      cursor:pointer;
-    }
-
-    .fav-btn.active {
-      color:#e53935;
-    }
-
-    .empty {
-      text-align:center;
-      margin-top:40px;
-      color:var(--hint-color);
-    }
-
-    .cart-footer {
-      position:fixed;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:10px;
-      z-index:40;
-      width:100%;
-      max-width:900px;
-      padding:0 10px;
-      pointer-events:none;
-    }
-
-    .cart-footer-inner {
-      background:#FFF7E6;
-      border-radius:999px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.12);
-      padding:6px;
-      pointer-events:auto;
-    }
-
-    #open-cart-btn {
-      width:100%;
-      border:none;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:14px;
-      font-weight:600;
-      color:#fff;
-      background-image:var(--brand-gradient);
-      cursor:pointer;
-    }
-
-    #open-cart-btn:disabled {
-      opacity:0.5;
-      cursor:default;
-    }
-
-    .btn {
-      border-radius:999px;
-      border:none;
-      padding:10px 16px;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-    }
-
-    .btn-primary {
-      width:100%;
-      color:#fff;
-      background-image:var(--brand-gradient);
-      box-shadow:0 8px 20px rgba(130,87,28,0.35);
-    }
-
-    .btn-primary:disabled {
-      opacity:0.65;
-      box-shadow:none;
-      cursor:default;
-    }
-
-    dialog {
-      border:none;
-      padding:0;
-      border-radius:18px;
-      max-width:480px;
-      width:92%;
-      box-shadow:0 18px 40px rgba(0,0,0,0.35);
-      animation:pop-in .18s ease-out;
-      position:relative;
-      z-index:1000;
-    }
-
-    dialog::backdrop {
-      background:rgba(0,0,0,0.45);
-      backdrop-filter:blur(4px);
-      z-index:999;
-    }
-
-    .modal-header {
-      padding:10px 14px;
-      border-bottom:1px solid var(--border-color);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      background:#FFFDF8;
-    }
-
-    .modal-header h2 {
-      margin:0;
-      font-size:15px;
-    }
-
-    .modal-close {
-      border:none;
-      background:transparent;
-      font-size:20px;
-      line-height:1;
-      cursor:pointer;
-      padding:2px 4px;
-    }
-
-    .modal-body {
-      padding:12px 14px 14px;
-      max-height:70vh;
-      overflow-y:auto;
-      background:#FFFBF3;
-    }
-
-    .product-desc {
-      font-size:13px;
-      color:var(--hint-color);
-      margin-bottom:10px;
-    }
-
-    .form-group {
-      margin-bottom:10px;
-    }
-
-    .form-group label {
-      display:block;
-      font-size:12px;
-      font-weight:600;
-      margin-bottom:4px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width:100%;
-      border-radius:10px;
-      border:1px solid var(--border-color);
-      padding:8px 10px;
-      font-size:14px;
-      background:#FFFDF8;
-      resize:none;
-    }
-
-    .form-group textarea {
-      font-size:13px;
-    }
-
-    .notice {
-      font-size:11px;
-      color:var(--hint-color);
-      margin-top:4px;
-    }
-
-    .notice.small {
-      font-size:10px;
-    }
-
-    .price-display {
-      font-size:18px;
-      font-weight:700;
-      margin:6px 0 10px;
-    }
-
-    .custom-weight-block {
-      margin-top:4px;
-    }
-
-    .custom-weight-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .custom-weight-toggle {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-size:11px;
-      color:var(--hint-color);
-      cursor:pointer;
-    }
-
-    .custom-weight-toggle input {
-      margin:0;
-    }
-
-    .custom-weight-input-wrap {
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px dashed var(--border-color);
-      background:#F5ECDA;
-      margin-top:6px;
-      opacity:0.7;
-    }
-
-    .custom-weight-input-wrap.enabled {
-      border-style:solid;
-      background:#FFFDF8;
-      opacity:1;
-    }
-
-    .custom-weight-input-wrap input {
-      border:none;
-      background:transparent;
-      padding:0;
-      font-size:16px;
-      flex:1;
-      min-width:0;
-    }
-
-    .custom-weight-input-wrap input:disabled {
-      color:var(--hint-color);
-    }
-
-    .custom-weight-unit {
-      font-size:13px;
-      color:var(--hint-color);
-    }
-
-    .piece-badge {
-      font-size:11px;
-      color:var(--hint-color);
-      margin-top:3px;
-    }
-
-    .cart-item {
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:8px 0;
-      border-bottom:1px solid rgba(0,0,0,0.04);
-    }
-
-    .cart-item-name {
-      font-size:13px;
-      font-weight:600;
-    }
-
-    .cart-item-variant {
-      font-size:12px;
-      color:var(--hint-color);
-      margin-top:2px;
-    }
-
-    .cart-item-price {
-      font-size:13px;
-      font-weight:600;
-      margin-top:2px;
-    }
-
-    .cart-item-controls {
-      display:flex;
-      align-items:center;
-    }
-
-    .qty-control {
-      display:inline-flex;
-      align-items:center;
-      border-radius:999px;
-      border:1px solid var(--border-color);
-      overflow:hidden;
-      background:#FFFDF8;
-    }
-
-    .qty-control button {
-      border:none;
-      background:transparent;
-      padding:4px 8px;
-      font-size:16px;
-      cursor:pointer;
-    }
-
-    .qty-control span {
-      min-width:24px;
-      text-align:center;
-      font-size:13px;
-    }
-
-    .cart-summary {
-      margin-top:10px;
-      padding-top:8px;
-      border-top:1px dashed var(--border-color);
-      font-size:14px;
-      font-weight:600;
-    }
-
-    .promo-block {
-      margin-top:8px;
-      font-weight:400;
-    }
-
-    .promo-block input {
-      margin-top:4px;
-    }
-
-    .discount-hint {
-      font-size:11px;
-      color:var(--success);
-      margin-top:2px;
-    }
-
-    .weighing-note {
-      margin-top:8px;
-      font-size:11px;
-      color:var(--hint-color);
-    }
-
-    .error-text {
-      font-size:12px;
-      color:var(--danger);
-      margin-top:4px;
-    }
-
-    @keyframes pop-in {
-      from { transform:translateY(10px) scale(0.98); opacity:0; }
-      to   { transform:translateY(0) scale(1); opacity:1; }
-    }
-
-    @media (max-width:480px) {
-      .product-thumb { height:100px; }
-      .modal-body { padding:10px 12px 12px; }
-      .price-display { font-size:17px; }
-      header { padding-left:8px; padding-right:8px; }
-      main { padding-left:6px; padding-right:6px; }
-    }
-  </style>
+:root{
+  --brand:#8a5b20;--brand-2:#c59b55;--brand-soft:#f6ead5;
+  --bg:#f7f2ea;--surface:#fffdf9;--surface-2:#fbf7f0;
+  --text:#241c12;--muted:#8b7d69;--border:rgba(61,43,24,.11);
+  --shadow:0 8px 28px rgba(49,32,12,.08);--shadow-hover:0 14px 34px rgba(49,32,12,.13);
+  --radius:18px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#app{max-width:980px;margin:0 auto;min-height:100vh;min-height:100dvh}
+header{
+ position:sticky;top:0;z-index:50;padding:10px 14px 9px;
+ background:rgba(247,242,234,.88);backdrop-filter:saturate(180%) blur(18px);
+ -webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--border)
+}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+#user-profile{display:flex;align-items:center;gap:9px;min-width:0}
+.user-avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;overflow:hidden;font-weight:800;color:var(--brand)}
+.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.user-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-title{font-size:21px;font-weight:900;letter-spacing:-.035em;background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.search-row{display:flex;gap:8px;margin-bottom:8px}
+.search-row input{
+ flex:1;height:44px;padding:0 15px;border:1px solid var(--border);border-radius:14px;
+ background:var(--surface);color:var(--text);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.025)
+}
+.filters-row{display:flex;gap:7px;align-items:center;margin-bottom:4px;overflow-x:auto;scrollbar-width:none}
+.filters-row::-webkit-scrollbar{display:none}
+.filters-row select,.chip{
+ flex:0 0 auto;height:36px;border:1px solid var(--border);border-radius:12px;
+ background:var(--surface);color:var(--text);font-size:12px;font-weight:650
+}
+.filters-row select{min-width:140px;padding:0 11px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:0 11px;white-space:nowrap}
+.chip input{margin:0;accent-color:var(--brand)}
+#favorites-bar{display:none;gap:7px;overflow-x:auto;scrollbar-width:none;padding:5px 0 1px}
+#favorites-bar::-webkit-scrollbar{display:none}
+.fav-chip{border:0;border-radius:999px;background:var(--brand-soft);color:var(--brand);padding:7px 11px;font-size:11px;font-weight:750;white-space:nowrap}
+main{padding:14px 12px calc(94px + env(safe-area-inset-bottom))}
+.section{margin-bottom:24px}
+.section-title{display:flex;align-items:center;margin:3px 3px 10px}
+.section-title::before{content:"";width:5px;height:23px;border-radius:99px;background:linear-gradient(180deg,var(--brand),var(--brand-2));margin-right:8px}
+.section-pill{padding:0;background:transparent;font-size:17px;font-weight:900;letter-spacing:-.025em;text-transform:none}
+.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.product-card{
+ background:var(--surface);border:1px solid rgba(61,43,24,.055);border-radius:17px;padding:8px;
+ box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;cursor:pointer;position:relative;
+ transition:transform .16s ease,box-shadow .16s ease
+}
+.product-card:active{transform:scale(.985)}
+.product-card:hover{box-shadow:var(--shadow-hover)}
+.product-thumb{width:100%;aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#efe4d3;margin-bottom:5px}
+.product-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.product-card .name{font-size:14px;line-height:1.22;font-weight:800;letter-spacing:-.01em;min-height:34px}
+.product-row{display:flex;align-items:center;gap:5px;margin-top:3px;min-width:0}
+.price{font-size:13px;font-weight:900;white-space:nowrap}
+.badge-piece{font-size:9px;padding:4px 6px;border-radius:8px;background:var(--brand-soft);color:var(--brand);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fav-btn{width:31px;height:31px;margin-left:auto;border:0;background:transparent;border-radius:10px;font-size:20px;padding:0;cursor:pointer}
+.fav-btn.active{color:#df3d49;background:#fff0f1}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.cart-footer{
+ position:fixed;left:50%;transform:translateX(-50%);bottom:8px;z-index:40;width:100%;max-width:980px;
+ padding:0 12px calc(env(safe-area-inset-bottom));pointer-events:none
+}
+.cart-footer-inner{background:rgba(255,253,249,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:18px;padding:5px;box-shadow:0 14px 40px rgba(35,22,8,.16);pointer-events:auto}
+#open-cart-btn{width:100%;height:48px;border:0;border-radius:14px;padding:0 15px;font-size:14px;font-weight:850;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));cursor:pointer}
+#open-cart-btn:disabled{opacity:.48}
+.btn{min-height:46px;border:0;border-radius:14px;padding:0 16px;font-size:14px;font-weight:850;cursor:pointer}
+.btn-primary{width:100%;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 8px 22px rgba(138,91,32,.24)}
+.btn-primary:disabled{opacity:.6;box-shadow:none}
+dialog{
+ border:0;padding:0;border-radius:22px;max-width:520px;width:min(92%,520px);
+ box-shadow:0 22px 65px rgba(0,0,0,.28);overflow:hidden;animation:sheet .18s ease-out
+}
+dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
+.modal-header{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface)}
+.modal-header h2{margin:0;font-size:17px;font-weight:900;letter-spacing:-.02em}
+.modal-close{width:34px;height:34px;border:0;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:22px;line-height:1;cursor:pointer}
+.modal-body{padding:14px 15px calc(16px + env(safe-area-inset-bottom));max-height:76vh;max-height:76dvh;overflow-y:auto;background:var(--surface-2)}
+.product-desc{font-size:13px;line-height:1.48;color:var(--muted);margin-bottom:13px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{
+ width:100%;min-height:45px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;
+ background:var(--surface);color:var(--text);font-size:14px
+}
+.form-group textarea{resize:vertical;min-height:72px}
+.notice{font-size:11px;line-height:1.4;color:var(--muted);margin-top:4px}
+.notice.small{font-size:10px}
+.price-display{font-size:23px;font-weight:950;letter-spacing:-.035em;margin:7px 0 12px}
+.custom-weight-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.custom-weight-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer}
+.custom-weight-toggle input{margin:0}
+.custom-weight-input-wrap{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:12px;border:1px dashed var(--border);background:#f4ead9;margin-top:6px;opacity:.72}
+.custom-weight-input-wrap.enabled{border-style:solid;background:var(--surface);opacity:1}
+.custom-weight-input-wrap input{border:0;background:transparent;padding:0;min-height:35px;font-size:17px;flex:1;min-width:0}
+.custom-weight-unit{font-size:13px;color:var(--muted)}
+.piece-badge{font-size:11px;color:var(--muted);margin-top:3px}
+.cart-item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(61,43,24,.07)}
+.cart-item-name{font-size:13px;font-weight:800}
+.cart-item-variant{font-size:11px;line-height:1.35;color:var(--muted);margin-top:2px}
+.cart-item-price{font-size:13px;font-weight:850;margin-top:4px}
+.qty-control{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
+.qty-control button{width:36px;height:36px;border:0;background:transparent;font-size:19px;cursor:pointer}
+.qty-control span{min-width:25px;text-align:center;font-size:13px;font-weight:800}
+.cart-summary{margin-top:11px;padding-top:9px;border-top:1px dashed var(--border);font-size:15px;font-weight:900}
+.promo-block{margin-top:9px;font-weight:400}
+.promo-block input{margin-top:5px}
+.discount-hint{font-size:11px;color:#2e8b57;margin-top:2px}
+.weighing-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:var(--brand-soft);font-size:11px;line-height:1.4;color:var(--muted)}
+.error-text{font-size:12px;color:#d63d3d;margin-top:5px}
+@keyframes sheet{from{transform:translateY(12px);opacity:.7}to{transform:translateY(0);opacity:1}}
+@media(min-width:700px){
+ main{padding-left:20px;padding-right:20px}
+ .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+ .product-thumb{aspect-ratio:1/1}
+}
+@media(max-width:420px){
+ header{padding-left:9px;padding-right:9px}
+ main{padding-left:7px;padding-right:7px}
+ .product-grid{gap:8px}
+ .product-card{padding:7px}
+ .product-card .name{font-size:13px}
+ .price{font-size:12px}
+ .header-title{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
   <div id="app">
@@ -775,7 +295,7 @@
           pricePerKg:2100,
           ico:'🧀',
           description:'Мешочек из моцареллы с начинкой из страчателлы. Срок хранения: 3–5 суток.',
-          img:DEFAULT_IMG,
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/mozzarella.webp',
           pieceWeightGrams:250
         },
         {
@@ -876,7 +396,7 @@
           pricePerKg:1900,
           ico:'🥨',
           description:'Слегка солёный, подходит ко всему. Срок хранения: 7 суток.',
-          img:DEFAULT_IMG,
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/imeretian.webp',
           pieceWeightGrams:200
         },
         {
@@ -935,7 +455,7 @@
           pricePerKg:2250,
           ico:'🌿',
           description:'С ореховым привкусом пажитника. Срок хранения: 7 суток.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp'
         },
 
         {
@@ -1023,7 +543,7 @@
           pricePerL:150,
           ico:'🥛',
           description:'Молоко отборное цельное, охлаждённое. Как из детства! Срок хранения: 3–5 суток в холодильнике.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/kosichka-smoked.webp'
         },
         {
           id:'milk-topped',
@@ -1041,7 +561,7 @@
           pricePerL:260,
           ico:'🥛',
           description:'Самый настоящий йогурт, приготовленный исключительно из отборного молока и натуральной закваски. Нежный, освежающий вкус с лёгкой кислинкой. Срок хранения: 5 суток в холодильнике.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp'
         },
         {
           id:'ryazhenka',
@@ -1050,7 +570,7 @@
           pricePerL:280,
           ico:'🥛',
           description:'Натуральная ряженка из молока. Один из любимых напитков всех детей! Срок хранения: до 5 суток в холодильнике.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/panir-herbs.webp'
         },
         {
           id:'misti-dahi',
@@ -1059,7 +579,7 @@
           pricePerL:300,
           ico:'🥛',
           description:'Кисломолочный напиток. Срок хранения: 5 суток.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/panir-spicy.webp'
         },
         {
           id:'whey',
@@ -1068,7 +588,7 @@
           pricePerL:60,
           ico:'💧',
           description:'Молочный низкокалорийный продукт, получаемый в процессе изготовления творога или сыра. Срок хранения: 3 суток в холодильнике.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/panir-smoked.webp'
         },
         {
           id:'cream',
@@ -1105,7 +625,7 @@
           pricePerKg:2900,
           ico:'🧈',
           description:'Состав: сливочное масло. Жирность ~99%. ГХИ — самое драгоценное, что можно взять из молока. Идеально для жарки. Срок хранения: больше 10 лет.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/hard-village.webp'
         },
         {
           id:'condensed-milk',
@@ -1114,7 +634,7 @@
           pricePerKg:1000,
           ico:'🥛',
           description:'Состав: цельное молоко, тростниковый сахар. Натуральная варёная сгущёнка, густая и карамельная. Осторожно — дети очень любят! Срок хранения: 7 суток в холодильнике.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-olives-walnut.webp'
         },
         {
           id:'tvorozhnaya-massa',
@@ -1220,7 +740,7 @@
           pricePerKg:600,
           ico:'🍪',
           description:'Мягкое домашнее печенье на твороге.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-apricot-cedar.webp'
         },
         {
           id:'cookies-oat',
@@ -1229,7 +749,7 @@
           pricePerKg:600,
           ico:'🍪',
           description:'Овсяное печенье к чаю.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/butter.webp'
         },
         {
           id:'cookies-nut',
@@ -1247,7 +767,7 @@
           pricePerKg:600,
           ico:'🍪',
           description:'Печенье с кэробом вместо какао.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp'
         },
         {
           id:'cookies-sandy',
@@ -1256,7 +776,7 @@
           pricePerKg:600,
           ico:'🍪',
           description:'Рассыпчатое песочное печенье.',
-          img:DEFAULT_IMG
+          img:'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-walnut.webp'
         },
 
         {
