@@ -8,134 +8,196 @@
 
   <style>
 :root{
-  --brand:#8a5b20;--brand-2:#c59b55;--brand-soft:#f6ead5;
-  --bg:#f7f2ea;--surface:#fffdf9;--surface-2:#fbf7f0;
-  --text:#241c12;--muted:#8b7d69;--border:rgba(61,43,24,.11);
-  --shadow:0 8px 28px rgba(49,32,12,.08);--shadow-hover:0 14px 34px rgba(49,32,12,.13);
-  --radius:18px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
+  --bg:#f6f3ee;--surface:#fffefa;--surface-soft:#f1ede5;
+  --ink:#211d18;--muted:#81786d;--line:rgba(48,38,26,.10);
+  --accent:#7b4f25;--accent-2:#a8743c;--accent-soft:#efe2d0;
+  --success:#367b59;--danger:#c94b4b;
+  --shadow:0 10px 32px rgba(46,31,15,.075);
+  --shadow-lg:0 22px 70px rgba(38,26,14,.18);
+  --r:20px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+html{background:var(--bg);color:var(--ink)}
+body{margin:0;background:var(--bg);font-family:var(--font);-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-#app{max-width:980px;margin:0 auto;min-height:100vh;min-height:100dvh}
+button{touch-action:manipulation}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#app{width:100%;max-width:1120px;margin:auto;min-height:100vh;min-height:100dvh}
 header{
- position:sticky;top:0;z-index:50;padding:10px 14px 9px;
- background:rgba(247,242,234,.88);backdrop-filter:saturate(180%) blur(18px);
- -webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--border)
+  position:sticky;top:0;z-index:50;
+  padding:12px max(14px,env(safe-area-inset-left)) 10px max(14px,env(safe-area-inset-right));
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);
+  border-bottom:1px solid var(--line)
 }
-.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
 #user-profile{display:flex;align-items:center;gap:9px;min-width:0}
-.user-avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;overflow:hidden;font-weight:800;color:var(--brand)}
-.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.user-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--accent-soft);color:var(--accent);font-weight:900;flex:none}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
 .user-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.header-title{font-size:21px;font-weight:900;letter-spacing:-.035em;background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.search-row{display:flex;gap:8px;margin-bottom:8px}
+.header-title{font-size:23px;font-weight:950;letter-spacing:-.055em;color:var(--ink)}
+.search-row{position:relative;margin-bottom:9px}
+.search-row:before{content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-52%);font-size:21px;color:var(--muted);pointer-events:none}
 .search-row input{
- flex:1;height:44px;padding:0 15px;border:1px solid var(--border);border-radius:14px;
- background:var(--surface);color:var(--text);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.025)
+  width:100%;height:46px;border:1px solid var(--line);border-radius:15px;
+  background:var(--surface);color:var(--ink);padding:0 16px 0 40px;
+  box-shadow:0 3px 14px rgba(42,31,19,.035);font-size:15px
 }
-.filters-row{display:flex;gap:7px;align-items:center;margin-bottom:4px;overflow-x:auto;scrollbar-width:none}
+.search-row input::placeholder{color:#a69d92}
+.filters-row{display:flex;align-items:center;gap:7px;overflow:auto;scrollbar-width:none}
 .filters-row::-webkit-scrollbar{display:none}
 .filters-row select,.chip{
- flex:0 0 auto;height:36px;border:1px solid var(--border);border-radius:12px;
- background:var(--surface);color:var(--text);font-size:12px;font-weight:650
+  height:36px;border:1px solid var(--line);border-radius:999px;background:var(--surface);
+  color:var(--ink);font-size:12px;font-weight:750;flex:none
 }
-.filters-row select{min-width:140px;padding:0 11px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:0 11px;white-space:nowrap}
-.chip input{margin:0;accent-color:var(--brand)}
-#favorites-bar{display:none;gap:7px;overflow-x:auto;scrollbar-width:none;padding:5px 0 1px}
+.filters-row select{min-width:136px;padding:0 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:0 12px;white-space:nowrap}
+.chip input{width:15px;height:15px;margin:0;accent-color:var(--accent)}
+#favorites-bar{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding:7px 0 1px}
 #favorites-bar::-webkit-scrollbar{display:none}
-.fav-chip{border:0;border-radius:999px;background:var(--brand-soft);color:var(--brand);padding:7px 11px;font-size:11px;font-weight:750;white-space:nowrap}
-main{padding:14px 12px calc(94px + env(safe-area-inset-bottom))}
-.section{margin-bottom:24px}
-.section-title{display:flex;align-items:center;margin:3px 3px 10px}
-.section-title::before{content:"";width:5px;height:23px;border-radius:99px;background:linear-gradient(180deg,var(--brand),var(--brand-2));margin-right:8px}
-.section-pill{padding:0;background:transparent;font-size:17px;font-weight:900;letter-spacing:-.025em;text-transform:none}
+#favorites-bar:empty{display:none}
+.fav-chip{border:0;border-radius:999px;background:var(--accent-soft);color:var(--accent);padding:7px 12px;font-size:11px;font-weight:800;white-space:nowrap}
+
+main{padding:18px 12px calc(112px + env(safe-area-inset-bottom))}
+.section{margin:0 0 27px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:0 2px 11px}
+.section-pill{font-size:19px;font-weight:950;letter-spacing:-.035em}
+.section-title:after{content:"";height:1px;flex:1;margin-left:13px;background:var(--line)}
+
 .product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .product-card{
- background:var(--surface);border:1px solid rgba(61,43,24,.055);border-radius:17px;padding:8px;
- box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;cursor:pointer;position:relative;
- transition:transform .16s ease,box-shadow .16s ease
+  position:relative;min-width:0;overflow:hidden;background:var(--surface);
+  border:1px solid rgba(50,39,25,.065);border-radius:19px;padding:7px;
+  box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;
+  transition:transform .16s ease,box-shadow .16s ease
 }
-.product-card:active{transform:scale(.985)}
-.product-card:hover{box-shadow:var(--shadow-hover)}
-.product-thumb{width:100%;aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#efe4d3;margin-bottom:5px}
-.product-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.product-card .name{font-size:14px;line-height:1.22;font-weight:800;letter-spacing:-.01em;min-height:34px}
-.product-row{display:flex;align-items:center;gap:5px;margin-top:3px;min-width:0}
-.price{font-size:13px;font-weight:900;white-space:nowrap}
-.badge-piece{font-size:9px;padding:4px 6px;border-radius:8px;background:var(--brand-soft);color:var(--brand);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fav-btn{width:31px;height:31px;margin-left:auto;border:0;background:transparent;border-radius:10px;font-size:20px;padding:0;cursor:pointer}
-.fav-btn.active{color:#df3d49;background:#fff0f1}
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.product-card:active{transform:scale(.975)}
+.product-thumb{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:#eee7dc}
+.product-thumb:after{content:"";position:absolute;inset:0;box-shadow:inset 0 -28px 35px rgba(0,0,0,.035);pointer-events:none}
+.product-thumb img{width:100%;height:100%;display:block;object-fit:cover}
+.product-info{padding:8px 5px 4px;display:flex;flex-direction:column;min-height:83px}
+.product-card .name{font-size:14px;line-height:1.2;font-weight:850;letter-spacing:-.015em;padding-right:26px}
+.product-meta{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:8px}
+.price{font-size:14px;font-weight:950;white-space:nowrap}
+.badge-piece{font-size:9px;line-height:1.15;padding:4px 6px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fav-btn{
+  position:absolute;right:12px;top:12px;z-index:2;width:32px;height:32px;border:0;border-radius:50%;
+  background:rgba(255,254,250,.90);box-shadow:0 4px 12px rgba(30,20,10,.10);
+  color:#736a60;font-size:19px;line-height:1;padding:0;cursor:pointer
+}
+.fav-btn.active{color:#d94b55}
+.add-dot{
+  position:absolute;right:9px;bottom:10px;width:34px;height:34px;border:0;border-radius:50%;
+  background:var(--ink);color:#fff;font-size:21px;line-height:1;display:grid;place-items:center;
+  box-shadow:0 5px 14px rgba(0,0,0,.15)
+}
+.empty{padding:64px 20px;text-align:center;color:var(--muted);font-size:14px}
+
 .cart-footer{
- position:fixed;left:50%;transform:translateX(-50%);bottom:8px;z-index:40;width:100%;max-width:980px;
- padding:0 12px calc(env(safe-area-inset-bottom));pointer-events:none
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:45;
+  width:100%;max-width:1120px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  pointer-events:none
 }
-.cart-footer-inner{background:rgba(255,253,249,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:18px;padding:5px;box-shadow:0 14px 40px rgba(35,22,8,.16);pointer-events:auto}
-#open-cart-btn{width:100%;height:48px;border:0;border-radius:14px;padding:0 15px;font-size:14px;font-weight:850;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));cursor:pointer}
-#open-cart-btn:disabled{opacity:.48}
-.btn{min-height:46px;border:0;border-radius:14px;padding:0 16px;font-size:14px;font-weight:850;cursor:pointer}
-.btn-primary{width:100%;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 8px 22px rgba(138,91,32,.24)}
-.btn-primary:disabled{opacity:.6;box-shadow:none}
+.cart-footer-inner{
+  pointer-events:auto;display:flex;align-items:center;gap:8px;padding:5px;
+  background:rgba(255,254,250,.91);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 14px 45px rgba(33,24,14,.17);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+#open-cart-btn{
+  width:100%;height:49px;border:0;border-radius:14px;background:var(--ink);color:#fff;
+  font-size:14px;font-weight:900;letter-spacing:-.01em;cursor:pointer
+}
+#open-cart-btn:disabled{background:#d6d0c8;color:#958d83}
+
 dialog{
- border:0;padding:0;border-radius:22px;max-width:520px;width:min(92%,520px);
- box-shadow:0 22px 65px rgba(0,0,0,.28);overflow:hidden;animation:sheet .18s ease-out
+  border:0;padding:0;width:min(560px,calc(100% - 20px));max-height:min(88dvh,820px);
+  border-radius:24px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-lg);
+  overflow:hidden
 }
-dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
-.modal-header{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface)}
-.modal-header h2{margin:0;font-size:17px;font-weight:900;letter-spacing:-.02em}
-.modal-close{width:34px;height:34px;border:0;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:22px;line-height:1;cursor:pointer}
-.modal-body{padding:14px 15px calc(16px + env(safe-area-inset-bottom));max-height:76vh;max-height:76dvh;overflow-y:auto;background:var(--surface-2)}
-.product-desc{font-size:13px;line-height:1.48;color:var(--muted);margin-bottom:13px}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}
+dialog::backdrop{background:rgba(27,21,15,.48);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;
+  border-bottom:1px solid var(--line);background:rgba(255,254,250,.96)
+}
+.modal-header h2{margin:0;font-size:19px;font-weight:950;letter-spacing:-.04em}
+.modal-close{width:34px;height:34px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--ink);font-size:22px;line-height:1;cursor:pointer}
+.modal-body{padding:15px;max-height:calc(min(88dvh,820px) - 61px);overflow:auto}
+.product-hero{width:100%;aspect-ratio:1.18/1;border-radius:18px;overflow:hidden;background:#eee7dc;margin-bottom:14px}
+.product-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.product-desc{font-size:13px;line-height:1.45;color:var(--muted);margin:0 0 15px}
+.form-group{margin:0 0 13px}
+.form-group label{display:block;font-size:11px;font-weight:850;color:var(--muted);margin:0 0 6px;padding-left:2px}
 .form-group input,.form-group select,.form-group textarea{
- width:100%;min-height:45px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;
- background:var(--surface);color:var(--text);font-size:14px
+  width:100%;min-height:46px;border:1px solid var(--line);border-radius:13px;
+  background:var(--surface);color:var(--ink);padding:9px 12px;font-size:14px
 }
-.form-group textarea{resize:vertical;min-height:72px}
-.notice{font-size:11px;line-height:1.4;color:var(--muted);margin-top:4px}
+.form-group textarea{min-height:76px;resize:vertical}
+.notice{font-size:11px;line-height:1.4;color:var(--muted);margin:5px 2px 0}
 .notice.small{font-size:10px}
-.price-display{font-size:23px;font-weight:950;letter-spacing:-.035em;margin:7px 0 12px}
-.custom-weight-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.custom-weight-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer}
-.custom-weight-toggle input{margin:0}
-.custom-weight-input-wrap{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:12px;border:1px dashed var(--border);background:#f4ead9;margin-top:6px;opacity:.72}
-.custom-weight-input-wrap.enabled{border-style:solid;background:var(--surface);opacity:1}
-.custom-weight-input-wrap input{border:0;background:transparent;padding:0;min-height:35px;font-size:17px;flex:1;min-width:0}
-.custom-weight-unit{font-size:13px;color:var(--muted)}
-.piece-badge{font-size:11px;color:var(--muted);margin-top:3px}
-.cart-item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(61,43,24,.07)}
-.cart-item-name{font-size:13px;font-weight:800}
-.cart-item-variant{font-size:11px;line-height:1.35;color:var(--muted);margin-top:2px}
-.cart-item-price{font-size:13px;font-weight:850;margin-top:4px}
-.qty-control{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
-.qty-control button{width:36px;height:36px;border:0;background:transparent;font-size:19px;cursor:pointer}
-.qty-control span{min-width:25px;text-align:center;font-size:13px;font-weight:800}
-.cart-summary{margin-top:11px;padding-top:9px;border-top:1px dashed var(--border);font-size:15px;font-weight:900}
-.promo-block{margin-top:9px;font-weight:400}
-.promo-block input{margin-top:5px}
-.discount-hint{font-size:11px;color:#2e8b57;margin-top:2px}
-.weighing-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:var(--brand-soft);font-size:11px;line-height:1.4;color:var(--muted)}
-.error-text{font-size:12px;color:#d63d3d;margin-top:5px}
-@keyframes sheet{from{transform:translateY(12px);opacity:.7}to{transform:translateY(0);opacity:1}}
-@media(min-width:700px){
- main{padding-left:20px;padding-right:20px}
- .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
- .product-thumb{aspect-ratio:1/1}
+.custom-weight-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.custom-weight-toggle{display:flex!important;align-items:center;gap:6px!important;font-size:11px!important;color:var(--muted)!important;font-weight:650!important}
+.custom-weight-toggle input{width:16px!important;min-height:16px!important;margin:0!important;padding:0!important}
+.custom-weight-input-wrap{display:flex;align-items:center;gap:8px;padding:6px 11px;border:1px dashed var(--line);border-radius:12px;background:var(--surface-soft);margin-top:6px}
+.custom-weight-input-wrap.enabled{border-style:solid;background:var(--surface)}
+.custom-weight-input-wrap input{border:0!important;background:transparent!important;padding:0!important;min-height:34px!important;flex:1}
+.custom-weight-unit{font-size:12px;color:var(--muted)}
+.piece-badge{font-size:11px;color:var(--muted);margin-top:4px}
+.price-display{font-size:25px;font-weight:950;letter-spacing:-.045em;margin:14px 0}
+.btn{min-height:48px;border:0;border-radius:14px;padding:0 16px;font-size:14px;font-weight:900;cursor:pointer}
+.btn-primary{width:100%;background:var(--ink);color:#fff;box-shadow:0 8px 20px rgba(30,23,16,.14)}
+.btn-primary:disabled{opacity:.55;box-shadow:none}
+.cart-item{
+  display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--line)
 }
-@media(max-width:420px){
- header{padding-left:9px;padding-right:9px}
- main{padding-left:7px;padding-right:7px}
- .product-grid{gap:8px}
- .product-card{padding:7px}
- .product-card .name{font-size:13px}
- .price{font-size:12px}
- .header-title{font-size:19px}
+.cart-item-name{font-size:14px;font-weight:850}
+.cart-item-variant{font-size:11px;color:var(--muted);margin-top:3px}
+.cart-item-price{font-size:13px;font-weight:900;margin-top:5px}
+.qty-control{display:inline-flex;align-items:center;height:36px;border:1px solid var(--line);border-radius:11px;background:var(--surface);overflow:hidden}
+.qty-control button{width:35px;height:35px;border:0;background:transparent;color:var(--ink);font-size:20px;cursor:pointer}
+.qty-control span{min-width:25px;text-align:center;font-size:13px;font-weight:850}
+.discount-hint{font-size:10px;color:var(--success);margin-top:3px;font-weight:700}
+.cart-summary{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);font-size:17px;font-weight:950}
+.promo-block{margin-top:13px;font-weight:400;display:flex;gap:7px}
+.promo-block label{display:none}
+.promo-block input{
+  min-width:0;flex:1;height:43px;border:1px solid var(--line);border-radius:12px;
+  background:var(--surface);padding:0 12px;font-size:13px
 }
+.checkout-title{font-size:16px;font-weight:950;letter-spacing:-.03em;margin:20px 0 12px}
+.error-text{font-size:12px;color:var(--danger);margin:7px 2px}
+.weighing-note{margin-top:10px;padding:10px 11px;border-radius:12px;background:var(--accent-soft);font-size:11px;line-height:1.35;color:var(--accent);font-weight:700}
+@media(min-width:620px){
+  header{padding-left:20px;padding-right:20px}
+  main{padding-left:20px;padding-right:20px}
+  .product-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+  .product-card .name{font-size:15px}
+}
+@media(min-width:900px){
+  .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+  main{padding-top:22px}
+}
+@media(max-width:380px){
+  header{padding-left:9px;padding-right:9px}
+  main{padding-left:7px;padding-right:7px}
+  .product-grid{gap:7px}
+  .product-card{padding:6px;border-radius:17px}
+  .product-card .name{font-size:12.5px}
+  .price{font-size:12px}
+  .add-dot{width:31px;height:31px;right:8px;bottom:8px}
+  .fav-btn{right:10px;top:10px;width:30px;height:30px}
+}
+@media(max-width:340px){
+  .product-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  dialog{position:fixed;left:0;right:0;bottom:0;top:auto;margin:0;width:100%;max-width:none;
+    max-height:92dvh;border-radius:24px 24px 0 0;animation:sheet .2s ease-out}
+  dialog::backdrop{background:rgba(20,16,11,.42)}
+  .modal-body{max-height:calc(92dvh - 61px);padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  .product-hero{aspect-ratio:1.35/1}
+}
+@keyframes sheet{from{transform:translateY(18px);opacity:.7}to{transform:translateY(0);opacity:1}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -149,27 +211,22 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
         </div>
         <div class="header-title">Сыромания</div>
       </div>
-
       <div class="search-row">
-        <input id="search-input" type="search" placeholder="Поиск по названию..." />
+        <input id="search-input" type="search" placeholder="Найти сыр или десерт" autocomplete="off" />
       </div>
-
       <div class="filters-row">
-        <select id="category-filter">
-          <option value="">Все категории</option>
+        <select id="category-filter" aria-label="Категория">
+          <option value="">Все товары</option>
         </select>
-
         <label class="chip">
           <input type="checkbox" id="only-cheese-checkbox" />
-          только сыры
+          <span>Сыры</span>
         </label>
-
         <label class="chip">
           <input type="checkbox" id="only-fav-checkbox" />
-          избранное
+          <span>♥</span>
         </label>
       </div>
-
       <div id="favorites-bar"></div>
     </header>
 
@@ -177,22 +234,22 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
 
     <div class="cart-footer">
       <div class="cart-footer-inner">
-        <button id="open-cart-btn" disabled>Корзина пуста</button>
+        <button id="open-cart-btn" disabled>Корзина</button>
       </div>
     </div>
   </div>
 
-  <!-- Модалка товара -->
   <dialog id="product-modal">
     <div class="modal-header">
       <h2 id="product-modal-title"></h2>
-      <button class="modal-close" onclick="closeProductModal()">&times;</button>
+      <button class="modal-close" type="button" onclick="closeProductModal()" aria-label="Закрыть">×</button>
     </div>
     <div class="modal-body">
+      <div class="product-hero"><img id="product-modal-image" src="" alt=""></div>
       <div class="product-desc" id="product-modal-description"></div>
 
       <div class="form-group">
-        <label for="product-variant-select">Вес / вариант</label>
+        <label for="product-variant-select">Выберите вес</label>
         <select id="product-variant-select"></select>
         <div class="notice" id="variant-hint"></div>
         <div class="piece-badge" id="piece-badge" style="display:none"></div>
@@ -200,20 +257,15 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
 
       <div class="form-group custom-weight-block" id="custom-weight-block">
         <div class="custom-weight-header">
-          <span>Свой вес</span>
+          <span style="font-size:13px;font-weight:800">Свой вес</span>
           <label class="custom-weight-toggle">
             <input type="checkbox" id="custom-weight-checkbox" />
-            <span>Указать свой вес</span>
+            <span>Указать</span>
           </label>
         </div>
         <div class="custom-weight-input-wrap" id="custom-weight-input-wrap">
-          <input type="number" id="product-custom-weight" min="1" step="1"
-                 placeholder="Например, 202" disabled />
+          <input type="number" id="product-custom-weight" min="1" step="1" placeholder="200" disabled />
           <span class="custom-weight-unit">г</span>
-        </div>
-        <div class="notice small">
-          Можно указать абсолютно любой вес в граммах — мы автоматически пересчитаем сумму,
-          скидки по килограммам тоже учитываются.
         </div>
       </div>
 
@@ -224,19 +276,18 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
 
       <div class="form-group">
         <label for="product-qty-input">Количество</label>
-        <input type="number" id="product-qty-input" value="1" min="1" />
+        <input type="number" id="product-qty-input" value="1" min="1" inputmode="numeric" />
       </div>
 
       <div class="price-display" id="product-modal-price">0 ₽</div>
-      <button class="btn btn-primary" id="add-to-cart-btn">Добавить в корзину</button>
+      <button class="btn btn-primary" id="add-to-cart-btn" type="button">Добавить в корзину</button>
     </div>
   </dialog>
 
-  <!-- Модалка корзины -->
   <dialog id="cart-modal">
     <div class="modal-header">
-      <h2>Корзина</h2>
-      <button class="modal-close" onclick="closeCartModal()">&times;</button>
+      <h2>Ваш заказ</h2>
+      <button class="modal-close" type="button" onclick="closeCartModal()" aria-label="Закрыть">×</button>
     </div>
     <div class="modal-body" id="cart-modal-body"></div>
   </dialog>
@@ -1174,33 +1225,33 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
       }
 
       function productCard(p){
-        const card = document.createElement('div');
+        const card = document.createElement('article');
         card.className = 'product-card';
         card.onclick = (e)=>{
           if(e.target.closest('.fav-btn')) return;
           openProductModal(p.id);
         };
-
         const priceText = getPriceText(p);
         const approx = approxPieceBadgeText(p);
         const favActive = favorites.has(p.id) ? 'active' : '';
-
         card.innerHTML = `
           <div class="product-thumb">
-            <img src="${p.img || DEFAULT_IMG}"
-                 alt="${escapeHtml(p.name)}"
+            <img src="${p.img || DEFAULT_IMG}" alt="${escapeHtml(p.name)}" loading="lazy"
                  onerror="this.src='${DEFAULT_IMG}'">
-          </div>
-          <div class="name">${p.name}</div>
-          <div class="product-row">
-            <div class="price">${priceText}</div>
-            ${approx ? `<div class="badge-piece">${approx}</div>` : ''}
-            <button class="fav-btn ${favActive}" title="В избранное"
+            <button class="fav-btn ${favActive}" type="button" aria-label="Избранное"
               onclick="event.stopPropagation(); window.toggleFavorite && window.toggleFavorite('${p.id}')">
               ${favActive ? '♥' : '♡'}
             </button>
+            <button class="add-dot" type="button" aria-label="Добавить"
+              onclick="event.stopPropagation(); openProductModal('${p.id}')">+</button>
+          </div>
+          <div class="product-info">
+            <div class="name">${p.name}</div>
+            <div class="product-meta">
+              <div class="price">${priceText}</div>
+              ${approx ? `<div class="badge-piece">${approx}</div>` : ''}
+            </div>
           </div>`;
-
         return card;
       }
 
@@ -1242,6 +1293,9 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
 
         el('product-modal-title').textContent = currentProduct.name;
         el('product-modal-description').textContent = currentProduct.description || '';
+        const modalImg = el('product-modal-image');
+        modalImg.src = currentProduct.img || DEFAULT_IMG;
+        modalImg.alt = currentProduct.name;
 
         renderVariantSelector();
         renderFlavorSelector();
@@ -1471,7 +1525,7 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
         const body = el('cart-modal-body');
         body.innerHTML = '';
         if(!cart.length){
-          body.innerHTML = '<p>Корзина пуста</p>';
+          body.innerHTML = '<div class="empty">Корзина пуста</div>';
           return;
         }
 
@@ -1480,41 +1534,36 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
           const price = calculatePrice(item.id,item.variant,item.qty);
           total += price.finalPrice;
           const rate = getDiscountRateForProduct(item.id);
-          const hint = rate>0 ? `<div class="discount-hint">Скидка ${Math.round(rate*100)}% применена</div>` : '';
-
+          const hint = rate>0 ? `<div class="discount-hint">Скидка ${Math.round(rate*100)}%</div>` : '';
           const row = document.createElement('div');
-          row.className = 'cart-item';
-          row.innerHTML = `
-            <div class="cart-item-info">
-              <div class="cart-item-name">${item.name}</div>
+          row.className='cart-item';
+          row.innerHTML=`
+            <div>
+              <div class="cart-item-name">${escapeHtml(item.name)}</div>
               <div class="cart-item-variant">${escapeHtml(item.variant)}</div>
               <div class="cart-item-price">${fmtRub(price.finalPrice)}</div>
               ${hint}
             </div>
-            <div class="cart-item-controls">
-              <div class="qty-control">
-                <button type="button" onclick="window.changeItemQty && window.changeItemQty(${idx},-1)">−</button>
-                <span>${item.qty}</span>
-                <button type="button" onclick="window.changeItemQty && window.changeItemQty(${idx},1)">+</button>
-              </div>
+            <div class="qty-control">
+              <button type="button" onclick="window.changeItemQty && window.changeItemQty(${idx},-1)">−</button>
+              <span>${item.qty}</span>
+              <button type="button" onclick="window.changeItemQty && window.changeItemQty(${idx},1)">+</button>
             </div>`;
           body.appendChild(row);
         });
 
         const summary = document.createElement('div');
-        summary.className = 'cart-summary';
-        summary.innerHTML = `
-          <div>Итого: ${fmtRub(total)}</div>
+        summary.className='cart-summary';
+        summary.innerHTML=`
+          <div>Итого <span style="float:right">${fmtRub(total)}</span></div>
           <div class="promo-block">
-            <label for="checkout-promo">Промокод</label>
-            <input id="checkout-promo" placeholder="Если есть" />
-            <div class="notice">Промокоды лучше хранить на сервере, но можно и в коде (см. PROMO_CODES).</div>
+            <input id="checkout-promo" placeholder="Промокод" autocomplete="off" />
           </div>`;
         body.appendChild(summary);
 
         const checkout = document.createElement('div');
-        checkout.innerHTML = `
-          <div class="section-title small"><span class="section-pill">Контакты и доставка</span></div>
+        checkout.innerHTML=`
+          <div class="checkout-title">Доставка</div>
           <div class="form-group">
             <label for="checkout-city">Город</label>
             <select id="checkout-city">
@@ -1523,45 +1572,41 @@ dialog::backdrop{background:rgba(24,16,8,.46);backdrop-filter:blur(4px)}
             </select>
           </div>
           <div class="form-group">
-            <label for="checkout-phone">Телефон для связи</label>
-            <input type="tel" id="checkout-phone" inputmode="tel" placeholder="+7 999 999-99-99" />
-            <div class="notice">Формат любой: 8999..., +7..., пробелы/скобки не важны — приведём к стандарту.</div>
+            <label for="checkout-phone">Телефон</label>
+            <input type="tel" id="checkout-phone" inputmode="tel" autocomplete="tel" placeholder="+7 999 999-99-99" />
           </div>
           <div class="form-group">
-            <label for="checkout-address">Адрес доставки</label>
-            <textarea id="checkout-address" rows="3" placeholder="Город, улица, дом, подъезд/этаж/кв."></textarea>
+            <label for="checkout-address">Адрес</label>
+            <textarea id="checkout-address" rows="3" placeholder="Улица, дом, квартира"></textarea>
           </div>
           <div class="form-group">
-            <label for="checkout-comment">Комментарий к заказу</label>
-            <textarea id="checkout-comment" rows="3" placeholder="Например: позвонить перед доставкой, без чеснока и т.п."></textarea>
+            <label for="checkout-comment">Комментарий</label>
+            <textarea id="checkout-comment" rows="2" placeholder="Пожелания к заказу"></textarea>
           </div>
-          <div id="checkout-errors" class="error-text" style="display:none"></div>
-        `;
+          <div id="checkout-errors" class="error-text" style="display:none"></div>`;
         body.appendChild(checkout);
 
-        el('checkout-phone').value   = checkoutState.phone   || '';
-        el('checkout-address').value= checkoutState.address || '';
-        el('checkout-comment').value= checkoutState.comment || '';
-        el('checkout-promo').value  = checkoutState.promo   || '';
-        el('checkout-city').value   = checkoutState.city    || 'Пенза';
+        el('checkout-phone').value=checkoutState.phone||'';
+        el('checkout-address').value=checkoutState.address||'';
+        el('checkout-comment').value=checkoutState.comment||'';
+        el('checkout-promo').value=checkoutState.promo||'';
+        el('checkout-city').value=checkoutState.city||'Пенза';
 
-        el('checkout-phone').addEventListener('input',()=>{ checkoutState.phone = el('checkout-phone').value; saveState(); });
-        el('checkout-address').addEventListener('input',()=>{ checkoutState.address = el('checkout-address').value; saveState(); });
-        el('checkout-comment').addEventListener('input',()=>{ checkoutState.comment = el('checkout-comment').value; saveState(); });
-        el('checkout-promo').addEventListener('input',()=>{ checkoutState.promo = el('checkout-promo').value.trim(); saveState(); });
-        el('checkout-city').addEventListener('change',()=>{ checkoutState.city = el('checkout-city').value; saveState(); });
+        el('checkout-phone').addEventListener('input',()=>{checkoutState.phone=el('checkout-phone').value;saveState();});
+        el('checkout-address').addEventListener('input',()=>{checkoutState.address=el('checkout-address').value;saveState();});
+        el('checkout-comment').addEventListener('input',()=>{checkoutState.comment=el('checkout-comment').value;saveState();});
+        el('checkout-promo').addEventListener('input',()=>{checkoutState.promo=el('checkout-promo').value.trim();saveState();});
+        el('checkout-city').addEventListener('change',()=>{checkoutState.city=el('checkout-city').value;saveState();});
 
-        const sendBtn = document.createElement('button');
-        sendBtn.type='button';
-        sendBtn.className='btn btn-primary';
-        sendBtn.textContent='Отправить заказ';
-        sendBtn.onclick = sendOrder;
+        const sendBtn=document.createElement('button');
+        sendBtn.type='button';sendBtn.className='btn btn-primary';sendBtn.textContent='Оформить заказ';
+        sendBtn.onclick=sendOrder;
         body.appendChild(sendBtn);
 
         if(hasCheeseInCart()){
-          const note = document.createElement('div');
+          const note=document.createElement('div');
           note.className='weighing-note';
-          note.textContent='Конечная сумма по сырам уточняется после фактического взвешивания в день доставки.';
+          note.textContent='Стоимость сыра уточняется после фактического взвешивания.';
           body.appendChild(note);
         }
       }
