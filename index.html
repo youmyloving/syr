@@ -1,1134 +1,2684 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Сыромания</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --hint-color: #999999;
-            --link-color: #2481cc;
-            --button-color: #2481cc;
-            --button-text-color: #ffffff;
-            --secondary-bg-color: #f7f7f7;
-            --header-bg-color: #ffffff;
-            --section-bg-color: #ffffff;
-            --border-color: #e0e0e0;
-            --error-color: #e74c3c;
-            --success-color: #2ecc71;
-            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <title>Сыромания — натуральные сыры и молочная продукция</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#F5F1EB" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Цветовая схема - тёплые натуральные тона */
+      --cream: #F5F1EB;
+      --cream-light: #FFF9F0;
+      --gold: #C9A962;
+      --gold-light: #E8D5A3;
+      --gold-pale: #F0E6C8;
+      --brown-dark: #2C2416;
+      --brown-medium: #5C4D3C;
+      --brown-light: #8A7F6A;
+      --border: #E2D4BD;
+      --shadow-soft: 0 4px 20px rgba(0,0,0,0.04);
+      --shadow-medium: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-strong: 0 12px 40px rgba(0,0,0,0.12);
+      
+      /* Размеры */
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 999px;
+    }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-family);
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        #app {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        header {
-            background-color: var(--header-bg-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px;
-            flex-shrink: 0;
-        }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--cream);
+      color: var(--brown-dark);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+    /* Скелетон-загрузка */
+    .skeleton {
+      background: linear-gradient(90deg, #E2D4BD 25%, #F0E6C8 50%, #E2D4BD 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-md);
+    }
 
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--secondary-bg-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: var(--hint-color);
-            overflow: hidden;
-        }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
 
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    /* Шапка */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(245, 241, 235, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+    }
 
-        .user-name {
-            font-weight: 500;
-        }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-        .search-container {
-            margin-bottom: 10px;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--brown-dark);
+      text-decoration: none;
+    }
 
-        #search-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color);
-            font-size: 16px;
-            box-sizing: border-box;
-        }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: var(--shadow-soft);
+    }
 
-        .filters-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--cream-light);
+      border: 2px solid var(--gold-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--brown-medium);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
 
-        .filters-container select,
-        .filters-container label {
-            font-size: 14px;
-        }
+    .user-avatar:active {
+      transform: scale(0.95);
+    }
 
-        #category-filter {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color);
-            flex-grow: 1;
-        }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-        #only-cheese-toggle {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+    /* Поиск */
+    .search-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      background: rgba(245, 241, 235, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px 12px;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s;
+    }
 
-        main {
-            flex-grow: 1;
-            padding: 10px;
-            padding-bottom: 80px;
-            /* Space for sticky footer */
-        }
+    .search-container.scrolled {
+      border-bottom-color: var(--border);
+      box-shadow: var(--shadow-soft);
+    }
 
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-        }
+    .search-box {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-        .product-card {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            background-color: var(--section-bg-color);
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      background: var(--cream-light);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--brown-dark);
+      transition: all 0.3s;
+      outline: none;
+    }
 
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        }
+    .search-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+    }
 
-        .product-card .ico {
-            font-size: 48px;
-            margin-bottom: 8px;
-        }
+    .search-input::placeholder {
+      color: var(--brown-light);
+    }
 
-        .product-card .name {
-            font-weight: 500;
-            font-size: 14px;
-            margin-bottom: 4px;
-            flex-grow: 1;
-        }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--brown-light);
+      font-size: 18px;
+    }
 
-        .product-card .price {
-            color: var(--hint-color);
-            font-size: 13px;
-        }
+    /* Основной контент */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 140px 16px 100px;
+      min-height: 100vh;
+    }
 
-        .cart-footer {
-            position: sticky;
-            bottom: 0;
-            background-color: var(--header-bg-color);
-            border-top: 1px solid var(--border-color);
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
+    /* Хиты продаж */
+    .hits-section {
+      margin-bottom: 24px;
+    }
 
-        #open-cart-btn {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            padding: 12px 24px;
-            border-radius: 24px;
-            cursor: pointer;
-            border: none;
-            font-size: 16px;
-            font-weight: 500;
-            width: 100%;
-            max-width: 400px;
-            transition: background-color 0.2s;
-        }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
 
-        #open-cart-btn:hover {
-            filter: brightness(110%);
-        }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--brown-dark);
+      margin: 0;
+    }
 
-        #open-cart-btn:disabled {
-            background-color: var(--hint-color);
-            cursor: not-allowed;
-        }
+    .see-all {
+      font-size: 13px;
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-        dialog {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0;
-            background-color: var(--section-bg-color);
-            color: var(--text-color);
-            width: 90vw;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+    .hits-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 4px 4px 12px;
+      margin: 0 -4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
 
-        dialog::backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
-        }
+    .hits-scroll::-webkit-scrollbar {
+      display: none;
+    }
 
-        .modal-header {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .hit-card {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+      background: var(--cream-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
 
-        .modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
+    .hit-card:active {
+      transform: scale(0.98);
+    }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--hint-color);
-            padding: 0;
-            line-height: 1;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .hit-card:hover {
+      box-shadow: var(--shadow-medium);
+    }
 
-        .modal-close:hover {
-            background-color: var(--secondary-bg-color);
-        }
+    .hit-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(135deg, #E74C3C, #C0392B);
+      color: white;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
 
-        .modal-body {
-            padding: 15px;
-            overflow-y: auto;
-            max-height: 60vh;
-        }
+    .hit-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #E2D4BD, #F0E6C8);
+    }
 
-        .modal-body .ico {
-            font-size: 64px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+    .hit-content {
+      padding: 16px;
+    }
 
-        .modal-body .description {
-            color: var(--hint-color);
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
+    .hit-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--brown-dark);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .hit-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
+    /* Категории */
+    .categories-section {
+      margin-bottom: 24px;
+      position: sticky;
+      top: 120px;
+      z-index: 98;
+      background: var(--cream);
+      padding: 8px 0;
+    }
 
-        .form-group select,
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color);
-            font-size: 16px;
-            box-sizing: border-box;
-        }
+    .categories-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
 
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
+    .categories-scroll::-webkit-scrollbar {
+      display: none;
+    }
 
-        .form-row .form-group {
-            flex-grow: 1;
-        }
+    .category-tab {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--cream-light);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--brown-medium);
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+      user-select: none;
+    }
 
-        .price-display {
-            font-size: 18px;
-            font-weight: 500;
-            text-align: center;
-            margin: 15px 0;
-        }
+    .category-tab.active {
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+    }
 
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            box-sizing: border-box;
-            transition: background-color 0.2s, transform 0.1s;
-        }
+    .category-tab:active {
+      transform: scale(0.95);
+    }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+    /* Сетка товаров */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
 
-        .btn-primary {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-        }
+    @media (min-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
 
-        .btn-primary:hover {
-            filter: brightness(110%);
-        }
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
 
-        .btn-secondary {
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
+    .product-card {
+      background: var(--cream-light);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .btn-secondary:hover {
-            background-color: var(--border-color);
-        }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-medium);
+    }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
+    .product-card:active {
+      transform: scale(0.98);
+    }
 
-        .cart-item:last-child {
-            border-bottom: none;
-        }
+    .product-image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: linear-gradient(135deg, #E2D4BD, #F0E6C8);
+    }
 
-        .cart-item-info {
-            flex-grow: 1;
-            padding-right: 10px;
-        }
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
 
-        .cart-item-name {
-            font-weight: 500;
-        }
+    .product-card:hover .product-image {
+      transform: scale(1.05);
+    }
 
-        .cart-item-variant {
-            font-size: 14px;
-            color: var(--hint-color);
-        }
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--brown-light);
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
 
-        .cart-item-price {
-            font-size: 14px;
-        }
+    .fav-btn:hover {
+      transform: scale(1.1);
+    }
 
-        .discount-hint {
-            color: var(--success-color);
-            font-size: 12px;
-        }
+    .fav-btn.active {
+      color: #E74C3C;
+      background: rgba(231, 76, 60, 0.1);
+    }
 
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .quick-add {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
+      z-index: 2;
+    }
 
-        .qty-control {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
+    .product-card:hover .quick-add,
+    .product-card:focus-within .quick-add {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-        .qty-control button {
-            background: none;
-            border: none;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 18px;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-        }
+    .quick-add:active {
+      transform: scale(0.9);
+    }
 
-        .qty-control button:hover {
-            background-color: var(--secondary-bg-color);
-        }
+    .product-info {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .qty-control span {
-            padding: 0 10px;
-            min-width: 30px;
-            text-align: center;
-        }
+    .product-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brown-dark);
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+      min-height: 40px;
+    }
 
-        .cart-summary {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid var(--border-color);
-            font-size: 18px;
-            font-weight: 500;
-            text-align: right;
-        }
-    </style>
+    .product-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-top: auto;
+    }
+
+    .product-unit {
+      font-size: 12px;
+      color: var(--brown-light);
+      font-weight: 400;
+    }
+
+    /* Модалка товара */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 36, 22, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .product-modal {
+      background: var(--cream-light);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.active .product-modal {
+      transform: translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .modal-overlay {
+        align-items: center;
+        padding: 20px;
+      }
+      .product-modal {
+        border-radius: var(--radius-lg);
+        max-height: 85vh;
+      }
+    }
+
+    .modal-header {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .modal-image {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      background: linear-gradient(135deg, #E2D4BD, #F0E6C8);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--brown-dark);
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+
+    .modal-close:active {
+      transform: scale(0.9);
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--brown-dark);
+      margin-bottom: 8px;
+    }
+
+    .modal-description {
+      font-size: 14px;
+      color: var(--brown-medium);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* Таблетки веса */
+    .weight-section {
+      margin-bottom: 20px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brown-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .weight-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .weight-pill {
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--border);
+      background: var(--cream);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brown-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .weight-pill:hover {
+      border-color: var(--gold-light);
+    }
+
+    .weight-pill.active {
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+    }
+
+    /* Варианты (вкусы/виды) */
+    .variants-section {
+      margin-bottom: 20px;
+    }
+
+    .variant-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .variant-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .variant-tab {
+      flex: 0 0 auto;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--border);
+      background: var(--cream);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--brown-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .variant-tab.active {
+      background: var(--brown-dark);
+      color: var(--cream-light);
+      border-color: var(--brown-dark);
+    }
+
+    /* Слайдер веса */
+    .custom-weight-section {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--cream);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      -webkit-appearance: none;
+      margin: 10px 0;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(201, 169, 98, 0.4);
+      border: 2px solid white;
+    }
+
+    .range-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px rgba(201, 169, 98, 0.4);
+    }
+
+    .weight-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .weight-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      background: white;
+      color: var(--brown-dark);
+    }
+
+    .weight-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    /* Цена */
+    .price-section {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 20px 0;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(201, 169, 98, 0.1), rgba(201, 169, 98, 0.05));
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(201, 169, 98, 0.2);
+    }
+
+    .price-main {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .price-old {
+      font-size: 16px;
+      color: var(--brown-light);
+      text-decoration: line-through;
+    }
+
+    .price-discount {
+      font-size: 13px;
+      color: #27AE60;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    /* Кнопки действий */
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px 24px;
+      border-radius: var(--radius-full);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-fav {
+      background: var(--cream);
+      color: var(--brown-dark);
+      border: 1.5px solid var(--border);
+      flex: 0 0 auto;
+      width: 56px;
+      padding: 0;
+    }
+
+    .btn-fav.active {
+      background: rgba(231, 76, 60, 0.1);
+      border-color: #E74C3C;
+      color: #E74C3C;
+    }
+
+    /* Кнопка с растениями */
+    .btn-plant {
+      position: relative;
+      background: linear-gradient(135deg, #82571c, #bd9952);
+      color: white;
+      overflow: hidden;
+      height: 56px;
+      flex: 1;
+    }
+
+    .btn-plant::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-plant:hover::before {
+      opacity: 1;
+    }
+
+    .leaves {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .leaf {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-pale));
+      border-radius: 0 100% 0 100%;
+      opacity: 0;
+      transform: scale(0) rotate(0deg);
+      transition: all 0.5s ease-out;
+    }
+
+    .btn-plant:hover .leaf,
+    .btn-plant:focus .leaf {
+      opacity: 0.8;
+      transform: scale(1) rotate(45deg);
+    }
+
+    .leaf:nth-child(1) { left: 10%; top: 20%; transition-delay: 0s; }
+    .leaf:nth-child(2) { left: 20%; top: 60%; transition-delay: 0.1s; width: 16px; height: 16px; }
+    .leaf:nth-child(3) { right: 15%; top: 30%; transition-delay: 0.2s; width: 24px; height: 24px; }
+    .leaf:nth-child(4) { right: 25%; top: 70%; transition-delay: 0.15s; width: 18px; height: 18px; }
+    .leaf:nth-child(5) { left: 50%; top: 10%; transition-delay: 0.05s; width: 22px; height: 22px; }
+
+    /* Нижняя навигация */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 249, 240, 0.98);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      color: var(--brown-light);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      color: var(--gold);
+    }
+
+    .nav-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background: #E74C3C;
+      color: white;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--cream-light);
+    }
+
+    /* Корзина */
+    .cart-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .cart-sheet.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .cart-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(44, 36, 22, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .cart-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--cream-light);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      max-height: 85vh;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-sheet.active .cart-content {
+      transform: translateY(0);
+    }
+
+    .cart-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cart-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: var(--cream);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .cart-item-image {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: linear-gradient(135deg, #E2D4BD, #F0E6C8);
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .cart-item-variant {
+      font-size: 12px;
+      color: var(--brown-light);
+    }
+
+    .cart-item-price {
+      font-weight: 700;
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--brown-dark);
+      transition: all 0.2s;
+    }
+
+    .qty-btn:active {
+      background: var(--gold);
+      color: white;
+      border-color: var(--gold);
+    }
+
+    .cart-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      background: var(--cream-light);
+    }
+
+    .cart-summary {
+      margin-bottom: 16px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .summary-row.discount {
+      color: #27AE60;
+    }
+
+    .summary-row.total {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--brown-dark);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brown-medium);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+      color: var(--brown-dark);
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Лоадер */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(247, 240, 227, 0.95);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .loader-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loader-cubes {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .loader-cube {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #82571c, #bd9952);
+      border-radius: 4px;
+      animation: cube-fall 1.5s infinite ease-in-out;
+    }
+
+    .loader-cube:nth-child(1) { animation-delay: 0s; }
+    .loader-cube:nth-child(2) { animation-delay: 0.2s; }
+    .loader-cube:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes cube-fall {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      50% { transform: translateY(30px) rotate(180deg); opacity: 0.5; }
+    }
+
+    .loader-text {
+      font-size: 16px;
+      color: var(--brown-medium);
+      font-weight: 500;
+    }
+
+    .loader-ground {
+      width: 120px;
+      height: 4px;
+      background: #E2D4BD;
+      border-radius: 2px;
+      margin-top: 10px;
+    }
+
+    /* Toast уведомления */
+    .toast-container {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--brown-dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: var(--shadow-strong);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Пустые состояния */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--brown-light);
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--brown-dark);
+      margin-bottom: 8px;
+    }
+
+    /* Pull to refresh индикатор */
+    .ptr-indicator {
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--cream-light);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: transform 0.3s;
+    }
+
+    .ptr-loading {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Адаптивность для десктопа */
+    @media (min-width: 1024px) {
+      .app-header, .search-container {
+        left: 280px;
+      }
+      
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        background: var(--cream-light);
+        border-right: 1px solid var(--border);
+        padding: 24px;
+        overflow-y: auto;
+        z-index: 90;
+      }
+      
+      .sidebar-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .sidebar-categories {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .sidebar-category {
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: var(--brown-medium);
+      }
+      
+      .sidebar-category:hover, .sidebar-category.active {
+        background: linear-gradient(135deg, var(--gold), #B8954A);
+        color: white;
+      }
+      
+      .main-content {
+        margin-left: 280px;
+        padding-top: 120px;
+      }
+      
+      .categories-section {
+        display: none;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        display: none;
+      }
+    }
+
+    /* Анимация добавления в корзину */
+    @keyframes flyToCart {
+      0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.2) translate(var(--cart-x), var(--cart-y));
+        opacity: 0;
+      }
+    }
+
+    .flying-item {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #B8954A);
+      z-index: 1000;
+      pointer-events: none;
+      animation: flyToCart 0.6s ease-in forwards;
+    }
+
+    /* Скрытые элементы */
+    .hidden { display: none !important; }
+  </style>
 </head>
-
 <body>
-    <div id="app">
-        <header>
-            <div class="user-profile" id="user-profile">
-                <!-- Profile will be rendered here -->
-            </div>
-            <div class="search-container">
-                <input type="search" id="search-input" placeholder="Поиск по названию...">
-            </div>
-            <div class="filters-container">
-                <select id="category-filter">
-                    <option value="">Все категории</option>
-                </select>
-                <label id="only-cheese-toggle">
-                    <input type="checkbox" id="only-cheese-checkbox">
-                    <span>Только сыры</span>
-                </label>
-            </div>
-        </header>
+  <!-- Лоадер -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader-cubes">
+      <div class="loader-cube"></div>
+      <div class="loader-cube"></div>
+      <div class="loader-cube"></div>
+    </div>
+    <div class="loader-text" id="loader-text">Отправляем заказ...</div>
+    <div class="loader-ground"></div>
+  </div>
 
-        <main>
-            <div id="product-grid" class="product-grid"></div>
-        </main>
+  <!-- Toast контейнер -->
+  <div class="toast-container" id="toast-container"></div>
 
-        <footer class="cart-footer">
-            <button id="open-cart-btn" disabled>Корзина пуста</button>
-        </footer>
+  <!-- Сайдбар (только десктоп) -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🧀</div>
+      Сыромания
+    </div>
+    <nav class="sidebar-categories" id="sidebar-categories"></nav>
+  </aside>
+
+  <!-- Шапка -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="#" class="logo" onclick="showHome(); return false;">
+        <div class="logo-icon">🧀</div>
+        Сыромания
+      </a>
+      <div class="user-avatar" id="user-avatar">
+        <span>С</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Поиск -->
+  <div class="search-container" id="search-container">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="search" class="search-input" id="search-input" placeholder="Найти сыр..." autocomplete="off">
+    </div>
+  </div>
+
+  <!-- Основной контент -->
+  <main class="main-content" id="main-content">
+    <!-- Хиты -->
+    <section class="hits-section" id="hits-section">
+      <div class="section-header">
+        <h2 class="section-title">Хиты продаж</h2>
+      </div>
+      <div class="hits-scroll" id="hits-scroll"></div>
+    </section>
+
+    <!-- Категории (мобильные) -->
+    <div class="categories-section" id="categories-section">
+      <div class="categories-scroll" id="categories-scroll"></div>
     </div>
 
-    <dialog id="product-modal">
-        <div class="modal-header">
-            <h2 id="product-modal-title"></h2>
-            <button class="modal-close" onclick="closeProductModal()">&times;</button>
+    <!-- Сетка товаров -->
+    <div class="products-grid" id="products-grid"></div>
+    
+    <!-- Пустое состояние -->
+    <div class="empty-state hidden" id="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">Ничего не найдено</div>
+      <p>Попробуйте изменить параметры поиска</p>
+    </div>
+  </main>
+
+  <!-- Модалка товара -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="product-modal">
+      <div class="modal-header">
+        <img class="modal-image" id="modal-image" src="" alt="">
+        <button class="modal-close" onclick="closeProductModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-description" id="modal-description"></p>
+        
+        <!-- Варианты товара (табы) -->
+        <div class="variants-section hidden" id="variants-section">
+          <div class="section-label">Выберите вид</div>
+          <div class="variant-tabs" id="variant-tabs"></div>
         </div>
-        <div class="modal-body">
-            <div class="ico" id="product-modal-ico"></div>
-            <p class="description" id="product-modal-description"></p>
-            <div class="form-group">
-                <label for="product-variant-select">Вариант</label>
-                <select id="product-variant-select"></select>
+
+        <!-- Вес -->
+        <div class="weight-section" id="weight-section">
+          <div class="section-label">Вес</div>
+          <div class="weight-pills" id="weight-pills"></div>
+        </div>
+
+        <!-- Свой вес -->
+        <div class="custom-weight-section hidden" id="custom-weight-section">
+          <div class="section-label">Свой вес (100г - 1кг)</div>
+          <input type="range" class="range-slider" id="weight-slider" min="100" max="1000" step="50" value="200">
+          <div class="weight-input-row">
+            <input type="number" class="weight-input" id="weight-input" min="100" max="1000" step="50" value="200">
+            <span>грамм</span>
+          </div>
+        </div>
+
+        <!-- Цена -->
+        <div class="price-section">
+          <span class="price-main" id="modal-price">0 ₽</span>
+          <span class="price-old hidden" id="modal-old-price"></span>
+          <span class="price-discount hidden" id="modal-discount"></span>
+        </div>
+
+        <!-- Действия -->
+        <div class="modal-actions">
+          <button class="btn btn-fav" id="modal-fav-btn" onclick="toggleModalFavorite()">
+            ♡
+          </button>
+          <button class="btn btn-plant" id="add-to-cart-btn" onclick="addToCartFromModal()">
+            <span class="leaves">
+              <span class="leaf"></span>
+              <span class="leaf"></span>
+              <span class="leaf"></span>
+              <span class="leaf"></span>
+              <span class="leaf"></span>
+            </span>
+            В корзину
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Корзина -->
+  <div class="cart-sheet" id="cart-sheet">
+    <div class="cart-overlay" onclick="closeCart()"></div>
+    <div class="cart-content">
+      <div class="cart-header">
+        <h2 class="cart-title">Корзина</h2>
+        <button class="modal-close" onclick="closeCart()">×</button>
+      </div>
+      <div class="cart-items" id="cart-items">
+        <!-- Динамически заполняется -->
+      </div>
+      <div class="cart-footer">
+        <div class="cart-summary" id="cart-summary"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Город</label>
+          <select class="form-select" id="checkout-city">
+            <option value="Пенза">Пенза</option>
+            <option value="Москва">Москва</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Телефон</label>
+          <input type="tel" class="form-input" id="checkout-phone" placeholder="+7 999 999-99-99">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Адрес доставки</label>
+          <textarea class="form-textarea" id="checkout-address" placeholder="Город, улица, дом, кв..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Комментарий</label>
+          <textarea class="form-textarea" id="checkout-comment" placeholder="Пожелания к заказу..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Промокод</label>
+          <input type="text" class="form-input" id="checkout-promo" placeholder="Если есть">
+        </div>
+
+        <button class="btn btn-plant" onclick="submitOrder()" style="width: 100%; margin-top: 8px;">
+          <span class="leaves">
+            <span class="leaf"></span>
+            <span class="leaf"></span>
+            <span class="leaf"></span>
+            <span class="leaf"></span>
+            <span class="leaf"></span>
+          </span>
+          Оформить заказ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Нижняя навигация -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showHome()">
+      <span class="nav-icon">🏠</span>
+      <span>Главная</span>
+    </button>
+    <button class="nav-item" onclick="showFavorites()">
+      <span class="nav-icon">♡</span>
+      <span>Избранное</span>
+      <span class="nav-badge hidden" id="fav-badge">0</span>
+    </button>
+    <button class="nav-item" onclick="openCart()">
+      <span class="nav-icon">🛒</span>
+      <span>Корзина</span>
+      <span class="nav-badge hidden" id="cart-badge">0</span>
+    </button>
+    <button class="nav-item" onclick="showProfile()">
+      <span class="nav-icon">👤</span>
+      <span>Профиль</span>
+    </button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // ===== КОНСТАНТЫ =====
+    const HAPTIC_ENABLED = false; // Поставь true чтобы включить виброотклик
+    
+    const BACKEND = 'https://puzzlebot-webhook-handler1.onrender.com';
+    const CURRENCY = 'RUB';
+    const ROUND = Math.round;
+    
+    const DISCOUNT_THRESHOLDS = [
+      { g: 500, rate: 0.05 },
+      { g: 700, rate: 0.10 },
+      { g: 1000, rate: 0.15 },
+    ];
+    
+    const STORAGE_CART_KEY = 'syromania-cart-v2';
+    const STORAGE_FAV_KEY = 'syromania-favorites-v2';
+    const STORAGE_CHECKOUT_KEY = 'syromania-checkout-v2';
+    
+    const DEFAULT_IMG = 'https://static.tildacdn.com/tild3134-3861-4539-a363-646133333238/__.webp';
+    
+    // Группы товаров
+    const GROUPS = [
+      { id: 'all', title: 'Все' },
+      { id: 'brined', title: 'Рассольные' },
+      { id: 'soft', title: 'Мягкие' },
+      { id: 'hard', title: 'Твёрдые' },
+      { id: 'rolls', title: 'Рулеты' },
+      { id: 'dairy', title: 'Молочка' },
+      { id: 'sweets', title: 'Сладости' },
+      { id: 'bakery', title: 'Выпечка' },
+    ];
+    
+    const CHEESE_GROUP_IDS = new Set(['brined', 'soft', 'hard', 'rolls']);
+    
+    // Хиты продаж (ID товаров)
+    const HITS = [
+      'spicy-klubok',
+      'halloumi-tomato-paprika',
+      'panir-herbs',
+      'sandesh-combo',
+      'barfi-sesame'
+    ];
+    
+    // ===== ДАННЫЕ ТОВАРОВ =====
+    // Объединённые варианты для товаров с несколькими видами
+    const PRODUCT_VARIANTS = {
+      'sandesh-combo': {
+        id: 'sandesh-combo',
+        name: 'Сандеш (набор)',
+        group: 'sweets',
+        pricePerUnit: 300,
+        ico: '🍮',
+        description: 'Нежный творожный десерт. Набор из 3 вкусов: апельсиновый, с грецким орехом, с кэробом. В каждом наборе 5 шт.',
+        img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp',
+        variants: [
+          { id: 'sandesh-orange', name: 'Апельсин', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp' },
+          { id: 'sandesh-walnut', name: 'Грецкий орех', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-walnut.webp' },
+          { id: 'sandesh-carob', name: 'Кэроб', img: 'https://static.tildacdn.com/tild6135-6337-4266-b764-613565386238/_.webp' }
+        ]
+      },
+      'halloumi-combo': {
+        id: 'halloumi-combo',
+        name: 'Халлуми',
+        group: 'brined',
+        pricePerKg: 2100,
+        ico: '🔥',
+        description: 'Идеален для жарки на сковороде или гриле — появляется хрустящая корочка. Вес одной штуки ~225 г.',
+        img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp',
+        pieceWeightGrams: 225,
+        pieceWeightRangeText: '200–250 г',
+        variants: [
+          { id: 'halloumi', name: 'Классический', pricePerKg: 1950, img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp' },
+          { id: 'halloumi-paprika-oregano', name: 'С паприкой', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3133-6165-4134-b335-396662633262/halloumi-paprika-ore.webp' },
+          { id: 'halloumi-tomato-basil-garlic', name: 'Томат-базилик', pricePerKg: 2100, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/halloumi-tomato-basil-garlic.webp' },
+          { id: 'halloumi-tomato-paprika', name: 'С вялеными томатами', pricePerKg: 2100, img: 'https://static.tildacdn.com/tild3863-3030-4439-a439-653238303862/halloumi-tomato-papr.webp' }
+        ]
+      },
+      'panir-combo': {
+        id: 'panir-combo',
+        name: 'Адыгейский сыр (панир)',
+        group: 'soft',
+        pricePerKg: 1450,
+        ico: '🧀',
+        description: 'Очень нежный, мягкий сыр ручной работы.',
+        img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp',
+        variants: [
+          { id: 'panir-classic', name: 'Классический', pricePerKg: 1450, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp' },
+          { id: 'panir-herbs', name: 'С зеленью', pricePerKg: 1600, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-herbs.webp' },
+          { id: 'panir-spicy', name: 'Со специями', pricePerKg: 1650, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-spicy.webp' },
+          { id: 'panir-smoked', name: 'Копчёный', pricePerKg: 1700, img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-smoked.webp' }
+        ]
+      }
+    };
+    
+    const PRODUCTS = [
+      // Рассольные сыры
+      { id: 'mozzarella', name: 'Моцарелла', group: 'brined', pricePerKg: 2000, ico: '🧀', description: 'Нити моцареллы в нежной оболочке. Срок хранения: 3–5 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/mozzarella.webp', pieceWeightGrams: 200 },
+      { id: 'buratta', name: 'Буратта', group: 'brined', pricePerKg: 2100, ico: '🧀', description: 'Мешочек из моцареллы с начинкой из страчателлы. Срок хранения: 3–5 суток.', img: DEFAULT_IMG, pieceWeightGrams: 250 },
+      { id: 'stracciatella', name: 'Страчателла', group: 'brined', pricePerKg: 2150, ico: '🧀', description: 'Нити моцареллы в сливках. Срок хранения: 5–7 суток.', img: 'https://static.tildacdn.com/tild3832-6430-4462-b663-353438383930/stracciatella.webp' },
+      { id: 'suluguni', name: 'Сулугуни', group: 'brined', pricePerKg: 1700, ico: '🧀', description: 'Умеренно солёный, слоистый и эластичный. Срок хранения: 7 суток.', img: 'https://static.tildacdn.com/tild3238-3866-4366-a436-623236363261/suluguni.webp' },
+      { id: 'suluguni-smoked', name: 'Сулугуни копчёный', group: 'brined', pricePerKg: 1800, ico: '💨', description: 'С лёгкой копчёностью, плотная и эластичная структура. Срок хранения: 30 суток.', img: 'https://static.tildacdn.com/tild6435-3838-4463-b431-353765323333/suluguni-smoked.webp' },
+      { id: 'imeretian', name: 'Имеретинский', group: 'brined', pricePerKg: 1500, ico: '🧀', description: 'Прекрасный рассольный сыр, подходит ко всем блюдам. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/imeretian.webp' },
+      { id: 'imeretian-dill-garlic', name: 'Имеретинский с зеленью', group: 'brined', pricePerKg: 1600, ico: '🧄', description: 'Свежий рассольный сыр с ароматной зеленью и чесноком. Срок хранения: 7 суток.', img: 'https://static.tildacdn.com/tild6435-3539-4337-a561-386438636230/__.webp' },
+      { id: 'halloumi-combo', name: 'Халлуми', group: 'brined', pricePerKg: 1950, ico: '🔥', description: 'Идеален для жарки на сковороде или гриле. Срок хранения: 7 суток.', img: 'https://static.tildacdn.com/tild3161-6362-4130-b134-623331346238/halloumi.webp', isCombo: true, comboKey: 'halloumi-combo' },
+      { id: 'kosichka', name: 'Сыр косичка', group: 'brined', pricePerKg: 1900, ico: '🥨', description: 'Слегка солёный, подходит ко всему. Срок хранения: 7 суток.', img: DEFAULT_IMG, pieceWeightGrams: 200 },
+      { id: 'kosichka-smoked', name: 'Сыр косичка копчёная', group: 'brined', pricePerKg: 2000, ico: '💨', description: 'Холодное копчение, лёгкая солёность. Срок хранения: 30 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/kosichka-smoked.webp', pieceWeightGrams: 200 },
+      { id: 'spicy-klubok', name: 'Пряные клубочки', group: 'brined', pricePerKg: 1950, ico: '🌶️', description: 'Нестандартный вкусный сыр, не сильно солёный, нравится всем. Срок хранения: 7 суток.', img: 'https://static.tildacdn.com/tild3463-6166-4665-a439-323264653939/spicy-klubok.webp', pieceWeightGrams: 150 },
+      
+      // Мягкие сыры
+      { id: 'ricotta', name: 'Творожный сыр (рикотта)', group: 'soft', pricePerKg: 1400, ico: '🥛', description: 'Нежный сыр, подходит и к бутербродам, и к блюдам. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta.webp' },
+      { id: 'ricotta-herbs', name: 'Творожный сыр с зеленью', group: 'soft', pricePerKg: 1500, ico: '🌿', description: 'Нежный, свежий, универсальный — лучше попробовать! Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/ricotta-herbs.webp' },
+      { id: 'caciotta', name: 'Качотта', group: 'soft', pricePerKg: 2200, ico: '🧀', description: 'Мягкий итальянский сыр. Срок хранения: 7 суток.', img: 'https://static.tildacdn.com/tild6165-3265-4834-a236-366661346562/caciotta.webp' },
+      { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', group: 'soft', pricePerKg: 2250, ico: '🌿', description: 'С ореховым привкусом пажитника. Срок хранения: 7 суток.', img: DEFAULT_IMG },
+      { id: 'panir-combo', name: 'Адыгейский сыр (панир)', group: 'soft', pricePerKg: 1450, ico: '🧀', description: 'Очень нежный, мягкий сыр ручной работы. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/panir-classic.webp', isCombo: true, comboKey: 'panir-combo' },
+      
+      // Твёрдые сыры
+      { id: 'hard-village', name: 'Твёрдый деревенский сыр', group: 'hard', pricePerKg: 1600, ico: '🧀', description: 'Твёрдый деревенский сыр готовится из творога с приправами. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/hard-village.webp' },
+      { id: 'hard-smoked', name: 'Твёрдый копчёный сыр', group: 'hard', pricePerKg: 1800, ico: '💨', description: 'Готовится из творога с приправами, обжаривается, затем коптится. Срок хранения: до 30 суток.', img: 'https://static.tildacdn.com/tild6662-3930-4663-b132-316135626136/hard-smoked.webp' },
+      
+      // Рулеты
+      { id: 'rolls-olives-walnut', name: 'Сырный рулет с маслинами', group: 'rolls', pricePerKg: 1700, ico: '🥜', description: 'Можно подать как закуску к любому столу. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-olives-walnut.webp' },
+      { id: 'rolls-apricot-cedar', name: 'Сырный рулет с курагой', group: 'rolls', pricePerKg: 1700, ico: '🍑', description: 'Слегка сладковатый благодаря творожному сыру, кураге и орехам. Срок хранения: 7 суток.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/rolls-apricot-cedar.webp' },
+      
+      // Молочка
+      { id: 'milk', name: 'Молоко', group: 'dairy', pricePerL: 150, ico: '🥛', description: 'Молоко отборное цельное, охлаждённое. Срок хранения: 3–5 суток.', img: DEFAULT_IMG },
+      { id: 'milk-topped', name: 'Молоко топлёное', group: 'dairy', pricePerL: 250, ico: '🥛', description: 'Настоящее цельное топлёное молоко. Срок хранения: 5–7 суток.', img: 'https://static.tildacdn.com/tild3839-3163-4066-a633-306366346631/milk-topped.webp' },
+      { id: 'yogurt', name: 'Йогурт', group: 'dairy', pricePerL: 260, ico: '🥛', description: 'Самый настоящий йогурт из отборного молока. Срок хранения: 5 суток.', img: DEFAULT_IMG },
+      { id: 'ryazhenka', name: 'Ряженка', group: 'dairy', pricePerL: 280, ico: '🥛', description: 'Натуральная ряженка из молока. Срок хранения: до 5 суток.', img: DEFAULT_IMG },
+      { id: 'misti-dahi', name: 'Мистхи-Дахи', group: 'dairy', pricePerL: 300, ico: '🥛', description: 'Кисломолочный напиток. Срок хранения: 5 суток.', img: DEFAULT_IMG },
+      { id: 'whey', name: 'Сыворотка', group: 'dairy', pricePerL: 60, ico: '💧', description: 'Молочный низкокалорийный продукт. Срок хранения: 3 суток.', img: DEFAULT_IMG },
+      { id: 'cream', name: 'Сливки (33–36%)', group: 'dairy', pricePerL: 1450, ico: '🥛', description: 'Натуральные свежие сливки. Срок хранения: 5 суток.', img: 'https://static.tildacdn.com/tild3163-3665-4636-a537-303830323163/cream.webp' },
+      { id: 'tvorog', name: 'Творог', group: 'dairy', pricePerKg: 700, ico: '🥛', description: 'Творожный нежный вкус. Срок хранения: 3–5 суток.', img: 'https://static.tildacdn.com/tild3136-3730-4134-b466-613138343764/tvorog.webp' },
+      { id: 'butter', name: 'Сливочное масло (шарик)', group: 'dairy', pricePerKg: 2100, ico: '🧈', description: 'Натуральное сливочное масло ручной работы. Приблизительный вес — 200 г.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/butter.webp', pieceWeightGrams: 200 },
+      { id: 'ghee', name: 'Топлёное масло (ГХИ)', group: 'dairy', pricePerKg: 2900, ico: '🧈', description: 'Жирность ~99%. Идеально для жарки. Срок хранения: больше 10 лет.', img: DEFAULT_IMG },
+      { id: 'condensed-milk', name: 'Варёная сгущёнка', group: 'dairy', pricePerKg: 1000, ico: '🥛', description: 'Натуральная варёная сгущёнка, густая и карамельная. Срок хранения: 7 суток.', img: DEFAULT_IMG },
+      { id: 'tvorozhnaya-massa', name: 'Творожная масса', group: 'dairy', pricePerKg: 850, ico: '🥛', description: 'С изюмом, финиками, черносливом или курагой. Срок хранения: 5 суток.', img: 'https://static.tildacdn.com/tild6630-3237-4430-b461-313634376333/tvorozhnaya-massa_.webp', flavors: ['С изюмом', 'С финиками', 'С черносливом', 'С курагой'] },
+      
+      // Сладости
+      { id: 'sandesh-combo', name: 'Сандеш', group: 'sweets', pricePerUnit: 300, ico: '🍮', description: 'Нежный творожный десерт. Набор из 5 шт.', img: 'https://raw.githubusercontent.com/youmyloving/syr/main/sandesh-orange.webp', isCombo: true, comboKey: 'sandesh-combo' },
+      { id: 'barfi-classic', name: 'Бурфи классический', group: 'sweets', pricePerUnit: 350, ico: '🍮', description: 'Нежный молочный десерт. В наборе 5 шт.', img: 'https://static.tildacdn.com/tild3430-3231-4562-b164-366638313434/barfi-classic.webp' },
+      { id: 'barfi-hazelnut', name: 'Бурфи с фундуком', group: 'sweets', pricePerUnit: 350, ico: '🍮', description: 'Бурфи с фундуком, 5 шт в наборе.', img: 'https://static.tildacdn.com/tild3065-3332-4466-a536-353130343264/barfi-hazelnut.webp' },
+      { id: 'barfi-sesame', name: 'Бурфи кунжутный', group: 'sweets', pricePerUnit: 490, ico: '🍮', description: 'Бурфи с кунжутом, 7 шт в наборе.', img: 'https://static.tildacdn.com/tild3439-6135-4861-a531-316233303166/_.webp' },
+      { id: 'halva', name: 'Халва', group: 'sweets', pricePerUnit: 200, ico: '🍯', description: 'Самая настоящая халва. Срок хранения: 14 дней.', img: 'https://static.tildacdn.com/tild3566-6566-4464-b531-306364646164/photo.webp' },
+      { id: 'potato-cake-5', name: 'Пирожное «Картошка» (5 шт)', group: 'sweets', pricePerUnit: 400, ico: '🍰', description: 'Домашние пирожные из цельнозерновой муки. В коробке 5 шт.', img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp' },
+      { id: 'potato-cake-2', name: 'Пирожное «Картошка» (2 шт)', group: 'sweets', pricePerUnit: 190, ico: '🍰', description: 'Домашние пирожные (2 шт).', img: 'https://static.tildacdn.com/tild3961-6133-4632-b162-396333663962/potato-cake-2.webp' },
+      
+      // Выпечка
+      { id: 'cookies-tvorog', name: 'Печенье творожное', group: 'bakery', pricePerKg: 600, ico: '🍪', description: 'Мягкое домашнее печенье на твороге.', img: DEFAULT_IMG },
+      { id: 'cookies-oat', name: 'Печенье овсяное', group: 'bakery', pricePerKg: 600, ico: '🍪', description: 'Овсяное печенье к чаю.', img: DEFAULT_IMG },
+      { id: 'cookies-nut', name: 'Ореховые пальчики', group: 'bakery', pricePerKg: 700, ico: '🍪', description: 'Печенье с орехами — хрустящие пальчики.', img: 'https://static.tildacdn.com/tild3035-6230-4434-b363-303434366630/cookies-nut.webp' },
+      { id: 'cookies-carob', name: 'Печенье кэробовое', group: 'bakery', pricePerKg: 600, ico: '🍪', description: 'Печенье с кэробом вместо какао.', img: DEFAULT_IMG },
+      { id: 'cookies-sandy', name: 'Печенье песочное', group: 'bakery', pricePerKg: 600, ico: '🍪', description: 'Рассыпчатое песочное печенье.', img: DEFAULT_IMG },
+      { id: 'muffin-plain', name: 'Кексы обычные', group: 'bakery', pricePerKg: 500, ico: '🧁', description: 'Домашние кексы.', img: DEFAULT_IMG },
+      { id: 'muffin-carob', name: 'Кексы с кэробом', group: 'bakery', pricePerKg: 550, ico: '🧁', description: 'Кексы с кэробом.', img: DEFAULT_IMG },
+      { id: 'muffin-raisin', name: 'Кексы с изюмом', group: 'bakery', pricePerKg: 550, ico: '🧁', description: 'Кексы с изюмом.', img: 'https://static.tildacdn.com/tild3465-3162-4436-a235-363763383339/muffin-raisin.webp' },
+      { id: 'casserole-plain', name: 'Творожная запеканка', group: 'bakery', pricePerUnit: 260, ico: '🍮', description: 'Домашняя творожная запеканка.', img: DEFAULT_IMG },
+      { id: 'casserole-raisin', name: 'Творожная запеканка с изюмом', group: 'bakery', pricePerUnit: 260, ico: '🍮', description: 'Запеканка с изюмом.', img: DEFAULT_IMG },
+      { id: 'crazy-cake', name: 'Сумасшедший пирог', group: 'bakery', pricePerUnit: 600, ico: '🍰', description: 'Домашний пирог к чаю.', img: DEFAULT_IMG },
+      { id: 'coconut-kuchen-1kg', name: 'Кокосовый пирог 1 кг', group: 'bakery', pricePerUnit: 1800, ico: '🍰', description: 'Кокосовый пирог (форма ~1 кг).', img: DEFAULT_IMG },
+      { id: 'coconut-kuchen-05kg', name: 'Кокосовый пирог 0.5 кг', group: 'bakery', pricePerUnit: 1000, ico: '🍰', description: 'Кокосовый пирог (форма ~0.5 кг).', img: DEFAULT_IMG },
+      { id: 'napoleon-1kg', name: 'Торт «Наполеон» 1 кг', group: 'bakery', pricePerUnit: 1300, ico: '🍰', description: 'Классический Наполеон (около 1 кг).', img: DEFAULT_IMG },
+      { id: 'napoleon-05kg', name: 'Торт «Наполеон» 0.5 кг', group: 'bakery', pricePerUnit: 750, ico: '🍰', description: 'Классический Наполеон (около 0.5 кг).', img: DEFAULT_IMG },
+      { id: 'apple-pie', name: 'Яблочный пирог', group: 'bakery', pricePerUnit: 560, ico: '🥧', description: 'Домашний яблочный пирог.', img: DEFAULT_IMG },
+      { id: 'bliny-10', name: 'Блины (10 шт)', group: 'bakery', pricePerUnit: 330, ico: '🥞', description: 'Тонкие блинчики, 10 шт.', img: DEFAULT_IMG },
+      { id: 'bliny-5', name: 'Блины (5 шт)', group: 'bakery', pricePerUnit: 220, ico: '🥞', description: 'Тонкие блинчики, 5 шт.', img: DEFAULT_IMG },
+      { id: 'bliny-tvorog-5', name: 'Блины с творогом (5 шт)', group: 'bakery', pricePerUnit: 300, ico: '🥞', description: 'Блины с начинкой из творога.', img: DEFAULT_IMG },
+      { id: 'syrniki-10', name: 'Сырники (10 шт)', group: 'bakery', pricePerUnit: 520, ico: '🥞', description: 'Домашние сырники, 10 шт.', img: DEFAULT_IMG },
+      { id: 'syrniki-5', name: 'Сырники (5 шт)', group: 'bakery', pricePerUnit: 280, ico: '🥞', description: 'Домашние сырники, 5 шт.', img: DEFAULT_IMG },
+      { id: 'chapati-10', name: 'Чапати (10 шт)', group: 'bakery', pricePerUnit: 270, ico: '🫓', description: 'Чапати из пшеничной муки. Срок хранения: 2 суток.', img: 'https://static.tildacdn.com/tild6332-6239-4538-b839-356132356236/chapati-10.webp' },
+      { id: 'chapati-wholewheat-10', name: 'Чапати цельнозерновые (10 шт)', group: 'bakery', pricePerUnit: 320, ico: '🫓', description: 'Чапати из цельнозерновой муки.', img: DEFAULT_IMG },
+    ];
+    
+    // Правила вариантов с ограничением 1000г
+    const VARIANT_RULES = {
+      'mozzarella': { type: 'fixed', options: ['1 шт (≈200 г)'] },
+      'buratta': { type: 'fixed', options: ['1 шт (≈250 г)'] },
+      'halloumi-combo': { type: 'fixed', options: ['1 шт (≈225 г)'] },
+      'kosichka': { type: 'fixed', options: ['1 шт (≈200 г)'] },
+      'kosichka-smoked': { type: 'fixed', options: ['1 шт (≈200 г)'] },
+      'spicy-klubok': { type: 'fixed', options: ['1 шт (≈150 г)'] },
+      
+      'milk': { type: 'fixed', options: ['0.5 л', '1 л'] },
+      'milk-topped': { type: 'fixed', options: ['0.5 л', '1 л'] },
+      'yogurt': { type: 'fixed', options: ['0.5 л', '1 л'] },
+      'ryazhenka': { type: 'fixed', options: ['0.5 л', '1 л'] },
+      'misti-dahi': { type: 'fixed', options: ['0.5 л', '1 л'] },
+      'whey': { type: 'fixed', options: ['1 л'] },
+      'cream': { type: 'fixed', options: ['0.2 л', '0.5 л', '1 л'] },
+      
+      'tvorog': { type: 'weight', unit: 'г', step: 250, min: 250, max: 1000 },
+      'tvorozhnaya-massa': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
+      'condensed-milk': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
+      
+      'butter': { type: 'fixed', options: ['1 шт (≈200 г)'] },
+      'ghee': { type: 'fixed', options: ['200 г', '500 г', '1000 г'] },
+      
+      'sandesh-combo': { type: 'fixed', options: ['1 набор (5 шт)'] },
+      'barfi-classic': { type: 'fixed', options: ['1 набор (5 шт)'] },
+      'barfi-hazelnut': { type: 'fixed', options: ['1 набор (5 шт)'] },
+      'barfi-sesame': { type: 'fixed', options: ['1 набор (7 шт)'] },
+      'halva': { type: 'fixed', options: ['0.2 кг'] },
+      'potato-cake-5': { type: 'fixed', options: ['5 шт'] },
+      'potato-cake-2': { type: 'fixed', options: ['2 шт'] },
+      
+      'cookies-tvorog': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'cookies-oat': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'cookies-nut': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'cookies-carob': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'cookies-sandy': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      
+      'muffin-plain': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'muffin-carob': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      'muffin-raisin': { type: 'weight', unit: 'г', step: 50, min: 200, max: 1000 },
+      
+      'casserole-plain': { type: 'fixed', options: ['1 шт'] },
+      'casserole-raisin': { type: 'fixed', options: ['1 шт'] },
+      'crazy-cake': { type: 'fixed', options: ['1 шт'] },
+      'coconut-kuchen-1kg': { type: 'fixed', options: ['1 торт (1 кг)'] },
+      'coconut-kuchen-05kg': { type: 'fixed', options: ['1 торт (0.5 кг)'] },
+      'napoleon-1kg': { type: 'fixed', options: ['1 торт (1 кг)'] },
+      'napoleon-05kg': { type: 'fixed', options: ['1 торт (0.5 кг)'] },
+      'apple-pie': { type: 'fixed', options: ['1 пирог'] },
+      
+      'bliny-10': { type: 'fixed', options: ['10 шт'] },
+      'bliny-5': { type: 'fixed', options: ['5 шт'] },
+      'bliny-tvorog-5': { type: 'fixed', options: ['5 шт'] },
+      'syrniki-10': { type: 'fixed', options: ['10 шт'] },
+      'syrniki-5': { type: 'fixed', options: ['5 шт'] },
+      'chapati-10': { type: 'fixed', options: ['10 шт'] },
+      'chapati-wholewheat-10': { type: 'fixed', options: ['10 шт'] },
+    };
+    
+    // ===== СОСТОЯНИЕ =====
+    let cart = [];
+    let favorites = new Set();
+    let currentCategory = 'all';
+    let currentProduct = null;
+    let currentVariant = null;
+    let selectedWeight = 200;
+    let selectedVariantIndex = 0;
+    let checkoutState = { phone: '', address: '', comment: '', promo: '', city: 'Пенза' };
+    
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    document.addEventListener('DOMContentLoaded', init);
+    
+    function init() {
+      loadState();
+      setupTelegram();
+      renderCategories();
+      renderHits();
+      renderProducts();
+      updateUI();
+      setupEventListeners();
+      
+      // Скролл для поиска
+      window.addEventListener('scroll', () => {
+        const searchContainer = document.getElementById('search-container');
+        if (window.scrollY > 10) {
+          searchContainer.classList.add('scrolled');
+        } else {
+          searchContainer.classList.remove('scrolled');
+        }
+      });
+    }
+    
+    function setupTelegram() {
+      if (window.Telegram?.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+          const avatar = document.getElementById('user-avatar');
+          const initial = (user.first_name || user.username || 'U').charAt(0).toUpperCase();
+          avatar.innerHTML = user.photo_url 
+            ? `<img src="${user.photo_url}" alt="" onerror="this.parentElement.innerHTML='<span>${initial}</span>'">`
+            : `<span>${initial}</span>`;
+        }
+      }
+    }
+    
+    function loadState() {
+      try {
+        const savedCart = localStorage.getItem(STORAGE_CART_KEY);
+        if (savedCart) cart = JSON.parse(savedCart);
+        
+        const savedFav = localStorage.getItem(STORAGE_FAV_KEY);
+        if (savedFav) favorites = new Set(JSON.parse(savedFav));
+        
+        const savedCheckout = localStorage.getItem(STORAGE_CHECKOUT_KEY);
+        if (savedCheckout) checkoutState = { ...checkoutState, ...JSON.parse(savedCheckout) };
+      } catch (e) {
+        console.error('Error loading state:', e);
+      }
+    }
+    
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart));
+        localStorage.setItem(STORAGE_FAV_KEY, JSON.stringify([...favorites]));
+        localStorage.setItem(STORAGE_CHECKOUT_KEY, JSON.stringify(checkoutState));
+      } catch (e) {
+        console.error('Error saving state:', e);
+      }
+    }
+    
+    // ===== РЕНДЕРИНГ =====
+    function renderCategories() {
+      // Мобильные табы
+      const scroll = document.getElementById('categories-scroll');
+      scroll.innerHTML = GROUPS.map(g => `
+        <button class="category-tab ${g.id === currentCategory ? 'active' : ''}" 
+                onclick="setCategory('${g.id}')">
+          ${g.title}
+        </button>
+      `).join('');
+      
+      // Десктопный сайдбар
+      const sidebar = document.getElementById('sidebar-categories');
+      if (sidebar) {
+        sidebar.innerHTML = GROUPS.map(g => `
+          <div class="sidebar-category ${g.id === currentCategory ? 'active' : ''}" 
+               onclick="setCategory('${g.id}')">
+            ${g.title}
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderHits() {
+      const container = document.getElementById('hits-scroll');
+      const hitProducts = HITS.map(id => {
+        if (id === 'sandesh-combo') return PRODUCT_VARIANTS['sandesh-combo'];
+        return PRODUCTS.find(p => p.id === id);
+      }).filter(Boolean);
+      
+      container.innerHTML = hitProducts.map(p => `
+        <div class="hit-card" onclick="openProductModal('${p.id}')">
+          <div class="hit-badge">ХИТ</div>
+          <img class="hit-image" src="${p.img || DEFAULT_IMG}" alt="" loading="lazy">
+          <div class="hit-content">
+            <div class="hit-name">${p.name}</div>
+            <div class="hit-price">${getPriceText(p)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function renderProducts() {
+      const grid = document.getElementById('products-grid');
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      
+      let filtered = PRODUCTS.filter(p => {
+        const matchesCategory = currentCategory === 'all' || p.group === currentCategory;
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+      
+      // Скрываем секцию хитов если есть поиск или фильтр
+      const hitsSection = document.getElementById('hits-section');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (searchTerm || currentCategory !== 'all') {
+        hitsSection.classList.add('hidden');
+      } else {
+        hitsSection.classList.remove('hidden');
+      }
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      grid.innerHTML = filtered.map(p => {
+        const isFav = favorites.has(p.id);
+        return `
+          <div class="product-card" onclick="openProductModal('${p.id}')" data-id="${p.id}">
+            <div class="product-image-wrap">
+              <img class="product-image skeleton" src="${p.img || DEFAULT_IMG}" 
+                   alt="" loading="lazy" onload="this.classList.remove('skeleton')">
+              <button class="fav-btn ${isFav ? 'active' : ''}" 
+                      onclick="event.stopPropagation(); toggleFavorite('${p.id}')">
+                ${isFav ? '♥' : '♡'}
+              </button>
+              <button class="quick-add" onclick="event.stopPropagation(); quickAdd('${p.id}')">
+                +
+              </button>
             </div>
-            <div class="form-group">
-                <label for="product-qty-input">Количество</label>
-                <input type="number" id="product-qty-input" value="1" min="1">
+            <div class="product-info">
+              <div class="product-name">${p.name}</div>
+              <div class="product-price">
+                ${getPriceText(p)}
+                ${p.pricePerKg ? '<span class="product-unit">/ кг</span>' : ''}
+              </div>
             </div>
-            <div class="price-display" id="product-modal-price">0 ₽</div>
-            <button class="btn btn-primary" id="add-to-cart-btn">Добавить в корзину</button>
-        </div>
-    </dialog>
-
-    <dialog id="cart-modal">
-        <div class="modal-header">
-            <h2>Корзина</h2>
-            <button class="modal-close" onclick="closeCartModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="cart-modal-body">
-            <!-- Cart items will be rendered here -->
-        </div>
-    </dialog>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        // --- CONFIGURATION & DATA ---
-        const CURRENCY = 'RUB';
-        const ROUND = Math.round;
-        const DISCOUNT_THRESHOLDS = [{ g: 1000, rate: 0.15 }, { g: 700, rate: 0.10 }, { g: 500, rate: 0.05 }];
-        const ONLY_CHEESE_FILTER_DEFAULT = false;
-        const PAYLOAD_SCHEMA_VERSION = 'v1';
-
-        const PRODUCTS = [
-            // Сыры
-            { id: 'panir-classic', name: 'Панир Классический', cat: 'Сыры', pricePerKg: 1200, ico: '🧀', description: 'Нежный свежий сыр.' },
-            { id: 'panir-herbs', name: 'Панир С зеленью', cat: 'Сыры', pricePerKg: 1300, ico: '🌿', description: 'С ароматными травами.' },
-            { id: 'panir-spicy', name: 'Панир С пряностями', cat: 'Сыры', pricePerKg: 1350, ico: '🌶️', description: 'С пикантными специями.' },
-            { id: 'panir-smoked', name: 'Панир Копчёный', cat: 'Сыры', pricePerKg: 1400, ico: '💨', description: 'С дымным ароматом.' },
-            { id: 'suluguni', name: 'Сулугуни', cat: 'Сыры', pricePerKg: 1400, ico: '🧀', description: 'Классический грузинский сыр.' },
-            { id: 'suluguni-smoked', name: 'Сулугуни копчёный', cat: 'Сыры', pricePerKg: 1550, ico: '💨', description: 'Копчёный сулугуни.' },
-            { id: 'imeretian', name: 'Имеретинский', cat: 'Сыры', pricePerKg: 1300, ico: '🧀', description: 'Мягкий, рассыпчатый сыр.' },
-            { id: 'imeretian-dill-garlic', name: 'Имеретинский с укропом и чесноком', cat: 'Сыры', pricePerKg: 1400, ico: '🧄', description: 'С насыщенным вкусом.' },
-            { id: 'halloumi', name: 'Халлуми (классический)', cat: 'Сыры', pricePerKg: 1650, ico: '🔥', description: 'Идеален для жарки.' },
-            { id: 'halloumi-paprika-oregano', name: 'Халлуми с паприкой и орегано', cat: 'Сыры', pricePerKg: 1800, ico: '🌶️', description: 'Средиземноморские нотки.' },
-            { id: 'halloumi-tomato-basil-garlic', name: 'Халлуми томат-базилик-чеснок', cat: 'Сыры', pricePerKg: 1800, ico: '🍅', description: 'Итальянский вкус.' },
-            { id: 'halloumi-tomato-paprika', name: 'Халлуми с вялеными помидорами и паприкой', cat: 'Сыры', pricePerKg: 1800, ico: '🍅', description: 'Яркий и насыщенный.' },
-            { id: 'kosichka', name: 'Косичка', cat: 'Сыры', pricePerKg: 1600, ico: '🥨', description: 'В форме плетенки.' },
-            { id: 'kosichka-smoked', name: 'Косичка копчёная', cat: 'Сыры', pricePerKg: 1750, ico: '💨', description: 'Копчёная косичка.' },
-            { id: 'spicy-klubok', name: 'Пряный клубок', cat: 'Сыры', pricePerUnit: 1680, ico: '🌶️', description: 'Острый сыр в виде клубка.' },
-            { id: 'mozzarella', name: 'Моцарелла', cat: 'Сыры', pricePerUnit: 1700, ico: '🧀', description: 'Классическая моцарелла.' },
-            { id: 'buratta', name: 'Буратта', cat: 'Сыры', pricePerUnit: 1800, ico: '🧀', description: 'Нежнейшая буратта.' },
-            { id: 'stracciatella', name: 'Страчателла', cat: 'Сыры', pricePerKg: 1850, ico: '🧀', description: 'Сливки и нити моцареллы.' },
-            { id: 'ricotta', name: 'Творожный сыр (рикотта)', cat: 'Сыры', pricePerKg: 1100, ico: '🥛', description: 'Итальянский творожный сыр.' },
-            { id: 'ricotta-herbs', name: 'Рикотта с укропом и зеленью', cat: 'Сыры', pricePerKg: 1200, ico: '🌿', description: 'С ароматной зеленью.' },
-            { id: 'caciotta', name: 'Качотта', cat: 'Сыры', pricePerKg: 2150, ico: '🧀', description: 'Мягкий итальянский сыр.' },
-            { id: 'caciotta-fenugreek', name: 'Качотта с пажитником', cat: 'Сыры', pricePerKg: 2250, ico: '🌿', description: 'С ореховым привкусом пажитника.' },
-            { id: 'hard-village', name: 'Твёрдый по-деревенски', cat: 'Сыры', pricePerKg: 1400, ico: '🧀', description: 'Насыщенный вкус.' },
-            { id: 'hard-smoked', name: 'Твёрдый копчёный', cat: 'Сыры', pricePerKg: 1600, ico: '💨', description: 'Копчёный твёрдый сыр.' },
-            { id: 'rolls-olives-walnut', name: 'Сырный рулет (маслины, грецкий орех)', cat: 'Сыры', pricePerKg: 1550, ico: '🥜', description: 'Праздничный вариант.' },
-            { id: 'rolls-apricot-cedar', name: 'Сырный рулет (курага, кедровый)', cat: 'Сыры', pricePerKg: 1550, ico: '🍑', description: 'Сладкий и соленый вкус.' },
-            // Молочная продукция
-            { id: 'milk', name: 'Молоко', cat: 'Молочная продукция', pricePerL: 100, ico: '🥛', description: 'Свежее молоко.' },
-            { id: 'milk-topped', name: 'Топлёное молоко', cat: 'Молочная продукция', pricePerL: 200, ico: '🥛', description: 'Традиционное топлёное.' },
-            { id: 'yogurt', name: 'Йогурт классический', cat: 'Молочная продукция', pricePerL: 230, ico: '🥛', description: 'Натуральный йогурт.' },
-            { id: 'ryazhenka', name: 'Ряженка', cat: 'Молочная продукция', pricePerL: 250, ico: '🥛', description: 'Кисломолочный напиток.' },
-            { id: 'whey', name: 'Сыворотка', cat: 'Молочная продукция', pricePerL: 50, ico: '💧', description: 'Молочная сыворотка.' },
-            { id: 'cream', name: 'Сливки', cat: 'Молочная продукция', pricePerL: 1200, ico: '🥛', description: 'Жирные сливки 33%.' },
-            { id: 'tvorog', name: 'Творог', cat: 'Молочная продукция', pricePerKg: 500, ico: '🥛', description: 'Домашний творог.' },
-            { id: 'butter', name: 'Масло сливочное', cat: 'Молочная продукция', pricePerKg: 1800, ico: '🧈', description: 'Вкусное сливочное масло.' },
-            { id: 'ghee', name: 'Топлёное масло (ГХИ)', cat: 'Молочная продукция', pricePerKg: 2300, ico: '🧈', description: 'Чистое топлёное масло.' },
-            { id: 'condensed-milk', name: 'Сгущенка', cat: 'Молочная продукция', pricePerKg: 850, ico: '🥛', description: 'Натуральная сгущенка.' },
-            { id: 'tvorozhnaya-massa', name: 'Творожная масса', cat: 'Молочная продукция', pricePerKg: 700, ico: '🥛', description: 'С добавками (изюм, курага и т.д.).' },
-            // Сладости и выпечка
-            { id: 'cookies-tvorog', name: 'Печенье творожное', cat: 'Сладости и выпечка', pricePerKg: 600, ico: '🍪', description: 'Нежное печенье.' },
-            { id: 'cookies-oat', name: 'Печенье овсяное', cat: 'Сладости и выпечка', pricePerKg: 600, ico: '🍪', description: 'Полезное овсяное.' },
-            { id: 'cookies-nut', name: 'Ореховые пальчики', cat: 'Сладости и выпечка', pricePerKg: 700, ico: '🍪', description: 'С хрустящими орехами.' },
-            { id: 'cookies-carob', name: 'Кэрбовые печенья', cat: 'Сладости и выпечка', pricePerKg: 600, ico: '🍪', description: 'На сладости кэроба.' },
-            { id: 'cookies-sandy', name: 'Песочное печенье', cat: 'Сладости и выпечка', pricePerKg: 600, ico: '🍪', description: 'Классическое песочное.' },
-            { id: 'muffin-plain', name: 'Кексы обычные', cat: 'Сладости и выпечка', pricePerKg: 500, ico: '🧁', description: 'Простые и вкусные.' },
-            { id: 'muffin-carob', name: 'Кексы кэробовые', cat: 'Сладости и выпечка', pricePerKg: 550, ico: '🧁', description: 'С кэробом.' },
-            { id: 'muffin-raisin', name: 'Кексы изюм', cat: 'Сладости и выпечка', pricePerKg: 550, ico: '🧁', description: 'С изюмом.' },
-            { id: 'muffin-mix-plain-raisin', name: 'Кексы микс (обычные+изюм)', cat: 'Сладости и выпечка', pricePerUnit: 280, ico: '🧁', description: 'Микс на 0.5 кг.' },
-            { id: 'muffin-mix-plain-carob', name: 'Кексы микс (обычные+кэроб)', cat: 'Сладости и выпечка', pricePerUnit: 300, ico: '🧁', description: 'Микс на 0.5 кг.' },
-            { id: 'muffin-mix-raisin-carob', name: 'Кексы микс (изюм+кэроб)', cat: 'Сладости и выпечка', pricePerUnit: 300, ico: '🧁', description: 'Микс на 0.5 кг.' },
-            { id: 'sandesh-orange', name: 'Сандеш (апельсин)', cat: 'Сладости и выпечка', pricePerUnit: 250, ico: '🍮', description: '5 шт.' },
-            { id: 'sandesh-walnut', name: 'Сандеш (грец. орех)', cat: 'Сладости и выпечка', pricePerUnit: 250, ico: '🍮', description: '5 шт.' },
-            { id: 'sandesh-carob', name: 'Сандеш (кэроб)', cat: 'Сладости и выпечка', pricePerUnit: 250, ico: '🍮', description: '5 шт.' },
-            { id: 'barfi-classic', name: 'Бурфи классический', cat: 'Сладости и выпечка', pricePerUnit: 300, ico: '🍮', description: '5 шт.' },
-            { id: 'barfi-hazelnut', name: 'Бурфи фундук', cat: 'Сладости и выпечка', pricePerUnit: 300, ico: '🍮', description: '5 шт.' },
-            { id: 'barfi-sesame', name: 'Бурфи кунжутный', cat: 'Сладости и выпечка', pricePerUnit: 420, ico: '🍮', description: '7 шт.' },
-            { id: 'halva', name: 'Халва', cat: 'Сладости и выпечка', pricePerUnit: 200, ico: '🍮', description: '0.2 кг' },
-            { id: 'potato-cake-5', name: 'Пирожное «Картошка»', cat: 'Сладости и выпечка', pricePerUnit: 330, ico: '🍰', description: '5 шт.' },
-            { id: 'potato-cake-2', name: 'Пирожное «Картошка»', cat: 'Сладости и выпечка', pricePerUnit: 155, ico: '🍰', description: '2 шт.' },
-            { id: 'casserole-plain', name: 'Запеканка творожная (обычная)', cat: 'Сладости и выпечка', pricePerUnit: 260, ico: '🍮', description: '250 г' },
-            { id: 'casserole-raisin', name: 'Запеканка творожная (с изюмом)', cat: 'Сладости и выпечка', pricePerUnit: 260, ico: '🍮', description: '250 г' },
-            { id: 'crazy-cake', name: 'Крейзи-кейк', cat: 'Сладости и выпечка', pricePerUnit: 600, ico: '🎂', description: '1 шт.' },
-            { id: 'coconut-kuchen-1kg', name: 'Кокосовый кухен', cat: 'Сладости и выпечка', pricePerUnit: 1800, ico: '🍰', description: '1 кг' },
-            { id: 'coconut-kuchen-05kg', name: 'Кокосовый кухен', cat: 'Сладости и выпечка', pricePerUnit: 1000, ico: '🍰', description: '0.5 кг' },
-            { id: 'napoleon-1kg', name: 'Торт «Наполеон»', cat: 'Сладости и выпечка', pricePerUnit: 1300, ico: '🎂', description: '1+ кг' },
-            { id: 'napoleon-05kg', name: 'Торт «Наполеон»', cat: 'Сладости и выпечка', pricePerUnit: 750, ico: '🎂', description: '0.5+ кг' },
-            { id: 'apple-pie', name: 'Яблочный пирог', cat: 'Сладости и выпечка', pricePerUnit: 560, ico: '🥧', description: '900 г' },
-            { id: 'bliny-10', name: 'Блины', cat: 'Сладости и выпечка', pricePerUnit: 330, ico: '🥞', description: '10 шт.' },
-            { id: 'bliny-5', name: 'Блины', cat: 'Сладости и выпечка', pricePerUnit: 220, ico: '🥞', description: '5 шт.' },
-            { id: 'bliny-tvorog-5', name: 'Блины творог/творог-изюм', cat: 'Сладости и выпечка', pricePerUnit: 300, ico: '🥞', description: '5 шт.' },
-            { id: 'syrniki-10', name: 'Сырники', cat: 'Сладости и выпечка', pricePerUnit: 520, ico: '🥞', description: '10 шт.' },
-            { id: 'syrniki-5', name: 'Сырники', cat: 'Сладости и выпечка', pricePerUnit: 280, ico: '🥞', description: '5 шт.' },
-            { id: 'chapati-10', name: 'Чапати', cat: 'Сладости и выпечка', pricePerUnit: 270, ico: '🫓', description: '10 шт.' },
-            { id: 'chapati-wholewheat-10', name: 'Чапати (ц/з мука)', cat: 'Сладости и выпечка', pricePerUnit: 320, ico: '🫓', description: '10 шт.' },
-        ];
-
-        const VARIANT_RULES = {
-            // Сыры
-            'panir-classic': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'panir-herbs': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'panir-spicy': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'panir-smoked': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'suluguni': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
-            'suluguni-smoked': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
-            'imeretian': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
-            'imeretian-dill-garlic': { type: 'weight', unit: 'г', step: 100, min: 100, max: 1000 },
-            'halloumi': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] },
-            'halloumi-paprika-oregano': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] },
-            'halloumi-tomato-basil-garlic': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] },
-            'halloumi-tomato-paprika': { type: 'fixed', options: ['1 шт (200 г)', '1 шт (250 г)'] },
-            'kosichka': { type: 'fixed', options: ['1 шт (200 г)'] },
-            'kosichka-smoked': { type: 'fixed', options: ['1 шт (200 г)'] },
-            'spicy-klubok': { type: 'fixed', options: ['1 шт (150 г)'] },
-            'mozzarella': { type: 'fixed', options: ['1 шт (200 г)'] },
-            'buratta': { type: 'fixed', options: ['1 шт (250 г)'] },
-            'stracciatella': { type: 'fixed', options: ['200 г', '250 г', '300 г', '500 г'] },
-            'ricotta': { type: 'fixed', options: ['200 г', '250 г', '300 г', '450 г'] },
-            'ricotta-herbs': { type: 'fixed', options: ['200 г', '250 г', '300 г', '450 г'] },
-            'caciotta': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
-            'caciotta-fenugreek': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
-            'hard-village': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'hard-smoked': { type: 'fixed', options: ['200 г', '300 г', '400 г', '500 г', '1000 г'] },
-            'rolls-olives-walnut': { type: 'weight', unit: 'г', step: 50, min: 100, max: 1000 },
-            'rolls-apricot-cedar': { type: 'weight', unit: 'г', step: 50, min: 100, max: 1000 },
-            // Молочная продукция
-            'milk': { type: 'fixed', options: ['0.5 л', '1 л'] },
-            'milk-topped': { type: 'fixed', options: ['0.5 л', '1 л'] },
-            'yogurt': { type: 'fixed', options: ['0.5 л', '1 л'] },
-            'ryazhenka': { type: 'fixed', options: ['0.5 л', '1 л'] },
-            'whey': { type: 'fixed', options: ['1 л'] },
-            'cream': { type: 'fixed', options: ['0.2 л', '0.5 л', '1 л'] },
-            'tvorog': { type: 'weight', unit: 'г', step: 500, min: 500, max: 2000 },
-            'butter': { type: 'fixed', options: ['1 шт (200 г)'] }, // Special price for this pack
-            'ghee': { type: 'fixed', options: ['200 г', '500 г', '1000 г'] },
-            'condensed-milk': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
-            'tvorozhnaya-massa': { type: 'weight', unit: 'г', step: 100, min: 200, max: 1000 },
-            // Сладости и выпечка
-            'cookies-tvorog': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'cookies-oat': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'cookies-nut': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'cookies-carob': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'cookies-sandy': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'muffin-plain': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'muffin-carob': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'muffin-raisin': { type: 'weight', unit: 'г', step: 250, min: 250, max: 2000 },
-            'muffin-mix-plain-raisin': { type: 'fixed', options: ['0.5 кг'] },
-            'muffin-mix-plain-carob': { type: 'fixed', options: ['0.5 кг'] },
-            'muffin-mix-raisin-carob': { type: 'fixed', options: ['0.5 кг'] },
-            'sandesh-orange': { type: 'fixed', options: ['5 шт'] },
-            'sandesh-walnut': { type: 'fixed', options: ['5 шт'] },
-            'sandesh-carob': { type: 'fixed', options: ['5 шт'] },
-            'barfi-classic': { type: 'fixed', options: ['5 шт'] },
-            'barfi-hazelnut': { type: 'fixed', options: ['5 шт'] },
-            'barfi-sesame': { type: 'fixed', options: ['7 шт'] },
-            'halva': { type: 'fixed', options: ['0.2 кг'] },
-            'potato-cake-5': { type: 'fixed', options: ['5 шт'] },
-            'potato-cake-2': { type: 'fixed', options: ['2 шт'] },
-            'casserole-plain': { type: 'fixed', options: ['250 г'] },
-            'casserole-raisin': { type: 'fixed', options: ['250 г'] },
-            'crazy-cake': { type: 'fixed', options: ['1 шт'] },
-            'coconut-kuchen-1kg': { type: 'fixed', options: ['1 кг'] },
-            'coconut-kuchen-05kg': { type: 'fixed', options: ['0.5 кг'] },
-            'napoleon-1kg': { type: 'fixed', options: ['1+ кг'] },
-            'napoleon-05kg': { type: 'fixed', options: ['0.5+ кг'] },
-            'apple-pie': { type: 'fixed', options: ['900 г'] },
-            'bliny-10': { type: 'fixed', options: ['10 шт'] },
-            'bliny-5': { type: 'fixed', options: ['5 шт'] },
-            'bliny-tvorog-5': { type: 'fixed', options: ['5 шт'] },
-            'syrniki-10': { type: 'fixed', options: ['10 шт'] },
-            'syrniki-5': { type: 'fixed', options: ['5 шт'] },
-            'chapati-10': { type: 'fixed', options: ['10 шт'] },
-            'chapati-wholewheat-10': { type: 'fixed', options: ['10 шт'] },
-        };
-
-        // --- STATE MANAGEMENT ---
-        let cart = [];
-        let currentProduct = null;
-        let filteredProducts = [];
-
-        // --- INITIALIZATION ---
-        function init() {
-            try {
-                loadState();
-                setupEventListeners();
-                setupTelegramWebApp();
-                renderUserProfile();
-                populateCategoryFilter();
-                filterAndSearchProducts();
-                updateCartUI();
-            } catch (e) {
-                console.error("An error occurred during initialization:", e);
-                const grid = document.getElementById('product-grid');
-                if (grid) {
-                    grid.innerHTML = `<p style="color: var(--error-color); text-align: center; padding: 20px;">Произошла ошибка при загрузке приложения. Пожалуйста, попробуйте обновить страницу.</p>`;
-                }
-            }
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ===== ДЕЙСТВИЯ =====
+    function setCategory(id) {
+      currentCategory = id;
+      renderCategories();
+      renderProducts();
+      if (HAPTIC_ENABLED) window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('light');
+    }
+    
+    function toggleFavorite(id) {
+      if (favorites.has(id)) {
+        favorites.delete(id);
+        showToast('Удалено из избранного');
+      } else {
+        favorites.add(id);
+        showToast('Добавлено в избранное');
+      }
+      saveState();
+      renderProducts();
+      updateBadges();
+      if (HAPTIC_ENABLED) window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('medium');
+    }
+    
+    function quickAdd(id) {
+      // Быстрое добавление с дефолтным весом
+      const product = PRODUCTS.find(p => p.id === id);
+      if (!product) return;
+      
+      let variant = '200 г';
+      const rule = VARIANT_RULES[id];
+      
+      if (rule) {
+        if (rule.type === 'fixed') {
+          variant = rule.options[0];
+        } else if (rule.type === 'weight') {
+          variant = `${rule.min} ${rule.unit}`;
         }
-
-        function loadState() {
-            try {
-                const savedCart = localStorage.getItem('syromania-cart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                }
-            } catch (e) {
-                console.warn("localStorage is not available. Starting with an empty cart.");
-                cart = [];
-            }
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem('syromania-cart', JSON.stringify(cart));
-            } catch (e) {
-                console.warn("Could not save state to localStorage.");
-            }
-        }
-
-        function setupTelegramWebApp() {
-            if (window.Telegram) {
-                const webApp = window.Telegram.WebApp;
-                webApp.ready();
-                webApp.expand();
-                applyTheme(webApp.themeParams, webApp.colorScheme);
-                webApp.MainButton.setText('Отправить заказ').onClick(sendOrder).hide();
-            } else {
-                console.warn('Telegram WebApp script is not loaded. Running in standalone mode.');
-                applyTheme({ bg_color: '#ffffff', text_color: '#000000', button_color: '#2481cc', button_text_color: '#ffffff' }, 'light');
-            }
-        }
-
-        function applyTheme(themeParams, colorScheme) {
-            const root = document.documentElement;
-            root.style.setProperty('--bg-color', themeParams.bg_color || '#ffffff');
-            root.style.setProperty('--text-color', themeParams.text_color || '#000000');
-            root.style.setProperty('--hint-color', themeParams.hint_color || '#999999');
-            root.style.setProperty('--link-color', themeParams.link_color || '#2481cc');
-            root.style.setProperty('--button-color', themeParams.button_color || '#2481cc');
-            root.style.setProperty('--button-text-color', themeParams.button_text_color || '#ffffff');
-            root.style.setProperty('--secondary-bg-color', colorScheme === 'dark' ? '#1a1a1a' : '#f7f7f7');
-            root.style.setProperty('--header-bg-color', colorScheme === 'dark' ? '#212121' : '#ffffff');
-            root.style.setProperty('--section-bg-color', colorScheme === 'dark' ? '#1a1a1a' : '#ffffff');
-            root.style.setProperty('--border-color', colorScheme === 'dark' ? '#333333' : '#e0e0e0');
-        }
-
-        // --- UI & RENDERING ---
-        function setupEventListeners() {
-            document.getElementById('search-input').addEventListener('input', filterAndSearchProducts);
-            document.getElementById('category-filter').addEventListener('change', filterAndSearchProducts);
-            document.getElementById('only-cheese-checkbox').addEventListener('change', filterAndSearchProducts);
-            document.getElementById('open-cart-btn').addEventListener('click', openCartModal);
-            document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
-            document.getElementById('product-variant-select').addEventListener('change', updateProductModalPrice);
-            document.getElementById('product-qty-input').addEventListener('input', updateProductModalPrice);
-        }
-
-        function renderUserProfile() {
-            const profileContainer = document.getElementById('user-profile');
-            let user = null;
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
-                user = window.Telegram.WebApp.initDataUnsafe.user;
-            }
-
-            if (user) {
-                profileContainer.innerHTML = `
-                    <div class="user-avatar">
-                        <img src="${user.photo_url}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span style="display:none;">${user.first_name.charAt(0).toUpperCase()}</span>
-                    </div>
-                    <div class="user-name">${user.first_name}</div>
-                `;
-            } else {
-                profileContainer.style.display = 'none';
-            }
-        }
-
-        function populateCategoryFilter() {
-            const categories = [...new Set(PRODUCTS.map(p => p.cat))].sort();
-            const select = document.getElementById('category-filter');
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                select.appendChild(option);
-            });
-        }
-
-        function filterAndSearchProducts() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const selectedCategory = document.getElementById('category-filter').value;
-            const onlyCheese = document.getElementById('only-cheese-checkbox').checked;
-
-            filteredProducts = PRODUCTS.filter(p => {
-                const hasPrice = p.pricePerKg || p.pricePerL || p.pricePerUnit;
-                if (!hasPrice) {
-                    console.warn(`TODO_PRICE: Product ${p.id} has no price.`);
-                    return false;
-                }
-
-                const matchesSearch = p.name.toLowerCase().includes(searchTerm);
-                const matchesCategory = !selectedCategory || p.cat === selectedCategory;
-                const matchesCheeseFilter = !onlyCheese || p.cat === 'Сыры';
-
-                return matchesSearch && matchesCategory && matchesCheeseFilter;
-            });
-
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            if (filteredProducts.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; color:var(--hint-color);">Ничего не найдено</p>';
-                return;
-            }
-            filteredProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => openProductModal(product.id);
-
-                const priceText = getPriceText(product);
-                card.innerHTML = `
-                    <div class="ico">${product.ico || '📦'}</div>
-                    <div class="name">${product.name}</div>
-                    <div class="price">${priceText}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function getPriceText(product) {
-            if (product.pricePerKg) return `${product.pricePerKg} ₽/кг`;
-            if (product.pricePerL) return `${product.pricePerL} ₽/л`;
-            if (product.pricePerUnit) return `${product.pricePerUnit} ₽`;
-            return 'Цена не указана';
-        }
-
-        // --- PRODUCT MODAL ---
-        function openProductModal(productId) {
-            currentProduct = PRODUCTS.find(p => p.id === productId);
-            if (!currentProduct) return;
-
-            const modal = document.getElementById('product-modal');
-            document.getElementById('product-modal-title').textContent = currentProduct.name;
-            document.getElementById('product-modal-ico').textContent = currentProduct.ico || '📦';
-            document.getElementById('product-modal-description').textContent = currentProduct.description || '';
-
-            renderVariantSelector();
-            updateProductModalPrice();
-
-            modal.showModal();
-        }
-
-        function closeProductModal() {
-            document.getElementById('product-modal').close();
-            currentProduct = null;
-        }
-
-        function renderVariantSelector() {
-            const select = document.getElementById('product-variant-select');
-            select.innerHTML = '';
-            const rule = VARIANT_RULES[currentProduct.id];
-
-            if (!rule) {
-                select.innerHTML = '<option>Вариант не определен</option>';
-                return;
-            }
-
-            if (rule.type === 'fixed') {
-                rule.options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt;
-                    option.textContent = opt;
-                    select.appendChild(option);
-                });
-            } else if (rule.type === 'weight') {
-                for (let value = rule.min; value <= rule.max; value += rule.step) {
-                    const option = document.createElement('option');
-                    option.value = `${value} ${rule.unit}`;
-                    option.textContent = `${value} ${rule.unit}`;
-                    select.appendChild(option);
-                }
-            }
-        }
-
-        function updateProductModalPrice() {
-            if (!currentProduct) return;
-            const variant = document.getElementById('product-variant-select').value;
-            const qty = parseInt(document.getElementById('product-qty-input').value) || 1;
-            const price = calculatePrice(currentProduct.id, variant, qty);
-            document.getElementById('product-modal-price').textContent = `${price.finalPrice} ₽`;
-        }
-
-        // --- CART LOGIC ---
-        function addToCart() {
-            if (!currentProduct) return;
-
-            const variant = document.getElementById('product-variant-select').value;
-            const qty = parseInt(document.getElementById('product-qty-input').value) || 1;
-
-            const existingItemIndex = cart.findIndex(item => item.id === currentProduct.id && item.variant === variant);
-
-            if (existingItemIndex > -1) {
-                cart[existingItemIndex].qty += qty;
-            } else {
-                cart.push({ id: currentProduct.id, name: currentProduct.name, cat: currentProduct.cat, variant, qty });
-            }
-
-            saveState();
-            updateCartUI();
-            closeProductModal();
-        }
-
-        function updateCartUI() {
-            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
-            const totalSum = cart.reduce((sum, item) => {
-                const price = calculatePrice(item.id, item.variant, item.qty);
-                return sum + price.finalPrice;
-            }, 0);
-
-            const cartButton = document.getElementById('open-cart-btn');
-            if (cart.length > 0) {
-                cartButton.disabled = false;
-                cartButton.textContent = `Корзина (${totalCount}) - ${totalSum} ₽`;
-            } else {
-                cartButton.disabled = true;
-                cartButton.textContent = 'Корзина пуста';
-            }
-
-            if (window.Telegram && window.Telegram.WebApp) {
-                const mainButton = window.Telegram.WebApp.MainButton;
-                if (cart.length > 0) {
-                    mainButton.setText(`Отправить заказ ${totalSum} ₽`);
-                    mainButton.show();
-                } else {
-                    mainButton.hide();
-                }
-            }
-        }
-
-        function openCartModal() {
-            renderCartModal();
-            document.getElementById('cart-modal').showModal();
-        }
-
-        function closeCartModal() {
-            document.getElementById('cart-modal').close();
-        }
-
-        function renderCartModal() {
-            const body = document.getElementById('cart-modal-body');
-            body.innerHTML = '';
-
-            if (cart.length === 0) {
-                body.innerHTML = '<p>Корзина пуста</p>';
-                return;
-            }
-
-            let totalSum = 0;
-            cart.forEach((item, index) => {
-                const price = calculatePrice(item.id, item.variant, item.qty);
-                totalSum += price.finalPrice;
-
-                const discountRate = getDiscountRateForProduct(item.id);
-                let discountHint = '';
-                if (discountRate > 0) {
-                    discountHint = `<div class="discount-hint">Скидка ${ROUND(discountRate * 100)}% применена</div>`;
-                }
-
-                const cartItemDiv = document.createElement('div');
-                cartItemDiv.className = 'cart-item';
-                cartItemDiv.innerHTML = `
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-variant">${item.variant}</div>
-                        <div class="cart-item-price">${price.finalPrice} ₽</div>
-                        ${discountHint}
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button onclick="changeItemQty(${index}, -1)">-</button>
-                            <span>${item.qty}</span>
-                            <button onclick="changeItemQty(${index}, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                body.appendChild(cartItemDiv);
-            });
-
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = 'cart-summary';
-            summaryDiv.innerHTML = `Итого: ${totalSum} ₽`;
-            body.appendChild(summaryDiv);
-
-            const sendOrderBtn = document.createElement('button');
-            sendOrderBtn.className = 'btn btn-primary';
-            sendOrderBtn.textContent = 'Отправить заказ';
-            sendOrderBtn.onclick = sendOrder;
-            body.appendChild(sendOrderBtn);
-        }
-
-        function changeItemQty(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
-            saveState();
-            updateCartUI();
-            renderCartModal();
-        }
-
-        // --- CALCULATIONS ---
-        function parseVariant(variantString) {
-            const match = variantString.match(/(\d+(?:\.\d+)?)\s*(г|кг|л|шт)/i);
-            if (match) {
-                const value = parseFloat(match[1]);
-                let unit = match[2].toLowerCase();
-                if (unit === 'г') return { value, unit: 'g' };
-                if (unit === 'кг') return { value, unit: 'kg' };
-                if (unit === 'л') return { value, unit: 'l' };
-                if (unit === 'шт') return { value, unit: 'pc' };
-            }
-            const specialMatch = variantString.match(/(\d+(?:\.\d+)?)\+\s*(кг|л)/i);
-            if (specialMatch) {
-                const value = parseFloat(specialMatch[1]);
-                const unit = specialMatch[2].toLowerCase();
-                if (unit === 'кг') return { value, unit: 'kg' };
-                if (unit === 'л') return { value, unit: 'l' };
-            }
-            return null;
-        }
-
-        function calculatePrice(productId, variant, qty) {
-            const product = PRODUCTS.find(p => p.id === productId);
-            if (!product) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
-
-            const rule = VARIANT_RULES[productId];
-            let basePrice = 0;
-
-            if (rule && rule.type === 'fixed' && product.pricePerUnit) {
-                basePrice = product.pricePerUnit * qty;
-            } else {
-                const parsedVariant = parseVariant(variant);
-                if (!parsedVariant) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
-
-                let pricePerUnit = 0;
-                if (product.pricePerKg) {
-                    pricePerUnit = product.pricePerKg;
-                    if (parsedVariant.unit === 'g') basePrice = (parsedVariant.value / 1000) * pricePerUnit;
-                    if (parsedVariant.unit === 'kg') basePrice = parsedVariant.value * pricePerUnit;
-                    if (parsedVariant.unit === 'pc') {
-                        const weightMatch = variant.match(/\((\d+)\s*г\)/);
-                        if (weightMatch) {
-                            const weightInKg = parseInt(weightMatch[1]) / 1000;
-                            basePrice = weightInKg * pricePerUnit;
-                        }
-                    }
-                } else if (product.pricePerL) {
-                    pricePerUnit = product.pricePerL;
-                    if (parsedVariant.unit === 'л') basePrice = parsedVariant.value * pricePerUnit;
-                } else if (product.pricePerUnit) {
-                    pricePerUnit = product.pricePerUnit;
-                    basePrice = pricePerUnit;
-                }
-                basePrice *= qty;
-            }
-
-            const discountRate = getDiscountRateForProduct(productId);
-            const finalPrice = ROUND(basePrice * (1 - discountRate));
-
-            return { basePrice: ROUND(basePrice), finalPrice, discountRate };
-        }
-
-        function getDiscountRateForProduct(productId) {
-            const product = PRODUCTS.find(p => p.id === productId);
-            if (!product || product.cat !== 'Сыры') return 0;
-
-            const totalWeightGrams = cart
-                .filter(item => item.id === productId)
-                .reduce((sum, item) => {
-                    const parsed = parseVariant(item.variant);
-                    if (parsed && parsed.unit === 'g') return sum + (parsed.value * item.qty);
-                    if (parsed && parsed.unit === 'kg') return sum + (parsed.value * 1000 * item.qty);
-                    if (parsed && parsed.unit === 'pc') {
-                        const weightMatch = item.variant.match(/\((\d+)\s*г\)/);
-                        if (weightMatch) return sum + (parseInt(weightMatch[1]) * item.qty);
-                    }
-                    return sum;
-                }, 0);
-
-            let applicableDiscount = 0;
-            for (const threshold of DISCOUNT_THRESHOLDS) {
-                if (totalWeightGrams >= threshold.g) {
-                    applicableDiscount = threshold.rate;
-                }
-            }
-            return applicableDiscount;
-        }
-
-
-
-        // --- ORDER SUBMISSION --- //
-        function sendOrder() {
-            if (cart.length === 0) return;
-
-            const payload = {
-                type: "cart",
-                source: "miniapp",
-                currency: CURRENCY,
-                items: [],
-                total: 0,
-                meta: {
-                    ts: Date.now(),
-                    schema_ver: PAYLOAD_SCHEMA_VERSION
-                }
+      } else if (product.pricePerL) {
+        variant = '1 л';
+      } else if (product.pricePerUnit) {
+        variant = '1 шт';
+      }
+      
+      addToCart(id, variant, 1);
+      animateFlyToCart(event.target);
+    }
+    
+    function openProductModal(id) {
+      const product = PRODUCTS.find(p => p.id === id);
+      if (!product) return;
+      
+      currentProduct = product;
+      selectedVariantIndex = 0;
+      
+      // Проверяем, является ли товар комбо (с вариантами)
+      if (product.isCombo && PRODUCT_VARIANTS[product.comboKey]) {
+        currentVariant = PRODUCT_VARIANTS[product.comboKey];
+        renderVariantTabs();
+      } else {
+        currentVariant = null;
+        document.getElementById('variants-section').classList.add('hidden');
+      }
+      
+      updateModalContent();
+      document.getElementById('product-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      if (HAPTIC_ENABLED) window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('medium');
+    }
+    
+    function renderVariantTabs() {
+      if (!currentVariant) return;
+      
+      const section = document.getElementById('variants-section');
+      const tabs = document.getElementById('variant-tabs');
+      
+      section.classList.remove('hidden');
+      tabs.innerHTML = currentVariant.variants.map((v, i) => `
+        <button class="variant-tab ${i === selectedVariantIndex ? 'active' : ''}" 
+                onclick="selectVariant(${i})">
+          ${v.name}
+        </button>
+      `).join('');
+    }
+    
+    function selectVariant(index) {
+      selectedVariantIndex = index;
+      renderVariantTabs();
+      updateModalContent();
+      if (HAPTIC_ENABLED) window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('light');
+    }
+    
+    function updateModalContent() {
+      if (!currentProduct) return;
+      
+      const variant = currentVariant?.variants?.[selectedVariantIndex];
+      const displayProduct = variant || currentProduct;
+      
+      document.getElementById('modal-image').src = displayProduct.img || currentProduct.img || DEFAULT_IMG;
+      document.getElementById('modal-title').textContent = currentProduct.name;
+      document.getElementById('modal-description').textContent = currentProduct.description;
+      
+      // Обновляем кнопку избранного
+      const favBtn = document.getElementById('modal-fav-btn');
+      const isFav = favorites.has(currentProduct.id);
+      favBtn.classList.toggle('active', isFav);
+      favBtn.textContent = isFav ? '♥' : '♡';
+      
+      // Рендерим таблетки веса
+      renderWeightPills();
+      
+      // Обновляем цену
+      updateModalPrice();
+    }
+    
+    function renderWeightPills() {
+      const container = document.getElementById('weight-pills');
+      const customSection = document.getElementById('custom-weight-section');
+      const rule = VARIANT_RULES[currentProduct.id];
+      
+      container.innerHTML = '';
+      
+      if (rule) {
+        if (rule.type === 'fixed') {
+          customSection.classList.add('hidden');
+          rule.options.forEach((opt, i) => {
+            const pill = document.createElement('button');
+            pill.className = `weight-pill ${i === 0 ? 'active' : ''}`;
+            pill.textContent = opt;
+            pill.onclick = () => selectWeightPill(pill, opt);
+            container.appendChild(pill);
+          });
+        } else if (rule.type === 'weight') {
+          // Весовые товары - показываем таблетки + слайдер
+          const weights = [];
+          for (let g = rule.min; g <= Math.min(rule.max, 1000); g += rule.step) {
+            weights.push(g);
+          }
+          
+          weights.forEach((g, i) => {
+            const pill = document.createElement('button');
+            pill.className = `weight-pill ${g === selectedWeight ? 'active' : ''}`;
+            pill.textContent = `${g} г`;
+            pill.onclick = () => {
+              selectedWeight = g;
+              renderWeightPills();
+              updateModalPrice();
             };
-
-            let grandTotal = 0;
-            cart.forEach(item => {
-                const price = calculatePrice(item.id, item.variant, item.qty);
-                grandTotal += price.finalPrice;
-                payload.items.push({
-                    id: item.id,
-                    name: item.name,
-                    cat: item.cat,
-                    variant: item.variant,
-                    qty: item.qty,
-                    unit_price_base: price.basePrice / item.qty,
-                    discount_rate: price.discountRate,
-                    unit_price: price.finalPrice / item.qty,
-                    line_total: price.finalPrice
-                });
-            });
-            payload.total = grandTotal;
-
-            axios.post('https://puzzlebot-webhook-handler1.onrender.com/', payload)
-                .then(function (response) {
-                    alert('Ваш заказ принят');
-                    window.Telegram.WebApp.close();
-                })
-                .catch(function (error) {
-                    alert('ошибка');
-                });
+            container.appendChild(pill);
+          });
+          
+          // Слайдер для произвольного веса
+          customSection.classList.remove('hidden');
+          const slider = document.getElementById('weight-slider');
+          const input = document.getElementById('weight-input');
+          
+          slider.min = rule.min;
+          slider.max = Math.min(rule.max, 1000);
+          slider.step = rule.step;
+          slider.value = selectedWeight;
+          input.value = selectedWeight;
+          
+          slider.oninput = (e) => {
+            selectedWeight = parseInt(e.target.value);
+            input.value = selectedWeight;
+            updateModalPrice();
+          };
+          
+          input.oninput = (e) => {
+            let val = parseInt(e.target.value) || rule.min;
+            val = Math.max(rule.min, Math.min(Math.min(rule.max, 1000), val));
+            selectedWeight = val;
+            slider.value = val;
+            updateModalPrice();
+          };
         }
-
-        // --- START --- //
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+      } else {
+        // Дефолтные варианты
+        customSection.classList.add('hidden');
+        if (currentProduct.pricePerKg) {
+          [200, 400, 600, 800, 1000].forEach((g, i) => {
+            const pill = document.createElement('button');
+            pill.className = `weight-pill ${g === selectedWeight ? 'active' : ''}`;
+            pill.textContent = `${g} г`;
+            pill.onclick = () => {
+              selectedWeight = g;
+              renderWeightPills();
+              updateModalPrice();
+            };
+            container.appendChild(pill);
+          });
+        } else if (currentProduct.pricePerL) {
+          ['0.5 л', '1 л'].forEach((opt, i) => {
+            const pill = document.createElement('button');
+            pill.className = `weight-pill ${i === 0 ? 'active' : ''}`;
+            pill.textContent = opt;
+            pill.onclick = () => selectWeightPill(pill, opt);
+            container.appendChild(pill);
+          });
+        } else if (currentProduct.pricePerUnit) {
+          const pill = document.createElement('button');
+          pill.className = 'weight-pill active';
+          pill.textContent = '1 шт';
+          container.appendChild(pill);
+        }
+      }
+    }
+    
+    function selectWeightPill(pill, value) {
+      document.querySelectorAll('.weight-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      updateModalPrice();
+    }
+    
+    function getSelectedVariant() {
+      const activePill = document.querySelector('.weight-pill.active');
+      if (activePill) {
+        const text = activePill.textContent;
+        if (text.includes('г') || text.includes('л') || text.includes('шт')) {
+          return text;
+        }
+      }
+      return `${selectedWeight} г`;
+    }
+    
+    function updateModalPrice() {
+      const variant = getSelectedVariant();
+      const qty = 1;
+      const price = calculatePrice(currentProduct.id, variant, qty);
+      
+      document.getElementById('modal-price').textContent = formatPrice(price.finalPrice);
+      
+      const oldPriceEl = document.getElementById('modal-old-price');
+      const discountEl = document.getElementById('modal-discount');
+      
+      if (price.discountRate > 0) {
+        oldPriceEl.textContent = formatPrice(price.basePrice);
+        oldPriceEl.classList.remove('hidden');
+        discountEl.textContent = `−${Math.round(price.discountRate * 100)}%`;
+        discountEl.classList.remove('hidden');
+      } else {
+        oldPriceEl.classList.add('hidden');
+        discountEl.classList.add('hidden');
+      }
+    }
+    
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.remove('active');
+      document.body.style.overflow = '';
+      currentProduct = null;
+    }
+    
+    function toggleModalFavorite() {
+      if (currentProduct) {
+        toggleFavorite(currentProduct.id);
+        const favBtn = document.getElementById('modal-fav-btn');
+        const isFav = favorites.has(currentProduct.id);
+        favBtn.classList.toggle('active', isFav);
+        favBtn.textContent = isFav ? '♥' : '♡';
+      }
+    }
+    
+    function addToCartFromModal() {
+      if (!currentProduct) return;
+      
+      const variant = getSelectedVariant();
+      const variantData = currentVariant?.variants?.[selectedVariantIndex];
+      const productId = variantData ? variantData.id : currentProduct.id;
+      const productName = variantData ? `${currentProduct.name} (${variantData.name})` : currentProduct.name;
+      
+      addToCart(productId, variant, 1, productName);
+      closeProductModal();
+    }
+    
+    function addToCart(id, variant, qty, customName = null) {
+      const existing = cart.find(item => item.id === id && item.variant === variant);
+      
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        const product = PRODUCTS.find(p => p.id === id) || 
+                       Object.values(PRODUCT_VARIANTS).flatMap(v => v.variants).find(v => v.id === id);
+        cart.push({
+          id,
+          name: customName || product?.name || id,
+          variant,
+          qty,
+          group: product?.group || 'other'
+        });
+      }
+      
+      saveState();
+      updateBadges();
+      showToast('Добавлено в корзину');
+      
+      if (HAPTIC_ENABLED) window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('medium');
+    }
+    
+    // ===== КОРЗИНА =====
+    function openCart() {
+      renderCart();
+      document.getElementById('cart-sheet').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeCart() {
+      document.getElementById('cart-sheet').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    function renderCart() {
+      const container = document.getElementById('cart-items');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <div class="empty-title">Корзина пуста</div>
+            <p>Добавьте товары из каталога</p>
+          </div>
+        `;
+        document.getElementById('cart-summary').innerHTML = '';
+        return;
+      }
+      
+      container.innerHTML = cart.map((item, index) => {
+        const price = calculatePrice(item.id, item.variant, item.qty);
+        const product = PRODUCTS.find(p => p.id === item.id) || 
+                       Object.values(PRODUCT_VARIANTS).flatMap(v => v.variants).find(v => v.id === item.id);
+        
+        return `
+          <div class="cart-item">
+            <img class="cart-item-image" src="${product?.img || DEFAULT_IMG}" alt="">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-variant">${item.variant}</div>
+              <div class="cart-item-price">${formatPrice(price.finalPrice)}</div>
+            </div>
+            <div class="cart-item-controls">
+              <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+              <span>${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Сводка
+      let total = 0;
+      let baseTotal = 0;
+      cart.forEach(item => {
+        const price = calculatePrice(item.id, item.variant, item.qty);
+        total += price.finalPrice;
+        baseTotal += price.basePrice;
+      });
+      
+      const discount = baseTotal - total;
+      
+      document.getElementById('cart-summary').innerHTML = `
+        <div class="summary-row">
+          <span>Сумма</span>
+          <span>${formatPrice(baseTotal)}</span>
+        </div>
+        ${discount > 0 ? `
+          <div class="summary-row discount">
+            <span>Скидка</span>
+            <span>−${formatPrice(discount)}</span>
+          </div>
+        ` : ''}
+        <div class="summary-row total">
+          <span>Итого</span>
+          <span>${formatPrice(total)}</span>
+        </div>
+      `;
+      
+      // Заполняем сохранённые данные
+      document.getElementById('checkout-phone').value = checkoutState.phone;
+      document.getElementById('checkout-address').value = checkoutState.address;
+      document.getElementById('checkout-comment').value = checkoutState.comment;
+      document.getElementById('checkout-promo').value = checkoutState.promo;
+      document.getElementById('checkout-city').value = checkoutState.city;
+    }
+    
+    function changeQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+      saveState();
+      renderCart();
+      updateBadges();
+    }
+    
+    // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
+    function submitOrder() {
+      if (cart.length === 0) return;
+      
+      const phone = document.getElementById('checkout-phone').value.trim();
+      const address = document.getElementById('checkout-address').value.trim();
+      const comment = document.getElementById('checkout-comment').value.trim();
+      const promo = document.getElementById('checkout-promo').value.trim().toUpperCase();
+      const city = document.getElementById('checkout-city').value;
+      
+      checkoutState = { phone, address, comment, promo, city };
+      saveState();
+      
+      if (!phone) {
+        showToast('Укажите телефон');
+        return;
+      }
+      if (!address) {
+        showToast('Укажите адрес');
+        return;
+      }
+      
+      showLoader('Отправляем заказ...');
+      
+      const payload = {
+        type: 'cart',
+        source: 'miniapp',
+        currency: CURRENCY,
+        items: cart.map(item => {
+          const price = calculatePrice(item.id, item.variant, item.qty);
+          return {
+            id: item.id,
+            name: item.name,
+            variant: item.variant,
+            qty: item.qty,
+            price: price.finalPrice / item.qty,
+            total: price.finalPrice
+          };
+        }),
+        total: cart.reduce((sum, item) => sum + calculatePrice(item.id, item.variant, item.qty).finalPrice, 0),
+        contact: { phone, address, comment, promo, city },
+        timestamp: Date.now()
+      };
+      
+      if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+        payload.user = window.Telegram.WebApp.initDataUnsafe.user;
+      }
+      
+      // Отправка
+      if (typeof axios !== 'undefined') {
+        axios.post(`${BACKEND}/order`, payload)
+          .then(() => {
+            hideLoader();
+            showToast('Заказ отправлен!');
+            cart = [];
+            saveState();
+            updateBadges();
+            closeCart();
+            setTimeout(() => {
+              window.Telegram?.WebApp?.close?.();
+            }, 1500);
+          })
+          .catch(err => {
+            hideLoader();
+            showToast('Ошибка отправки. Попробуйте ещё раз.');
+            console.error(err);
+          });
+      } else {
+        // Демо режим
+        setTimeout(() => {
+          hideLoader();
+          showToast('Заказ отправлен! (демо)');
+          console.log('ORDER:', payload);
+          cart = [];
+          saveState();
+          updateBadges();
+          closeCart();
+        }, 1500);
+      }
+    }
+    
+    // ===== УТИЛИТЫ =====
+    function calculatePrice(productId, variant, qty) {
+      // Ищем продукт в основном списке или в вариантах
+      let product = PRODUCTS.find(p => p.id === productId);
+      if (!product) {
+        // Ищем в комбо-вариантах
+        for (const combo of Object.values(PRODUCT_VARIANTS)) {
+          const variantProduct = combo.variants.find(v => v.id === productId);
+          if (variantProduct) {
+            product = { ...combo, ...variantProduct };
+            break;
+          }
+        }
+      }
+      
+      if (!product) return { basePrice: 0, finalPrice: 0, discountRate: 0 };
+      
+      let base = 0;
+      
+      if (product.pricePerKg) {
+        const grams = extractGrams(variant) || 200;
+        base = (grams / 1000) * product.pricePerKg * qty;
+      } else if (product.pricePerL) {
+        const liters = extractLiters(variant) || 1;
+        base = liters * product.pricePerL * qty;
+      } else if (product.pricePerUnit) {
+        base = product.pricePerUnit * qty;
+      }
+      
+      // Скидка только для сыров
+      let discountRate = 0;
+      if (CHEESE_GROUP_IDS.has(product.group)) {
+        const totalGrams = cart
+          .filter(i => i.id === productId)
+          .reduce((sum, i) => sum + (extractGrams(i.variant) || 0) * i.qty, 0);
+        
+        for (const threshold of DISCOUNT_THRESHOLDS) {
+          if (totalGrams >= threshold.g) discountRate = threshold.rate;
+        }
+      }
+      
+      return {
+        basePrice: Math.round(base),
+        finalPrice: Math.round(base * (1 - discountRate)),
+        discountRate
+      };
+    }
+    
+    function extractGrams(variant) {
+      const match = variant.match(/(\d+)\s*г/);
+      return match ? parseInt(match[1]) : 0;
+    }
+    
+    function extractLiters(variant) {
+      const match = variant.match(/(\d+(?:\.\d+)?)\s*л/);
+      return match ? parseFloat(match[1]) : 0;
+    }
+    
+    function getPriceText(product) {
+      if (product.pricePerKg) return formatPrice(product.pricePerKg);
+      if (product.pricePerL) return formatPrice(product.pricePerL);
+      if (product.pricePerUnit) return formatPrice(product.pricePerUnit);
+      return 'Цена не указана';
+    }
+    
+    function formatPrice(price) {
+      return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
+    }
+    
+    function updateBadges() {
+      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const cartBadge = document.getElementById('cart-badge');
+      const favBadge = document.getElementById('fav-badge');
+      
+      cartBadge.textContent = cartCount;
+      cartBadge.classList.toggle('hidden', cartCount === 0);
+      
+      favBadge.textContent = favorites.size;
+      favBadge.classList.toggle('hidden', favorites.size === 0);
+    }
+    
+    function updateUI() {
+      updateBadges();
+    }
+    
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      container.appendChild(toast);
+      
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+    
+    function showLoader(text = 'Загрузка...') {
+      document.getElementById('loader-text').textContent = text;
+      document.getElementById('loader').classList.add('active');
+    }
+    
+    function hideLoader() {
+      document.getElementById('loader').classList.remove('active');
+    }
+    
+    function animateFlyToCart(element) {
+      const rect = element.getBoundingClientRect();
+      const cartBtn = document.querySelector('.nav-item[onclick="openCart()"]');
+      const cartRect = cartBtn.getBoundingClientRect();
+      
+      const flyer = document.createElement('div');
+      flyer.className = 'flying-item';
+      flyer.style.left = rect.left + 'px';
+      flyer.style.top = rect.top + 'px';
+      flyer.style.setProperty('--cart-x', (cartRect.left - rect.left) + 'px');
+      flyer.style.setProperty('--cart-y', (cartRect.top - rect.top) + 'px');
+      
+      document.body.appendChild(flyer);
+      setTimeout(() => flyer.remove(), 600);
+    }
+    
+    // ===== НАВИГАЦИЯ =====
+    function showHome() {
+      currentCategory = 'all';
+      document.getElementById('search-input').value = '';
+      renderCategories();
+      renderProducts();
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelector('.nav-item[onclick="showHome()"]').classList.add('active');
+    }
+    
+    function showFavorites() {
+      const favProducts = PRODUCTS.filter(p => favorites.has(p.id));
+      const grid = document.getElementById('products-grid');
+      const hitsSection = document.getElementById('hits-section');
+      const categoriesSection = document.getElementById('categories-section');
+      const emptyState = document.getElementById('empty-state');
+      
+      hitsSection.classList.add('hidden');
+      categoriesSection.classList.add('hidden');
+      
+      if (favProducts.length === 0) {
+        grid.innerHTML = '';
+        emptyState.innerHTML = `
+          <div class="empty-icon">♡</div>
+          <div class="empty-title">Нет избранного</div>
+          <p>Добавьте товары в избранное</p>
+        `;
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        grid.innerHTML = favProducts.map(p => {
+          const isFav = favorites.has(p.id);
+          return `
+            <div class="product-card" onclick="openProductModal('${p.id}')" data-id="${p.id}">
+              <div class="product-image-wrap">
+                <img class="product-image" src="${p.img || DEFAULT_IMG}" alt="" loading="lazy">
+                <button class="fav-btn ${isFav ? 'active' : ''}" 
+                        onclick="event.stopPropagation(); toggleFavorite('${p.id}')">
+                  ${isFav ? '♥' : '♡'}
+                </button>
+                <button class="quick-add" onclick="event.stopPropagation(); quickAdd('${p.id}')">
+                  +
+                </button>
+              </div>
+              <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">${getPriceText(p)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelector('.nav-item[onclick="showFavorites()"]').classList.add('active');
+    }
+    
+    function showProfile() {
+      showToast('Профиль в разработке');
+    }
+    
+    // ===== СОБЫТИЯ =====
+    function setupEventListeners() {
+      // Поиск
+      document.getElementById('search-input').addEventListener('input', () => {
+        renderProducts();
+      });
+      
+      // Закрытие модалок по Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeProductModal();
+          closeCart();
+        }
+      });
+      
+      // Сохранение данных формы
+      ['checkout-phone', 'checkout-address', 'checkout-comment', 'checkout-promo'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', (e) => {
+          checkoutState[id.replace('checkout-', '')] = e.target.value;
+          saveState();
+        });
+      });
+      
+      document.getElementById('checkout-city')?.addEventListener('change', (e) => {
+        checkoutState.city = e.target.value;
+        saveState();
+      });
+    }
+  </script>
 </body>
-
 </html>
