@@ -1808,8 +1808,7 @@ dialog::backdrop{background:rgba(27,21,15,.48);backdrop-filter:blur(5px);-webkit
         }
 
         if(typeof axios === 'undefined'){
-          console.log('ORDER PAYLOAD', payload);
-          alert('axios не подключён, заказ выведен в консоль.');
+          window.Telegram?.WebApp?.showAlert?.('Не удалось подготовить заказ. Попробуйте ещё раз.');
           return;
         }
 
